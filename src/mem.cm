@@ -1,0 +1,97 @@
+//
+
+@attribute("c-no-print")
+import "libc/stdio.hm"
+
+import "./mem.hm"
+
+
+var ram: [RAM_SIZE]Nat8
+
+func get_ram_ptr() -> *[]Nat8 {
+    return &ram
+}
+
+func vm_mem_read8(adr: Nat32) -> Nat8 {
+    if (adr >= RAM_START) and (adr <= RAM_END) {
+        let p = &ram[adr - RAM_START] to Pointer to *Nat8
+        return *p
+    } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
+        return 0
+    } else {
+        // memory voilation
+    }
+    
+    return 0
+}
+
+func vm_mem_read16(adr: Nat32) -> Nat16 {
+    if (adr >= RAM_START) and (adr <= RAM_END) {
+        let p = &ram[adr - RAM_START] to Pointer to *Nat16
+        return *p
+    } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
+        return 0
+    } else {
+        // memory voilation
+    }
+    
+    return 0
+}
+
+func vm_mem_read32(adr: Nat32) -> Nat32 {
+    if (adr >= RAM_START) and (adr <= RAM_END) {
+        let p = &ram[adr - RAM_START] to Pointer to *Nat32
+        return *p
+    } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
+        return 0
+    } else {
+        // memory voilation
+    }
+    
+    return 0
+}
+
+
+
+func vm_mem_write8(adr: Nat32, value: Nat8) {
+    if (adr >= RAM_START) and (adr <= RAM_END) {
+        let p = &ram[adr - RAM_START] to Pointer to *Nat8
+        *p := value
+    } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
+        if adr == CONSOLE_PUT_ADR {
+            putchar(value to Int)
+            return
+        }
+    } else {
+        // memory voilation
+    }
+}
+
+func vm_mem_write16(adr: Nat32, value: Nat16) {
+    if (adr >= RAM_START) and (adr <= RAM_END) {
+        let p = &ram[adr - RAM_START] to Pointer to *Nat16
+        *p := value
+    } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
+        if adr == CONSOLE_PUT_ADR {
+            putchar(value to Int)
+            return
+        }
+    } else {
+        // memory voilation
+    }
+}
+
+func vm_mem_write32(adr: Nat32, value: Nat32) {
+    if (adr >= RAM_START) and (adr <= RAM_END) {
+        let p = &ram[adr - RAM_START] to Pointer to *Nat32
+        *p := value
+    } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
+        if adr == CONSOLE_PUT_ADR {
+            putchar(value to Int)
+            return
+        }
+    } else {
+        // memory voilation
+    }
+}
+

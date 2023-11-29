@@ -1,0 +1,50 @@
+
+const NREGS = 32
+
+
+type MemoryInterface record {
+    read8: *(adr: Nat32) -> Nat8
+    read16: *(adr: Nat32) -> Nat16
+    read32: *(adr: Nat32) -> Nat32
+
+    write8: *(adr: Nat32, value: Nat8) -> Unit
+    write16: *(adr: Nat32, value: Nat16) -> Unit
+    write32: *(adr: Nat32, value: Nat32) -> Unit
+}
+
+
+type Core record {
+    reg: [NREGS]Int32
+    ip: Nat32
+    sp: Nat32
+    
+    need_step : Bool
+    
+    memctl: *MemoryInterface
+    
+    text: *[]Nat32
+    textlen: Nat32
+}
+
+
+const OP_NOP = 0
+
+const OPCODE_LUI = 0x37
+const OPCODE_AUI_PC = 0x17
+const OPCODE_JAL = 0x6F
+const OPCODE_JALR = 0x67
+const OP_B = 0x63  // branch
+const OP_L = 0x03  // load
+const OP_S = 0x23  // store
+const OP_I = 0x13
+const OP_R = 0x33
+const OP_ECALL = 0x00000073
+const OP_EBREAK = 0x00100073
+const OP_PAUSE = 0x0100000F
+
+const OP_STOP = 0
+
+
+func core_init(core: *Core, memctl: *MemoryInterface, text: *[]Nat32, textlen: Nat32, sp: Nat32)
+func core_tick(core: *Core) -> Bool
+

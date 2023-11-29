@@ -1,0 +1,25 @@
+//
+
+// see mem.ld
+const RAM_START = 0x10000000
+const RAM_SIZE = 0x08000
+const RAM_END = RAM_START + RAM_SIZE
+
+const MMIO_START = 0xF00C0000
+const MMMIO_SIZE  = 0xFFFF
+const MMIO_END = MMIO_START + MMMIO_SIZE
+
+const CONSOLE_MMIO_ADR = MMIO_START + 0x10
+const CONSOLE_PUT_ADR  = CONSOLE_MMIO_ADR + 0
+const CONSOLE_GET_ADR  = CONSOLE_MMIO_ADR + 1
+
+func get_ram_ptr() -> *[]Nat8
+
+func vm_mem_read8(adr: Nat32) -> Nat8
+func vm_mem_read16(adr: Nat32) -> Nat16
+func vm_mem_read32(adr: Nat32) -> Nat32
+
+func vm_mem_write8(adr: Nat32, value: Nat8)
+func vm_mem_write16(adr: Nat32, value: Nat16)
+func vm_mem_write32(adr: Nat32, value: Nat32)
+
