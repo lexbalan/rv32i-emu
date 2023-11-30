@@ -1,3 +1,2 @@
 # riscv-emu
-# riscv-emu
-# riscv-emu
+Just for fun; now in research.
