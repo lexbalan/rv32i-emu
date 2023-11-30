@@ -178,7 +178,7 @@ declare i32 @puts(%ConstCharStr*)
 declare i32 @ungetc(i32, %FILE*)
 declare void @perror(%ConstCharStr*)
 
-; -- SOURCE: /Users/alexbalan/p/Modest/examples/vm/src/core.hm
+; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/core.hm
 
 
 
@@ -257,42 +257,6 @@ declare void @perror(%ConstCharStr*)
 @str44 = private constant [14 x i8] [i8 10, i8 10, i8 42, i8 32, i8 42, i8 32, i8 42, i8 32, i8 83, i8 84, i8 79, i8 80, i8 10, i8 0]
 @str45 = private constant [22 x i8] [i8 85, i8 78, i8 75, i8 78, i8 79, i8 87, i8 78, i8 32, i8 79, i8 80, i8 67, i8 79, i8 68, i8 69, i8 58, i8 32, i8 37, i8 48, i8 56, i8 88, i8 10, i8 0]
 
-
-
-@instructions = global [32 x i32] [
-    i32 16823,
-    i32 3224469915,
-    i32 18977171,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0,
-    i32 0
-]
 
 define void @core_init(%Core* %core, %MemoryInterface* %memctl, [0 x i32]* %text, i32 %textlen, i32 %sp) {
     %1 = bitcast %Core* %core to i8*
@@ -549,10 +513,11 @@ then_9:
     %74 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
     %75 = getelementptr inbounds [32 x i32], [32 x i32]* %74, i32 0, i8 %6
     %76 = load i32, i32* %75
-    %77 = xor i32 %76, %4
+    %77 = and i32 %76, %4
     %78 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
     %79 = getelementptr inbounds [32 x i32], [32 x i32]* %78, i32 0, i8 %5
     store i32 %77, i32* %79
+    ;printf("ANDI=%x\n", core.reg[rd])
     br label %endif_9
 endif_9:
     br label %endif_8

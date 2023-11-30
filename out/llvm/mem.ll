@@ -89,7 +89,7 @@ declare i32 @puts(%ConstCharStr*)
 declare i32 @ungetc(i32, %FILE*)
 declare void @perror(%ConstCharStr*)
 
-; -- SOURCE: /Users/alexbalan/p/Modest/examples/vm/src/mem.hm
+; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/mem.hm
 
 
 

@@ -6,39 +6,6 @@ import "libc/stdio.hm"
 
 import "./core.hm"
 
-/*
-    0x00828103
-    0x3e800093
-    0x7d008113
-    0xc1810193
-    0x83018213
-    0x3e820293
-    0x003100b3
-    0xfffff337
-    0xfffff317
-    0xfe5ff36f
-    0x0ff100e7
-    0xfe8086e3
-    0xfe8094e3
-    0xfe80c2e3
-    0xfe80d0e3
-    0xfc80eee3
-    0xfc80fce3
-    0x003110b3
-    0x403100b3
-    0x003120b3
-    0x003130b3
-    0x003150b3
-    0x403150b3
-    
-*/
-
-var instructions: [32]Nat32 = [
-    0x000041b7
-    0xc031819b
-    0x01219193
-    OP_STOP
-]
 
 func core_init(core: *Core, memctl: *MemoryInterface, text: *[]Nat32, textlen: Nat32, sp: Nat32) {
     memset(core, 0, sizeof(Core))
@@ -160,7 +127,8 @@ is an arithmetic right shift (the original sign bit is copied into the vacated u
 
     } else if funct3 == 7 {
         printf("andi x%d, x%d, %d\n", rd, rs1, imm)
-        core.reg[rd] := core.reg[rs1] xor imm
+        core.reg[rd] := core.reg[rs1] and imm
+		//printf("ANDI=%x\n", core.reg[rd])
     }
 }
 

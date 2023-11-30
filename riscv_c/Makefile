@@ -6,6 +6,8 @@ all:
 	ld.lld -T mem.ld -o main.elf main.o
 	llvm-objcopy -Iriscv32 main.elf --only-section=.text -Obinary text.bin
 	llvm-objcopy -Iriscv32 main.elf --only-section=.data -Obinary data.bin
+
+	llvm-objdump -d ./main.elf >> ./dump.txt
     
     #llvm-objcopy -Iriscv32 main.elf --only-section=.text --only-section=.data -Obinary out.bin
 	#llvm-objcopy -Iriscv32 main.o --only-section=.text -Obinary out.bin

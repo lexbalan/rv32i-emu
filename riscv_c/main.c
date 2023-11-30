@@ -10,13 +10,22 @@
 #define CONSOLE_PUT  (*((volatile char *)CONSOLE_PUT_ADR))
 #define CONSOLE_GET  (*((volatile char *)CONSOLE_PUT_ADR))
 
+
 int main() {
 	int i = 0;
 	
-	while (i < 10) {
-		CONSOLE_PUT = '0' + i;
+	while (1) {
+		if (i & 1) {
+			CONSOLE_PUT = '0' + i;
+		}
 		i = i + 1;
+
+		if (i > 10) {
+			break;
+		}
 	}
 	
+	asm("ebreak");
+
     return 0;
 }

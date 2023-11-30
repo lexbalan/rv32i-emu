@@ -178,7 +178,7 @@ declare i32 @puts(%ConstCharStr*)
 declare i32 @ungetc(i32, %FILE*)
 declare void @perror(%ConstCharStr*)
 
-; -- SOURCE: /Users/alexbalan/p/Modest/examples/vm/src/mem.hm
+; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/mem.hm
 
 
 
@@ -191,7 +191,7 @@ declare void @vm_mem_write8(i32, i8)
 declare void @vm_mem_write16(i32, i16)
 declare void @vm_mem_write32(i32, i32)
 
-; -- SOURCE: /Users/alexbalan/p/Modest/examples/vm/src/core.hm
+; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/core.hm
 
 
 
