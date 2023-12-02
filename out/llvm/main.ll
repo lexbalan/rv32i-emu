@@ -236,7 +236,9 @@ declare i1 @core_tick(%Core*)
 @str7 = private constant [11 x i8] [i8 72, i8 101, i8 108, i8 108, i8 111, i8 32, i8 86, i8 77, i8 33, i8 10, i8 0]
 @str8 = private constant [7 x i8] [i8 83, i8 84, i8 65, i8 82, i8 84, i8 10, i8 0]
 @str9 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
-@str10 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
+@str10 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
+@str11 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
+@str12 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
 
 
 
@@ -310,7 +312,7 @@ break_1:
     br label %again_2
 again_2:
     %19 = load i32, i32* %i
-    %20 = icmp slt i32 %19, 32
+    %20 = icmp slt i32 %19, 16
     br i1 %20 , label %body_2, label %break_2
 body_2:
     %21 = load i32, i32* %i
@@ -318,10 +320,19 @@ body_2:
     %23 = load i32, i32* %i
     %24 = getelementptr inbounds [32 x i32], [32 x i32]* %22, i32 0, i32 %23
     %25 = load i32, i32* %24
-    %26 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([16 x i8]* @str10 to [0 x i8]*), i32 %21, i32 %25)
-    %27 = load i32, i32* %i
-    %28 = add i32 %27, 1
-    store i32 %28, i32* %i
+    %26 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([15 x i8]* @str10 to [0 x i8]*), i32 %21, i32 %25)
+    %27 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([5 x i8]* @str11 to [0 x i8]*))
+    %28 = load i32, i32* %i
+    %29 = add i32 %28, 16
+    %30 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 0
+    %31 = load i32, i32* %i
+    %32 = add i32 %31, 16
+    %33 = getelementptr inbounds [32 x i32], [32 x i32]* %30, i32 0, i32 %32
+    %34 = load i32, i32* %33
+    %35 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([16 x i8]* @str12 to [0 x i8]*), i32 %29, i32 %34)
+    %36 = load i32, i32* %i
+    %37 = add i32 %36, 1
+    store i32 %37, i32* %i
     br label %again_2
 break_2:
     ret i32 0

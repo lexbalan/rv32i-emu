@@ -10,22 +10,28 @@
 #define CONSOLE_PUT  (*((volatile char *)CONSOLE_PUT_ADR))
 #define CONSOLE_GET  (*((volatile char *)CONSOLE_PUT_ADR))
 
+int main();
+
+// first function (!)
+void __boot() {
+	main();
+
+	asm("ebreak");
+}
+
+
+void some_func(char c) {
+	CONSOLE_PUT = '0' + c;
+}
 
 int main() {
-	int i = 0;
+	volatile int i = 0;
 	
-	while (1) {
-		if (i & 1) {
-			CONSOLE_PUT = '0' + i;
-		}
-		i = i + 1;
+	while (i < 5) {
+		some_func(i);
 
-		if (i > 10) {
-			break;
-		}
+		i = i + 1;
 	}
-	
-	asm("ebreak");
 
     return 0;
 }

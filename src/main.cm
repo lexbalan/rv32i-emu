@@ -80,8 +80,10 @@ func main() -> Int {
     printf("\nCore dump:\n")
     
     var i := 0
-    while i < 32 {
-        printf("x%02d = 0x%08x\n", i, core.reg[i])
+    while i < 16 {
+        printf("x%02d = 0x%08x", i, core.reg[i])
+		printf("    ")
+		printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
         i := i + 1
     }
     
