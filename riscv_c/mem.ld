@@ -1,6 +1,9 @@
 /* Thanks https://github.com/darklife/darkriscv */
-  __heap_size    = 0x200;  /* required amount of heap */
+  __heap_size   = 0x200;  /* required amount of heap */
   __stack_size  = 0x800;  /* required amount of stack */
+
+
+/* Ищет символы строки в 10007fb7 то есть в RAM Нет там стек! */
 
   MEMORY
   {
@@ -14,13 +17,26 @@
       *(.boot)
       *(.text)
       *(.rodata*)
+	  
+	  /* говорим - размести data тут а сами потом считаем ее в ram */
+	  _data_flash_start = .;
+	  *(.data)
+	  _data_flash_end = .;
+	  
     } > ROM
     
     .data :
     {
       *(.sbss)
+	  
+	  _data_start = .;
       *(.data)
+	  _data_end = .;
+	  
+	  _bss_start = .;
       *(.bss)
+	  _bss_end = .;
+	  
       *(COMMON)
     } > RAM
 
@@ -28,10 +44,10 @@
     {
       . = ALIGN(4);
       PROVIDE ( end = . );
-      _sheap = .;
+      _heap_start = .;
       . = . + __heap_size;
       . = ALIGN(4);
-      _eheap = .;
+      _heap_end = .;
     } >RAM
 
     .stack :

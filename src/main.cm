@@ -13,6 +13,7 @@ const text_filename = "./riscv_c/text.bin" to *Str8
 const data_filename = "./riscv_c/data.bin" to *Str8
 
 
+const SHOW_TEXT = true
 
 var memctl: MemoryInterface
 var core: Core
@@ -36,19 +37,39 @@ func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
 
     printf("LOADED: %d bytes\n", n)
     
-    /*var i := 0 to Nat32
-    while i < n {
-        printf("=0x%08x\n", text[i])
-        i := i + 1
-    }
-    
-    printf("-----------\n")*/
+
+	if SHOW_TEXT {
+		var i := 0 to SizeT
+		while i < n {
+			printf("%08x: 0x%08x\n", i * 4, text[i])
+			i := i + 1
+		}
+
+		printf("-----------\n")
+	}
 
     fclose(fp)
     
     return n to Nat32
 }
 
+
+func show_regs() {
+	var i := 0
+    while i < 16 {
+        printf("x%02d = 0x%08x", i, core.reg[i])
+		printf("    ")
+		printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
+        i := i + 1
+    }
+}
+
+func show_mem() {
+	var i := 0
+    while i < 32 {
+		i := i + 1
+	}
+}
 
 func main() -> Int {
     printf("Hello VM!\n")
@@ -57,6 +78,7 @@ func main() -> Int {
     memctl.read8 := &vm_mem_read8
     memctl.read16 := &vm_mem_read16
     memctl.read32 := &vm_mem_read32
+
     memctl.write8 := &vm_mem_write8
     memctl.write16 := &vm_mem_write16
     memctl.write32 := &vm_mem_write32
@@ -71,6 +93,15 @@ func main() -> Int {
     printf("START\n")
     
     while true {
+		//var cmd: [8]Char8
+		//scanf("%c", &cmd[0])
+
+		/*if strcmp(&cmd, "regs") == 0 {
+			show_regs()
+		} else if strcmp(&cmd, "mem") == 0{
+			show_mem()
+		}*/
+
         let cont = core_tick(&core)
         if not cont {
             break
@@ -79,13 +110,7 @@ func main() -> Int {
     
     printf("\nCore dump:\n")
     
-    var i := 0
-    while i < 16 {
-        printf("x%02d = 0x%08x", i, core.reg[i])
-		printf("    ")
-		printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
-        i := i + 1
-    }
+	show_regs()
     
     return 0
 }

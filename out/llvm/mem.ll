@@ -96,6 +96,9 @@ declare void @perror(%ConstCharStr*)
 
 ; -- SOURCE: src/mem.cm
 
+@str1 = private constant [9 x i8] [i8 32, i8 76, i8 91, i8 48, i8 120, i8 37, i8 120, i8 93, i8 0]
+@str2 = private constant [9 x i8] [i8 32, i8 123, i8 48, i8 120, i8 37, i8 120, i8 125, i8 10, i8 0]
+@str3 = private constant [13 x i8] [i8 32, i8 62, i8 62, i8 32, i8 48, i8 120, i8 37, i8 120, i8 32, i8 60, i8 60, i8 10, i8 0]
 
 
 
@@ -116,14 +119,18 @@ then_0:
     %5 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i8*
-    %8 = load i8, i8* %7
-    ret i8 %8
+    %8 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([9 x i8]* @str1 to [0 x i8]*), i32 %adr)
+    %9 = load i8, i8* %7
+    %10 = zext i8 %9 to i32
+    %11 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([9 x i8]* @str2 to [0 x i8]*), i32 %10)
+    %12 = load i8, i8* %7
+    ret i8 %12
     br label %endif_0
 else_0:
-    %10 = icmp uge i32 %adr, 4027318272
-    %11 = icmp ule i32 %adr, 4027383807
-    %12 = and i1 %10, %11
-    br i1 %12 , label %then_1, label %else_1
+    %14 = icmp uge i32 %adr, 4027318272
+    %15 = icmp ule i32 %adr, 4027383807
+    %16 = and i1 %14, %15
+    br i1 %16 , label %then_1, label %else_1
 then_1:
     ret i8 0
     br label %endif_1
@@ -218,7 +225,8 @@ then_1:
     br i1 %11 , label %then_2, label %endif_2
 then_2:
     %12 = sext i8 %value to i32
-    %13 = call i32(i32) @putchar (i32 %12)
+    %13 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str3 to [0 x i8]*), i32 %12)
+    %14 = call i32(i32) @putchar (i32 %12)
     ret void
     br label %endif_2
 endif_2:

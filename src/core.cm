@@ -95,7 +95,6 @@ func i_type_op(core: *Core, instr: Nat32) {
         /* SLLI is a logical left shift (zeros are shifted
 into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
 is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). */
-        // TODO
         printf("slli x%d, x%d, %d\n", rd, rs1, imm)
 		if rd != 0 {
         	core.reg[rd] := (core.reg[rs1] to Nat32 << imm) to Int32
@@ -107,8 +106,12 @@ is an arithmetic right shift (the original sign bit is copied into the vacated u
 		if rd != 0 {
         	core.reg[rd] := (core.reg[rs1] < imm) to Int32
 		}
+
     } else if funct3 == 3 {
         printf("sltiu x%d, x%d, %d\n", rd, rs1, imm)
+		if rd != 0 {
+        	core.reg[rd] := (core.reg[rs1] to Nat32 < imm to Nat32) to Int32
+		}
         
     } else if funct3 == 4 {
         printf("xori x%d, x%d, %d\n", rd, rs1, imm)
@@ -116,14 +119,15 @@ is an arithmetic right shift (the original sign bit is copied into the vacated u
         	core.reg[rd] := core.reg[rs1] xor imm
 		}
     } else if (funct3 == 5) and (funct7 == 0) {
-        // TODO
         printf("srli x%d, x%d, %d\n", rd, rs1, imm)
 		if rd != 0 {
         	core.reg[rd] := (core.reg[rs1] to Nat32 >> imm) to Int32
 		}
     } else if (funct3 == 5) and (funct7 == 0x20) {
-        // TODO
         printf("srai x%d, x%d, %d\n", rd, rs1, imm)
+		if rd != 0 {
+        	core.reg[rd] := (core.reg[rs1] >> imm) to Int32
+		}
 
     } else if funct3 == 6 {
         printf("ori x%d, x%d, %d\n", rd, rs1, imm)
@@ -179,7 +183,7 @@ func r_type_op(core: *Core, instr: Nat32) {
         printf("srl x%d, x%d, x%d\n", rd, rs1, rs2)
         core.reg[rd] := (v1 to Nat32 >> v2) to Int32
     } else if funct3 == 5 and funct7 == 0x20 {
-        // TODO: shift right arithmetical
+        // shift right arithmetical
         printf("sra x%d, x%d, x%d\n", rd, rs1, rs2)
         core.reg[rd] := v1 >> v2
     } else if funct3 == 6 {
@@ -256,7 +260,7 @@ func core_tick(core: *Core) -> Bool {
 		let x = (core.ip to Int32) + (imm << 12)
         core.reg[rd] := x
 		printf("auipc x%d, 0x%X\n", rd, imm)
-        
+
     } else if op == OPCODE_JAL {
         // U-type
 		let raw_imm = jal_imm_recode(extract_imm31_12(instr) to Nat32)
@@ -378,6 +382,7 @@ func core_tick(core: *Core) -> Bool {
             // lw
             printf("lw x%d, %d(x%d)\n", rd, imm, rs1)
             let val = core.memctl.read32(adr) to Int32
+			printf("LW [0x%x] (0x%x)\n", adr, val)
 			if rd != 0 {
             	core.reg[rd] := val
 			}
@@ -386,6 +391,7 @@ func core_tick(core: *Core) -> Bool {
             // lbu
             printf("lbu x%d, %d(x%d)\n", rd, imm, rs1)
             let val = core.memctl.read8(adr) to Nat32 to Int32
+			printf("LBU[0x%x] (0x%x)\n", adr, val)
 			if rd != 0 {
             	core.reg[rd] := val
 			}
