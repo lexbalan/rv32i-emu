@@ -96,17 +96,18 @@ declare void @perror(%ConstCharStr*)
 
 ; -- SOURCE: src/mem.cm
 
-@str1 = private constant [9 x i8] [i8 32, i8 76, i8 91, i8 48, i8 120, i8 37, i8 120, i8 93, i8 0]
-@str2 = private constant [9 x i8] [i8 32, i8 123, i8 48, i8 120, i8 37, i8 120, i8 125, i8 10, i8 0]
-@str3 = private constant [13 x i8] [i8 32, i8 62, i8 62, i8 32, i8 48, i8 120, i8 37, i8 120, i8 32, i8 60, i8 60, i8 10, i8 0]
+@str1 = private constant [30 x i8] [i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
+@str2 = private constant [9 x i8] [i8 32, i8 76, i8 91, i8 48, i8 120, i8 37, i8 120, i8 93, i8 0]
+@str3 = private constant [9 x i8] [i8 32, i8 123, i8 48, i8 120, i8 37, i8 120, i8 125, i8 10, i8 0]
+@str4 = private constant [13 x i8] [i8 32, i8 62, i8 62, i8 32, i8 48, i8 120, i8 37, i8 120, i8 32, i8 60, i8 60, i8 10, i8 0]
 
 
 
 @rom = global [65536 x i8] zeroinitializer
-@ram = global [32768 x i8] zeroinitializer
+@ram = global [256 x i8] zeroinitializer
 
 define [0 x i8]* @get_ram_ptr() {
-    %1 = bitcast [32768 x i8]* @ram to [0 x i8]*
+    %1 = bitcast [256 x i8]* @ram to [0 x i8]*
     ret [0 x i8]* %1
 }
 
@@ -115,20 +116,29 @@ define [0 x i8]* @get_rom_ptr() {
     ret [0 x i8]* %1
 }
 
+
+declare void @exit(i32)
+
+define void @mem_violation(i8 %rw, i32 %adr) {
+    %1 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([30 x i8]* @str1 to [0 x i8]*), i8 %rw, i32 %adr)
+    call void(i32) @exit (i32 1)
+    ret void
+}
+
 define i8 @vm_mem_read8(i32 %adr) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268468224
+    %2 = icmp ule i32 %adr, 268435712
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i8*
-    %8 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([9 x i8]* @str1 to [0 x i8]*), i32 %adr)
+    %8 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([9 x i8]* @str2 to [0 x i8]*), i32 %adr)
     %9 = load i8, i8* %7
     %10 = zext i8 %9 to i32
-    %11 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([9 x i8]* @str2 to [0 x i8]*), i32 %10)
+    %11 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([9 x i8]* @str3 to [0 x i8]*), i32 %10)
     %12 = load i8, i8* %7
     ret i8 %12
     br label %endif_0
@@ -141,7 +151,22 @@ then_1:
     ret i8 0
     br label %endif_1
 else_1:
-    ; memory voilation
+    %18 = icmp uge i32 %adr, 0
+    %19 = icmp ule i32 %adr, 65536
+    %20 = and i1 %18, %19
+    br i1 %20 , label %then_2, label %else_2
+then_2:
+    %21 = sub i32 %adr, 0
+    %22 = getelementptr inbounds [65536 x i8], [65536 x i8]* @rom, i32 0, i32 %21
+    %23 = bitcast i8* %22 to i8*
+    %24 = bitcast i8* %23 to i8*
+    %25 = load i8, i8* %24
+    ret i8 %25
+    br label %endif_2
+else_2:
+    call void(i8, i32) @mem_violation (i8 114, i32 %adr)
+    br label %endif_2
+endif_2:
     br label %endif_1
 endif_1:
     br label %endif_0
@@ -151,12 +176,12 @@ endif_0:
 
 define i16 @vm_mem_read16(i32 %adr) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268468224
+    %2 = icmp ule i32 %adr, 268435712
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i16*
     %8 = load i16, i16* %7
@@ -171,7 +196,22 @@ then_1:
     ret i16 0
     br label %endif_1
 else_1:
-    ; memory voilation
+    %14 = icmp uge i32 %adr, 0
+    %15 = icmp ule i32 %adr, 65536
+    %16 = and i1 %14, %15
+    br i1 %16 , label %then_2, label %else_2
+then_2:
+    %17 = sub i32 %adr, 0
+    %18 = getelementptr inbounds [65536 x i8], [65536 x i8]* @rom, i32 0, i32 %17
+    %19 = bitcast i8* %18 to i8*
+    %20 = bitcast i8* %19 to i16*
+    %21 = load i16, i16* %20
+    ret i16 %21
+    br label %endif_2
+else_2:
+    call void(i8, i32) @mem_violation (i8 114, i32 %adr)
+    br label %endif_2
+endif_2:
     br label %endif_1
 endif_1:
     br label %endif_0
@@ -194,12 +234,12 @@ then_0:
     br label %endif_0
 else_0:
     %10 = icmp uge i32 %adr, 268435456
-    %11 = icmp ule i32 %adr, 268468224
+    %11 = icmp ule i32 %adr, 268435712
     %12 = and i1 %10, %11
     br i1 %12 , label %then_1, label %else_1
 then_1:
     %13 = sub i32 %adr, 268435456
-    %14 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %13
+    %14 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %13
     %15 = bitcast i8* %14 to i8*
     %16 = bitcast i8* %15 to i32*
     %17 = load i32, i32* %16
@@ -214,7 +254,7 @@ then_2:
     ret i32 0
     br label %endif_2
 else_2:
-    ; memory voilation
+    call void(i8, i32) @mem_violation (i8 114, i32 %adr)
     br label %endif_2
 endif_2:
     br label %endif_1
@@ -226,12 +266,12 @@ endif_0:
 
 define void @vm_mem_write8(i32 %adr, i8 %value) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268468224
+    %2 = icmp ule i32 %adr, 268435712
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i8*
     store i8 %value, i8* %7
@@ -246,14 +286,14 @@ then_1:
     br i1 %11 , label %then_2, label %endif_2
 then_2:
     %12 = sext i8 %value to i32
-    %13 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str3 to [0 x i8]*), i32 %12)
+    %13 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str4 to [0 x i8]*), i32 %12)
     %14 = call i32(i32) @putchar (i32 %12)
     ret void
     br label %endif_2
 endif_2:
     br label %endif_1
 else_1:
-    ; memory voilation
+    call void(i8, i32) @mem_violation (i8 119, i32 %adr)
     br label %endif_1
 endif_1:
     br label %endif_0
@@ -263,12 +303,12 @@ endif_0:
 
 define void @vm_mem_write16(i32 %adr, i16 %value) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268468224
+    %2 = icmp ule i32 %adr, 268435712
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i16*
     store i16 %value, i16* %7
@@ -289,7 +329,7 @@ then_2:
 endif_2:
     br label %endif_1
 else_1:
-    ; memory voilation
+    call void(i8, i32) @mem_violation (i8 119, i32 %adr)
     br label %endif_1
 endif_1:
     br label %endif_0
@@ -299,12 +339,12 @@ endif_0:
 
 define void @vm_mem_write32(i32 %adr, i32 %value) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268468224
+    %2 = icmp ule i32 %adr, 268435712
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i32*
     store i32 %value, i32* %7
@@ -325,7 +365,7 @@ then_2:
 endif_2:
     br label %endif_1
 else_1:
-    ; memory voilation
+    call void(i8, i32) @mem_violation (i8 119, i32 %adr)
     br label %endif_1
 endif_1:
     br label %endif_0

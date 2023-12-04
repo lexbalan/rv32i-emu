@@ -141,16 +141,9 @@ main:
 	li	a0, 0
 	sw	a0, -16(s0)
 	sw	a0, -12(s0)
-	lui	a1, %hi(str)
-	li	a2, 104
-	sb	a2, %lo(str)(a1)
-	addi	a1, a1, %lo(str)
-	li	a2, 105
-	sb	a2, 1(a1)
-	li	a2, 33
-	sb	a2, 2(a1)
-	sb	a0, 3(a1)
-	li	a2, 3
+	lui	a1, %hi(hi)
+	lw	a1, %lo(hi)(a1)
+	li	a2, 12
 	call	write
 	lw	a0, -16(s0)
 	lw	ra, 12(sp)
@@ -160,12 +153,34 @@ main:
 .Lfunc_end4:
 	.size	main, .Lfunc_end4-main
 
+	.type	.L.str,@object
+	.section	.rodata.str1.1,"aMS",@progbits,1
+.L.str:
+	.asciz	"hello world!"
+	.size	.L.str, 13
+
+	.type	hi,@object
+	.section	.sdata,"aw",@progbits
+	.globl	hi
+	.p2align	2
+hi:
+	.word	.L.str
+	.size	hi, 4
+
 	.type	str,@object
 	.bss
 	.globl	str
 str:
 	.zero	13
 	.size	str, 13
+
+	.type	z,@object
+	.section	.sbss,"aw",@nobits
+	.globl	z
+	.p2align	2
+z:
+	.word	0
+	.size	z, 4
 
 	.ident	"Homebrew clang version 14.0.6"
 	.section	".note.GNU-stack","",@progbits
@@ -177,4 +192,4 @@ str:
 	.addrsig_sym _data_start
 	.addrsig_sym _data_flash_start
 	.addrsig_sym _data_end
-	.addrsig_sym str
+	.addrsig_sym hi

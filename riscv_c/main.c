@@ -80,16 +80,20 @@ int write(int fd, void *data, int len) {
 
 //const char *hello = "Hello world!";
 
-char str[13];// = "hello world!";
+char *hi = "hello world!";
+char str[13];//
+int z;
 
+//int k = 32;
 //volatile int k; // goes into 2 .data BSS
 
 int main() {
-	str[0] = 'h';
-	str[1] = 'i';
-	str[2] = '!';
-	str[3] = 0;
-	write(0, str, 3);
+//	str[0] = 'h';
+//	str[1] = 'i';
+//	str[2] = '!';
+//	str[3] = 0;
+//	write(0, str, 3);
+	write(0, hi, 12);
 	/*int i = 0;
 	
 	while (1) {

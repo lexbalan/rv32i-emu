@@ -2,7 +2,7 @@
 
 // see mem.ld
 const RAM_START = 0x10000000
-const RAM_SIZE = 0x08000
+const RAM_SIZE = 256
 const RAM_END = RAM_START + RAM_SIZE
 
 

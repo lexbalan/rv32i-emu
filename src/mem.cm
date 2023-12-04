@@ -3,6 +3,7 @@
 @attribute("c-no-print")
 import "libc/stdio.hm"
 
+
 import "./mem.hm"
 
 
@@ -17,8 +18,16 @@ func get_rom_ptr() -> *[]Nat8 {
     return &rom
 }
 
-func vm_mem_read8(adr: Nat32) -> Nat8 {
+extern func exit(code: Int32)
 
+
+func mem_violation(rw: Char8, adr: Nat32) {
+	printf("MEMORY VIOLATION '%c' 0x%08x\n", rw, adr)
+	exit(1)
+}
+
+
+func vm_mem_read8(adr: Nat32) -> Nat8 {
 	if (adr >= RAM_START) and (adr <= RAM_END) {
         let p = &ram[adr - RAM_START] to Pointer to *Nat8
 		printf(" L[0x%x]", adr)
@@ -26,8 +35,11 @@ func vm_mem_read8(adr: Nat32) -> Nat8 {
         return *p
     } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
         return 0
+	} else if (adr >= ROM_START) and (adr <= ROM_END) {
+		let p = &rom[adr - ROM_START] to Pointer to *Nat8
+		return *p
     } else {
-        // memory voilation
+        mem_violation("r"[0], adr)
     }
     
     return 0
@@ -39,8 +51,11 @@ func vm_mem_read16(adr: Nat32) -> Nat16 {
         return *p
     } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
         return 0
+	} else if (adr >= ROM_START) and (adr <= ROM_END) {
+		let p = &rom[adr - ROM_START] to Pointer to *Nat16
+		return *p
     } else {
-        // memory voilation
+        mem_violation("r"[0], adr)
     }
     
     return 0
@@ -56,7 +71,7 @@ func vm_mem_read32(adr: Nat32) -> Nat32 {
     } else if (adr >= MMIO_START) and (adr <= MMIO_END) {
         return 0
     } else {
-        // memory voilation
+        mem_violation("r"[0], adr)
     }
     
     return 0
@@ -76,7 +91,7 @@ func vm_mem_write8(adr: Nat32, value: Nat8) {
             return
         }
     } else {
-        // memory voilation
+        mem_violation("w"[0], adr)
     }
 }
 
@@ -90,7 +105,7 @@ func vm_mem_write16(adr: Nat32, value: Nat16) {
             return
         }
     } else {
-        // memory voilation
+        mem_violation("w"[0], adr)
     }
 }
 
@@ -104,7 +119,7 @@ func vm_mem_write32(adr: Nat32, value: Nat32) {
             return
         }
     } else {
-        // memory voilation
+        mem_violation("w"[0], adr)
     }
 }
 

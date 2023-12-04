@@ -239,9 +239,12 @@ declare i1 @core_tick(%Core*)
 @str9 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
 @str10 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
 @str11 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
-@str12 = private constant [11 x i8] [i8 72, i8 101, i8 108, i8 108, i8 111, i8 32, i8 86, i8 77, i8 33, i8 10, i8 0]
-@str13 = private constant [7 x i8] [i8 83, i8 84, i8 65, i8 82, i8 84, i8 10, i8 0]
-@str14 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
+@str12 = private constant [5 x i8] [i8 37, i8 48, i8 56, i8 88, i8 0]
+@str13 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
+@str14 = private constant [2 x i8] [i8 10, i8 0]
+@str15 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
+@str16 = private constant [7 x i8] [i8 83, i8 84, i8 65, i8 82, i8 84, i8 10, i8 0]
+@str17 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 
 
 
@@ -272,26 +275,27 @@ then_1:
     br label %again_1
 again_1:
     %10 = load i64, i64* %i
-    %11 = icmp ult i64 %10, %8
-    br i1 %11 , label %body_1, label %break_1
+    %11 = udiv i64 %8, 4
+    %12 = icmp ult i64 %10, %11
+    br i1 %12 , label %body_1, label %break_1
 body_1:
-    %12 = load i64, i64* %i
-    %13 = mul i64 %12, 4
-    %14 = load i64, i64* %i
-    %15 = getelementptr inbounds [4096 x i32], [4096 x i32]* @text, i32 0, i64 %14
-    %16 = load i32, i32* %15
-    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([14 x i8]* @str7 to [0 x i8]*), i64 %13, i32 %16)
-    %18 = load i64, i64* %i
-    %19 = add i64 %18, 1
-    store i64 %19, i64* %i
+    %13 = load i64, i64* %i
+    %14 = bitcast [0 x i8]* %bufptr to [0 x i32]*
+    %15 = load i64, i64* %i
+    %16 = getelementptr inbounds [0 x i32], [0 x i32]* %14, i32 0, i64 %15
+    %17 = load i32, i32* %16
+    %18 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([14 x i8]* @str7 to [0 x i8]*), i64 %13, i32 %17)
+    %19 = load i64, i64* %i
+    %20 = add i64 %19, 4
+    store i64 %20, i64* %i
     br label %again_1
 break_1:
-    %20 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str8 to [0 x i8]*))
+    %21 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str8 to [0 x i8]*))
     br label %endif_1
 endif_1:
-    %21 = call i32(%FILE*) @fclose (%FILE* %2)
-    %22 = trunc i64 %8 to i32
-    ret i32 %22
+    %22 = call i32(%FILE*) @fclose (%FILE* %2)
+    %23 = trunc i64 %8 to i32
+    ret i32 %23
 }
 
 define void @show_regs() {
@@ -329,22 +333,46 @@ break_1:
 define void @show_mem() {
     %i = alloca i32
     store i32 0, i32* %i
+    %1 = call [0 x i8]*() @get_ram_ptr ()
     br label %again_1
 again_1:
-    %1 = load i32, i32* %i
-    %2 = icmp slt i32 %1, 32
-    br i1 %2 , label %body_1, label %break_1
+    %2 = load i32, i32* %i
+    %3 = icmp slt i32 %2, 256
+    br i1 %3 , label %body_1, label %break_1
 body_1:
-    %3 = load i32, i32* %i
-    %4 = add i32 %3, 1
-    store i32 %4, i32* %i
+    %4 = load i32, i32* %i
+    %5 = mul i32 %4, 16
+    %6 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([5 x i8]* @str12 to [0 x i8]*), i32 %5)
+    %j = alloca i32
+    store i32 0, i32* %j
+    br label %again_2
+again_2:
+    %7 = load i32, i32* %j
+    %8 = icmp slt i32 %7, 16
+    br i1 %8 , label %body_2, label %break_2
+body_2:
+    %9 = load i32, i32* %i
+    %10 = load i32, i32* %j
+    %11 = add i32 %9, %10
+    %12 = getelementptr inbounds [0 x i8], [0 x i8]* %1, i32 0, i32 %11
+    %13 = load i8, i8* %12
+    %14 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([6 x i8]* @str13 to [0 x i8]*), i8 %13)
+    %15 = load i32, i32* %j
+    %16 = add i32 %15, 1
+    store i32 %16, i32* %j
+    br label %again_2
+break_2:
+    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([2 x i8]* @str14 to [0 x i8]*))
+    %18 = load i32, i32* %i
+    %19 = add i32 %18, 16
+    store i32 %19, i32* %i
     br label %again_1
 break_1:
     ret void
 }
 
 define i32 @main() {
-    %1 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([11 x i8]* @str12 to [0 x i8]*))
+    %1 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([11 x i8]* @str15 to [0 x i8]*))
     ; memory controller initialize
     %2 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 0
     store i8(i32)* @vm_mem_read8, i8(i32)** %2
@@ -360,12 +388,10 @@ define i32 @main() {
     store void(i32, i32)* @vm_mem_write32, void(i32, i32)** %7
     %8 = call [0 x i8]*() @get_rom_ptr ()
     %9 = call i32([0 x i8]*, [0 x i8]*, i32) @loader ([0 x i8]* bitcast ([19 x i8]* @str1 to [0 x i8]*), [0 x i8]* %8, i32 65536)
-    ;let ramptr = get_ram_ptr()
-    ;let loaded_bytes_data = loader(text_filename, &text to *[]Nat8, sizeof(Nat32) * TEXT_BUFFER_SIZE)
     %10 = bitcast %Core* @core to %Core*
     %11 = bitcast %MemoryInterface* @memctl to %MemoryInterface*
-    call void(%Core*, %MemoryInterface*, i32) @core_init (%Core* %10, %MemoryInterface* %11, i32 268468224)
-    %12 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([7 x i8]* @str13 to [0 x i8]*))
+    call void(%Core*, %MemoryInterface*, i32) @core_init (%Core* %10, %MemoryInterface* %11, i32 268435712)
+    %12 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([7 x i8]* @str16 to [0 x i8]*))
     br label %again_1
 again_1:
     br i1 1 , label %body_1, label %break_1
@@ -383,8 +409,9 @@ then_0:
 endif_0:
     br label %again_1
 break_1:
-    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str14 to [0 x i8]*))
+    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str17 to [0 x i8]*))
     call void() @show_regs ()
+    call void() @show_mem ()
     ret i32 0
 }
 

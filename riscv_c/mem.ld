@@ -1,6 +1,6 @@
 /* Thanks https://github.com/darklife/darkriscv */
-  __heap_size   = 0x200;  /* required amount of heap */
-  __stack_size  = 0x800;  /* required amount of stack */
+  __heap_size  = 0x20;  /* required amount of heap */
+  __stack_size = 0x40;  /* required amount of stack */
 
 
 /* Ищет символы строки в 10007fb7 то есть в RAM Нет там стек! */
@@ -8,17 +8,17 @@
   MEMORY
   {
     ROM (rwx) : ORIGIN = 0x00000000, LENGTH = 0x10000
-    RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 0x08000
+    RAM (rwx) : ORIGIN = 0x10000000, LENGTH = 256
   }
   SECTIONS
   {
-    .text :
+    /*.text :
     {
       *(boot)
       *(.text)
       *(.rodata*)
 	  
-	  /* говорим - размести data тут а сами потом считаем ее в ram */
+	   говорим - размести data тут а сами потом считаем ее в ram 
 	  _data_flash_start = .;
 	  *(.data)
 	  _data_flash_end = .;
@@ -38,7 +38,30 @@
 	  _bss_end = .;
 	  
       *(COMMON)
-    } > RAM
+    } > RAM*/
+	
+	.boot : {*(boot)} > ROM
+	
+	.text : {
+		*(.text*)
+		*(.rodata*)
+	} > ROM
+
+	.bss : {
+		_bss_start = .;
+		*(.sbss SORT(.bss.*) COMMON)
+		*(.bss SORT(.bss.*) COMMON)
+		_bss_end = .;
+	} > RAM
+
+	.data : {
+		_data_start = .;
+		*(.sdata SORT(.data.*))
+		*(.data SORT(.data.*))
+		_data_end = .;
+	} > RAM AT > ROM
+
+	_data_flash_start = LOADADDR(.data);
 
     .heap :
     {
@@ -59,3 +82,4 @@
       _sstack = .;
     } >RAM
   }
+

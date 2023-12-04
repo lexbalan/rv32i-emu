@@ -40,9 +40,9 @@ func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
 
 	if SHOW_TEXT {
 		var i := 0 to SizeT
-		while i < n {
-			printf("%08x: 0x%08x\n", i * 4, text[i])
-			i := i + 1
+		while i < (n / 4) {
+			printf("%08x: 0x%08x\n", i, (bufptr to *[]Nat32)[i])
+			i := i + 4
 		}
 
 		printf("-----------\n")
@@ -66,8 +66,19 @@ func show_regs() {
 
 func show_mem() {
 	var i := 0
-    while i < 32 {
-		i := i + 1
+	let ramptr = get_ram_ptr()
+    while i < 256 {
+		printf("%08X", i * 16)
+
+		var j := 0
+		while j < 16 {
+			printf(" %02X", ramptr[i + j]);
+			j := j + 1
+		}
+
+		printf("\n")
+
+		i := i + 16
 	}
 }
 
@@ -110,6 +121,8 @@ func main() -> Int {
     
 	show_regs()
     
+	show_mem()
+
     return 0
 }
 

@@ -352,10 +352,12 @@ func core_tick(core: *Core) -> Bool {
         } else if funct3 == 7 {
             //bgeu
             printf("bgeu x%d, x%d, %d\n", rs1, rs2, imm to Int32)
+
             if core.reg[rs1] to Nat32 >= core.reg[rs2] to Nat32 {
                 core.ip := (core.ip to Int32 + imm to Int32) to Nat32
                 core.need_step := false
-            }
+			} else {
+			}
         }
 
     } else if op == OP_L {
