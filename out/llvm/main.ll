@@ -184,6 +184,7 @@ declare void @perror(%ConstCharStr*)
 
 
 declare [0 x i8]* @get_ram_ptr()
+declare [0 x i8]* @get_rom_ptr()
 declare i8 @vm_mem_read8(i32)
 declare i16 @vm_mem_read16(i32)
 declare i32 @vm_mem_read32(i32)
@@ -222,7 +223,7 @@ declare void @vm_mem_write32(i32, i32)
 
 
 
-declare void @core_init(%Core*, %MemoryInterface*, [0 x i32]*, i32, i32)
+declare void @core_init(%Core*, %MemoryInterface*, i32)
 declare i1 @core_tick(%Core*)
 
 ; -- SOURCE: src/main.cm
@@ -357,15 +358,14 @@ define i32 @main() {
     store void(i32, i16)* @vm_mem_write16, void(i32, i16)** %6
     %7 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 5
     store void(i32, i32)* @vm_mem_write32, void(i32, i32)** %7
-    %8 = bitcast [4096 x i32]* @text to [0 x i8]*
-    %9 = call i32([0 x i8]*, [0 x i8]*, i32) @loader ([0 x i8]* bitcast ([19 x i8]* @str1 to [0 x i8]*), [0 x i8]* %8, i32 16384)
+    %8 = call [0 x i8]*() @get_rom_ptr ()
+    %9 = call i32([0 x i8]*, [0 x i8]*, i32) @loader ([0 x i8]* bitcast ([19 x i8]* @str1 to [0 x i8]*), [0 x i8]* %8, i32 65536)
     ;let ramptr = get_ram_ptr()
     ;let loaded_bytes_data = loader(text_filename, &text to *[]Nat8, sizeof(Nat32) * TEXT_BUFFER_SIZE)
     %10 = bitcast %Core* @core to %Core*
     %11 = bitcast %MemoryInterface* @memctl to %MemoryInterface*
-    %12 = bitcast [4096 x i32]* @text to [0 x i32]*
-    call void(%Core*, %MemoryInterface*, [0 x i32]*, i32, i32) @core_init (%Core* %10, %MemoryInterface* %11, [0 x i32]* %12, i32 %9, i32 268468224)
-    %13 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([7 x i8]* @str13 to [0 x i8]*))
+    call void(%Core*, %MemoryInterface*, i32) @core_init (%Core* %10, %MemoryInterface* %11, i32 268468224)
+    %12 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([7 x i8]* @str13 to [0 x i8]*))
     br label %again_1
 again_1:
     br i1 1 , label %body_1, label %break_1
@@ -373,17 +373,17 @@ body_1:
     ;var cmd: [8]Char8
     ;scanf("%c", &cmd[0])
 
-    %14 = bitcast %Core* @core to %Core*
-    %15 = call i1(%Core*) @core_tick (%Core* %14)
-    %16 = xor  i1 %15, -1
-    br i1 %16 , label %then_0, label %endif_0
+    %13 = bitcast %Core* @core to %Core*
+    %14 = call i1(%Core*) @core_tick (%Core* %13)
+    %15 = xor  i1 %14, -1
+    br i1 %15 , label %then_0, label %endif_0
 then_0:
     br label %break_1
     br label %endif_0
 endif_0:
     br label %again_1
 break_1:
-    %18 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str14 to [0 x i8]*))
+    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str14 to [0 x i8]*))
     call void() @show_regs ()
     ret i32 0
 }

@@ -6,14 +6,20 @@ import "libc/stdio.hm"
 import "./mem.hm"
 
 
+var rom: [ROM_SIZE]Nat8
 var ram: [RAM_SIZE]Nat8
 
 func get_ram_ptr() -> *[]Nat8 {
     return &ram
 }
 
+func get_rom_ptr() -> *[]Nat8 {
+    return &rom
+}
+
 func vm_mem_read8(adr: Nat32) -> Nat8 {
-    if (adr >= RAM_START) and (adr <= RAM_END) {
+
+	if (adr >= RAM_START) and (adr <= RAM_END) {
         let p = &ram[adr - RAM_START] to Pointer to *Nat8
 		printf(" L[0x%x]", adr)
 		printf(" {0x%x}\n", *p to Nat32)
@@ -41,7 +47,10 @@ func vm_mem_read16(adr: Nat32) -> Nat16 {
 }
 
 func vm_mem_read32(adr: Nat32) -> Nat32 {
-    if (adr >= RAM_START) and (adr <= RAM_END) {
+	if (adr >= ROM_START) and (adr <= ROM_END) {
+		let p = &rom[adr - ROM_START] to Pointer to *Nat32
+        return *p
+	} else if (adr >= RAM_START) and (adr <= RAM_END) {
         let p = &ram[adr - RAM_START] to Pointer to *Nat32
         return *p
     } else if (adr >= MMIO_START) and (adr <= MMIO_END) {

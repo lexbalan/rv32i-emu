@@ -14,7 +14,7 @@
   {
     .text :
     {
-      *(.boot)
+      *(boot)
       *(.text)
       *(.rodata*)
 	  

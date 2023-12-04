@@ -7,11 +7,11 @@ import "libc/stdio.hm"
 import "./core.hm"
 
 
-func core_init(core: *Core, memctl: *MemoryInterface, text: *[]Nat32, textlen: Nat32, sp: Nat32) {
+func core_init(core: *Core, memctl: *MemoryInterface, sp: Nat32) {
     memset(core, 0, sizeof(Core))
     core.memctl := memctl
-    core.text := text
-    core.textlen := textlen
+    //core.text := text
+    //core.textlen := textlen
     core.need_step := true
 	core.reg[2] = sp to Int32
 }
@@ -126,7 +126,7 @@ is an arithmetic right shift (the original sign bit is copied into the vacated u
     } else if (funct3 == 5) and (funct7 == 0x20) {
         printf("srai x%d, x%d, %d\n", rd, rs1, imm)
 		if rd != 0 {
-        	core.reg[rd] := (core.reg[rs1] >> imm) to Int32
+        	core.reg[rd] := core.reg[rs1] >> imm
 		}
 
     } else if funct3 == 6 {
@@ -215,8 +215,9 @@ func jal_imm_recode(imm: Nat32) -> Nat32 {
 
 
 func fetch(core: *Core) -> Nat32 {
-    let instr_adr = core.ip / 4
-    let instr = core.text[instr_adr]
+    //let instr_adr = core.ip / 4
+    //let instr = core.text[instr_adr]
+	let instr = core.memctl.read32(core.ip)
     return instr
 }
 

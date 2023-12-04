@@ -102,10 +102,16 @@ declare void @perror(%ConstCharStr*)
 
 
 
+@rom = global [65536 x i8] zeroinitializer
 @ram = global [32768 x i8] zeroinitializer
 
 define [0 x i8]* @get_ram_ptr() {
     %1 = bitcast [32768 x i8]* @ram to [0 x i8]*
+    ret [0 x i8]* %1
+}
+
+define [0 x i8]* @get_rom_ptr() {
+    %1 = bitcast [65536 x i8]* @rom to [0 x i8]*
     ret [0 x i8]* %1
 }
 
@@ -174,28 +180,43 @@ endif_0:
 }
 
 define i32 @vm_mem_read32(i32 %adr) {
-    %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268468224
+    %1 = icmp uge i32 %adr, 0
+    %2 = icmp ule i32 %adr, 65536
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
-    %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %4
+    %4 = sub i32 %adr, 0
+    %5 = getelementptr inbounds [65536 x i8], [65536 x i8]* @rom, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i32*
     %8 = load i32, i32* %7
     ret i32 %8
     br label %endif_0
 else_0:
-    %10 = icmp uge i32 %adr, 4027318272
-    %11 = icmp ule i32 %adr, 4027383807
+    %10 = icmp uge i32 %adr, 268435456
+    %11 = icmp ule i32 %adr, 268468224
     %12 = and i1 %10, %11
     br i1 %12 , label %then_1, label %else_1
 then_1:
-    ret i32 0
+    %13 = sub i32 %adr, 268435456
+    %14 = getelementptr inbounds [32768 x i8], [32768 x i8]* @ram, i32 0, i32 %13
+    %15 = bitcast i8* %14 to i8*
+    %16 = bitcast i8* %15 to i32*
+    %17 = load i32, i32* %16
+    ret i32 %17
     br label %endif_1
 else_1:
+    %19 = icmp uge i32 %adr, 4027318272
+    %20 = icmp ule i32 %adr, 4027383807
+    %21 = and i1 %19, %20
+    br i1 %21 , label %then_2, label %else_2
+then_2:
+    ret i32 0
+    br label %endif_2
+else_2:
     ; memory voilation
+    br label %endif_2
+endif_2:
     br label %endif_1
 endif_1:
     br label %endif_0

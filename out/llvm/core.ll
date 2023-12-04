@@ -260,22 +260,20 @@ declare void @perror(%ConstCharStr*)
 @str47 = private constant [22 x i8] [i8 85, i8 78, i8 75, i8 78, i8 79, i8 87, i8 78, i8 32, i8 79, i8 80, i8 67, i8 79, i8 68, i8 69, i8 58, i8 32, i8 37, i8 48, i8 56, i8 88, i8 10, i8 0]
 
 
-define void @core_init(%Core* %core, %MemoryInterface* %memctl, [0 x i32]* %text, i32 %textlen, i32 %sp) {
+define void @core_init(%Core* %core, %MemoryInterface* %memctl, i32 %sp) {
     %1 = bitcast %Core* %core to i8*
     %2 = call i8*(i8*, i32, i64) @memset (i8* %1, i32 0, i64 168)
     %3 = bitcast %MemoryInterface* %memctl to %MemoryInterface*
     %4 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
     store %MemoryInterface* %3, %MemoryInterface** %4
-    %5 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    store [0 x i32]* %text, [0 x i32]** %5
-    %6 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 6
-    store i32 %textlen, i32* %6
-    %7 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 1, i1* %7
-    %8 = bitcast i32 %sp to i32
-    %9 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %10 = getelementptr inbounds [32 x i32], [32 x i32]* %9, i32 0, i32 2
-    store i32 %8, i32* %10
+    ;core.text := text
+    ;core.textlen := textlen
+    %5 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 1, i1* %5
+    %6 = bitcast i32 %sp to i32
+    %7 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %8 = getelementptr inbounds [32 x i32], [32 x i32]* %7, i32 0, i32 2
+    store i32 %6, i32* %8
     ret void
 }
 
@@ -424,7 +422,6 @@ else_1:
     br i1 %19 , label %then_3, label %else_3
 then_3:
 
-    ; TODO
     %20 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str2 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
     %21 = icmp ne i8 %4, 0
     br i1 %21 , label %then_4, label %endif_4
@@ -466,103 +463,127 @@ else_5:
     br i1 %40 , label %then_7, label %else_7
 then_7:
     %41 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([20 x i8]* @str4 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
-    call void(i32) @exit (i32 1)
+    %42 = icmp ne i8 %4, 0
+    br i1 %42 , label %then_8, label %endif_8
+then_8:
+    %43 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %44 = getelementptr inbounds [32 x i32], [32 x i32]* %43, i32 0, i8 %5
+    %45 = load i32, i32* %44
+    %46 = bitcast i32 %45 to i32
+    %47 = bitcast i32 %3 to i32
+    %48 = icmp ult i32 %46, %47
+    %49 = sext i1 %48 to i32
+    %50 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %51 = getelementptr inbounds [32 x i32], [32 x i32]* %50, i32 0, i8 %4
+    store i32 %49, i32* %51
+    br label %endif_8
+endif_8:
     br label %endif_7
 else_7:
-    %42 = icmp eq i8 %1, 4
-    br i1 %42 , label %then_8, label %else_8
-then_8:
-    %43 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str5 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
-    %44 = icmp ne i8 %4, 0
-    br i1 %44 , label %then_9, label %endif_9
+    %52 = icmp eq i8 %1, 4
+    br i1 %52 , label %then_9, label %else_9
 then_9:
-    %45 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %46 = getelementptr inbounds [32 x i32], [32 x i32]* %45, i32 0, i8 %5
-    %47 = load i32, i32* %46
-    %48 = xor i32 %47, %3
-    %49 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %50 = getelementptr inbounds [32 x i32], [32 x i32]* %49, i32 0, i8 %4
-    store i32 %48, i32* %50
-    br label %endif_9
-endif_9:
-    br label %endif_8
-else_8:
-    %51 = icmp eq i8 %1, 5
-    %52 = icmp eq i8 %2, 0
-    %53 = and i1 %51, %52
-    br i1 %53 , label %then_10, label %else_10
+    %53 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str5 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
+    %54 = icmp ne i8 %4, 0
+    br i1 %54 , label %then_10, label %endif_10
 then_10:
-    ; TODO
-    %54 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str6 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
-    %55 = icmp ne i8 %4, 0
-    br i1 %55 , label %then_11, label %endif_11
-then_11:
-    %56 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %57 = getelementptr inbounds [32 x i32], [32 x i32]* %56, i32 0, i8 %5
-    %58 = load i32, i32* %57
-    %59 = bitcast i32 %58 to i32
-    %60 = lshr i32 %59, %3
-    %61 = bitcast i32 %60 to i32
-    %62 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %63 = getelementptr inbounds [32 x i32], [32 x i32]* %62, i32 0, i8 %4
-    store i32 %61, i32* %63
-    br label %endif_11
-endif_11:
+    %55 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %56 = getelementptr inbounds [32 x i32], [32 x i32]* %55, i32 0, i8 %5
+    %57 = load i32, i32* %56
+    %58 = xor i32 %57, %3
+    %59 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %60 = getelementptr inbounds [32 x i32], [32 x i32]* %59, i32 0, i8 %4
+    store i32 %58, i32* %60
     br label %endif_10
-else_10:
-    %64 = icmp eq i8 %1, 5
-    %65 = icmp eq i8 %2, 32
-    %66 = and i1 %64, %65
-    br i1 %66 , label %then_12, label %else_12
+endif_10:
+    br label %endif_9
+else_9:
+    %61 = icmp eq i8 %1, 5
+    %62 = icmp eq i8 %2, 0
+    %63 = and i1 %61, %62
+    br i1 %63 , label %then_11, label %else_11
+then_11:
+    %64 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str6 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
+    %65 = icmp ne i8 %4, 0
+    br i1 %65 , label %then_12, label %endif_12
 then_12:
-    %67 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str7 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
-    call void(i32) @exit (i32 1)
+    %66 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %67 = getelementptr inbounds [32 x i32], [32 x i32]* %66, i32 0, i8 %5
+    %68 = load i32, i32* %67
+    %69 = bitcast i32 %68 to i32
+    %70 = lshr i32 %69, %3
+    %71 = bitcast i32 %70 to i32
+    %72 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %73 = getelementptr inbounds [32 x i32], [32 x i32]* %72, i32 0, i8 %4
+    store i32 %71, i32* %73
     br label %endif_12
-else_12:
-    %68 = icmp eq i8 %1, 6
-    br i1 %68 , label %then_13, label %else_13
+endif_12:
+    br label %endif_11
+else_11:
+    %74 = icmp eq i8 %1, 5
+    %75 = icmp eq i8 %2, 32
+    %76 = and i1 %74, %75
+    br i1 %76 , label %then_13, label %else_13
 then_13:
-    %69 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([18 x i8]* @str8 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
-    %70 = icmp ne i8 %4, 0
-    br i1 %70 , label %then_14, label %endif_14
+    %77 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str7 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
+    %78 = icmp ne i8 %4, 0
+    br i1 %78 , label %then_14, label %endif_14
 then_14:
-    %71 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %72 = getelementptr inbounds [32 x i32], [32 x i32]* %71, i32 0, i8 %5
-    %73 = load i32, i32* %72
-    %74 = or i32 %73, %3
-    %75 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %76 = getelementptr inbounds [32 x i32], [32 x i32]* %75, i32 0, i8 %4
-    store i32 %74, i32* %76
+    %79 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %80 = getelementptr inbounds [32 x i32], [32 x i32]* %79, i32 0, i8 %5
+    %81 = load i32, i32* %80
+    %82 = ashr i32 %81, %3
+    %83 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %84 = getelementptr inbounds [32 x i32], [32 x i32]* %83, i32 0, i8 %4
+    store i32 %82, i32* %84
     br label %endif_14
 endif_14:
     br label %endif_13
 else_13:
-    %77 = icmp eq i8 %1, 7
-    br i1 %77 , label %then_15, label %endif_15
+    %85 = icmp eq i8 %1, 6
+    br i1 %85 , label %then_15, label %else_15
 then_15:
-    %78 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str9 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
-    %79 = icmp ne i8 %4, 0
-    br i1 %79 , label %then_16, label %endif_16
+    %86 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([18 x i8]* @str8 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
+    %87 = icmp ne i8 %4, 0
+    br i1 %87 , label %then_16, label %endif_16
 then_16:
-    %80 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %81 = getelementptr inbounds [32 x i32], [32 x i32]* %80, i32 0, i8 %5
-    %82 = load i32, i32* %81
-    %83 = and i32 %82, %3
-    %84 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %85 = getelementptr inbounds [32 x i32], [32 x i32]* %84, i32 0, i8 %4
-    store i32 %83, i32* %85
+    %88 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %89 = getelementptr inbounds [32 x i32], [32 x i32]* %88, i32 0, i8 %5
+    %90 = load i32, i32* %89
+    %91 = or i32 %90, %3
+    %92 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %93 = getelementptr inbounds [32 x i32], [32 x i32]* %92, i32 0, i8 %4
+    store i32 %91, i32* %93
     br label %endif_16
 endif_16:
+    br label %endif_15
+else_15:
+    %94 = icmp eq i8 %1, 7
+    br i1 %94 , label %then_17, label %endif_17
+then_17:
+    %95 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str9 to [0 x i8]*), i8 %4, i8 %5, i32 %3)
+    %96 = icmp ne i8 %4, 0
+    br i1 %96 , label %then_18, label %endif_18
+then_18:
+    %97 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %98 = getelementptr inbounds [32 x i32], [32 x i32]* %97, i32 0, i8 %5
+    %99 = load i32, i32* %98
+    %100 = and i32 %99, %3
+    %101 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %102 = getelementptr inbounds [32 x i32], [32 x i32]* %101, i32 0, i8 %4
+    store i32 %100, i32* %102
+    br label %endif_18
+endif_18:
+    br label %endif_17
+endif_17:
     br label %endif_15
 endif_15:
     br label %endif_13
 endif_13:
-    br label %endif_12
-endif_12:
-    br label %endif_10
-endif_10:
-    br label %endif_8
-endif_8:
+    br label %endif_11
+endif_11:
+    br label %endif_9
+endif_9:
     br label %endif_7
 endif_7:
     br label %endif_5
@@ -684,7 +705,7 @@ else_7:
     %64 = and i1 %62, %63
     br i1 %64 , label %then_8, label %else_8
 then_8:
-    ; TODO: shift right arithmetical
+    ; shift right arithmetical
     %65 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([19 x i8]* @str17 to [0 x i8]*), i8 %4, i8 %5, i8 %6)
     %66 = ashr i32 %11, %14
     %67 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
@@ -754,13 +775,15 @@ define i32 @jal_imm_recode(i32 %imm) {
 }
 
 define i32 @fetch(%Core* %core) {
+    ;let instr_adr = core.ip / 4
+    ;let instr = core.text[instr_adr]
     %1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
     %2 = load i32, i32* %1
-    %3 = udiv i32 %2, 4
-    %4 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %5 = load [0 x i32]*, [0 x i32]** %4
-    %6 = getelementptr inbounds [0 x i32], [0 x i32]* %5, i32 0, i32 %3
-    %7 = load i32, i32* %6
+    %3 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+    %4 = load %MemoryInterface*, %MemoryInterface** %3
+    %5 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %4, i32 0, i32 2
+    %6 = load i32(i32)*, i32(i32)** %5
+    %7 = call i32(i32) %6 (i32 %2)
     ret i32 %7
 }
 

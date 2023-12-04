@@ -45,6 +45,6 @@ const OP_PAUSE = 0x0100000F
 const OP_STOP = 0
 
 
-func core_init(core: *Core, memctl: *MemoryInterface, text: *[]Nat32, textlen: Nat32, sp: Nat32)
+func core_init(core: *Core, memctl: *MemoryInterface, sp: Nat32)
 func core_tick(core: *Core) -> Bool
 

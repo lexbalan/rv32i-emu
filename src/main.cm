@@ -72,7 +72,7 @@ func show_mem() {
 }
 
 func main() -> Int {
-    printf("Hello VM!\n")
+    printf("RISC-V VM\n")
     
     // memory controller initialize
     memctl.read8 := &vm_mem_read8
@@ -83,12 +83,10 @@ func main() -> Int {
     memctl.write16 := &vm_mem_write16
     memctl.write32 := &vm_mem_write32
     
-    let loaded_bytes_text = loader(text_filename, &text to *[]Nat8, sizeof(Nat32) * TEXT_BUFFER_SIZE)
+	let romptr = get_rom_ptr()
+	let loaded_bytes_text = loader(text_filename, romptr, ROM_SIZE)
     
-    //let ramptr = get_ram_ptr()
-    //let loaded_bytes_data = loader(text_filename, &text to *[]Nat8, sizeof(Nat32) * TEXT_BUFFER_SIZE)
-    
-    core_init(&core, &memctl, &text, loaded_bytes_text, RAM_END)
+    core_init(&core, &memctl, RAM_END)
     
     printf("START\n")
     

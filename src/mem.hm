@@ -5,6 +5,12 @@ const RAM_START = 0x10000000
 const RAM_SIZE = 0x08000
 const RAM_END = RAM_START + RAM_SIZE
 
+
+const ROM_START = 0x00000000
+const ROM_SIZE = 0x10000
+const ROM_END = ROM_START + ROM_SIZE
+
+
 const MMIO_START = 0xF00C0000
 const MMMIO_SIZE  = 0xFFFF
 const MMIO_END = MMIO_START + MMMIO_SIZE
@@ -14,6 +20,7 @@ const CONSOLE_PUT_ADR  = CONSOLE_MMIO_ADR + 0
 const CONSOLE_GET_ADR  = CONSOLE_MMIO_ADR + 1
 
 func get_ram_ptr() -> *[]Nat8
+func get_rom_ptr() -> *[]Nat8
 
 func vm_mem_read8(adr: Nat32) -> Nat8
 func vm_mem_read16(adr: Nat32) -> Nat16

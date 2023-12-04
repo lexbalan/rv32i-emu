@@ -13,5 +13,11 @@ all:
 	#llvm-objcopy -Iriscv32 main.o --only-section=.text -Obinary out.bin
 
 
-elfdump:
+dump:
 	objdump --full-contents main.elf
+
+sect:
+	objdump -h main.elf
+	
+symb:
+	objdump -t main.elf

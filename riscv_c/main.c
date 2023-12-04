@@ -15,8 +15,10 @@
 int main();
 void __rt0 ();
 
+
+
 // first function (!)
-void __boot() {
+__attribute__ ((section ("boot"))) void __boot() {
 	__rt0();
 	main();
 
@@ -25,7 +27,7 @@ void __boot() {
 
 
 void __rt0() {
-#if 1
+#if 0
   // Зануление BSS сегмента
   {
     extern uint32_t _bss_start, _bss_end;
@@ -74,16 +76,20 @@ int write(int fd, void *data, int len) {
 }
 
 
+
+
 //const char *hello = "Hello world!";
 
-char str[13] = "hello world!";
+char str[13];// = "hello world!";
+
+//volatile int k; // goes into 2 .data BSS
 
 int main() {
-	int c = str[0];
-	int d = str[1];
-	int e = str[2];
-	int f = str[3];
-	//write(0, hello, 12);
+	str[0] = 'h';
+	str[1] = 'i';
+	str[2] = '!';
+	str[3] = 0;
+	write(0, str, 3);
 	/*int i = 0;
 	
 	while (1) {
