@@ -1,23 +1,9 @@
 
+#include <stdint.h>
+
 #include "vm_sys.h"
+#include "console.h"
 
-
-
-void console_print_char8(char c) {
-	*((int8_t *)CONSOLE_PRINT_CHAR8_ADR) = (int8_t)c;
-}
-
-void console_print_int(int32_t i) {
-	*((int32_t *)CONSOLE_PRINT_INT32_ADR) = i;
-}
-
-void console_print_uint(uint32_t i) {
-	*((uint32_t *)CONSOLE_PRINT_INT32_ADR) = i;
-}
-
-void console_print_uint_hex(uint32_t i) {
-	*((uint32_t *)CONSOLE_PRINT_UINT32_HEX_ADR) = i;
-}
 
 
 int write(int fd, void *data, int len) {
@@ -44,7 +30,9 @@ char *str = "Hello world!";
 
 int main() {
 
+	// print "Hello world!"
 	write(0, str, 12);
+
 
 	volatile uint32_t x = 0x80001200;
 
@@ -54,20 +42,6 @@ int main() {
 	console_print_uint(123);
 	console_print_char8('\n');
 	console_print_uint_hex(x >> 8);
-
-
-	/*int i = 0;
-	
-	while (1) {
-		//char c = '0' + i;
-		write(0, hello, 12);
-
-		if (i > 5) {
-			break;
-		}
-
-		i = i + 1;
-	}*/
 
     return 0;
 }
