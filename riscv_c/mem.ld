@@ -47,21 +47,24 @@
 		*(.rodata*)
 	} > ROM
 
-	.bss : {
-		_bss_start = .;
-		*(.sbss SORT(.bss.*) COMMON)
-		*(.bss SORT(.bss.*) COMMON)
-		_bss_end = .;
-	} > RAM
-
+	
 	.data : {
 		_data_start = .;
 		*(.sdata SORT(.data.*))
 		*(.data SORT(.data.*))
 		_data_end = .;
 	} > RAM AT > ROM
-
+	
 	_data_flash_start = LOADADDR(.data);
+	
+	
+	.bss : {
+		_bss_start = .;
+		*(.sbss SORT(.bss.*) COMMON)
+		*(.bss SORT(.bss.*) COMMON)
+		_bss_end = .;
+	} > RAM
+	
 
     .heap :
     {

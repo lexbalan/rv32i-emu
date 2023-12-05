@@ -46,9 +46,9 @@ void __rt0() {
 #if 1
   // Копирование .data сегмента из FLASH в RAM
   {
-    extern uint32_t _data_start, _data_end, _data_flash_start;
-    uint32_t *const dst = &_data_start;
-    uint32_t *const src = &_data_flash_start;
+    extern void _data_start, _data_end, _data_flash_start;
+    uint8_t *const dst = &_data_start;
+    uint8_t *const src = &_data_flash_start;
     const uint32_t data_size = (uint32_t)&_data_end - (uint32_t)&_data_start;
 
     uint32_t i = 0;
@@ -76,24 +76,21 @@ int write(int fd, void *data, int len) {
 }
 
 
+// Нужно копировать секцию data
+// в ней лежат инициализаторы глобальных переменных
+// как простых интов, так и указателей на строки, например.
+// Те сама строка лежит в секции rodata, но указатель на нее
+// не кодируется жестко в инструкциях а лежит в секции data
+// для соотв переменной (!)
 
+int a = 0x5A;
+int b = 0x22;
 
-//const char *hello = "Hello world!";
-
-char *hi = "hello world!";
-char str[13];//
-int z;
-
-//int k = 32;
-//volatile int k; // goes into 2 .data BSS
+char *str = "Hello world!";
 
 int main() {
-//	str[0] = 'h';
-//	str[1] = 'i';
-//	str[2] = '!';
-//	str[3] = 0;
-//	write(0, str, 3);
-	write(0, hi, 12);
+
+	write(0, str, 12);
 	/*int i = 0;
 	
 	while (1) {

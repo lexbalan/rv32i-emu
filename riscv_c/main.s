@@ -54,13 +54,12 @@ __rt0:
 	lw	a1, -24(s0)
 	lui	a0, %hi(_data_flash_start)
 	addi	a0, a0, %lo(_data_flash_start)
-	slli	a1, a1, 2
 	add	a0, a1, a0
-	lw	a0, 0(a0)
+	lb	a0, 0(a0)
 	lui	a2, %hi(_data_start)
 	addi	a2, a2, %lo(_data_start)
 	add	a1, a1, a2
-	sw	a0, 0(a1)
+	sb	a0, 0(a1)
 	lw	a0, -24(s0)
 	addi	a0, a0, 1
 	sw	a0, -24(s0)
@@ -141,8 +140,8 @@ main:
 	li	a0, 0
 	sw	a0, -16(s0)
 	sw	a0, -12(s0)
-	lui	a1, %hi(hi)
-	lw	a1, %lo(hi)(a1)
+	lui	a1, %hi(str)
+	lw	a1, %lo(str)(a1)
 	li	a2, 12
 	call	write
 	lw	a0, -16(s0)
@@ -153,34 +152,34 @@ main:
 .Lfunc_end4:
 	.size	main, .Lfunc_end4-main
 
+	.type	a,@object
+	.section	.sdata,"aw",@progbits
+	.globl	a
+	.p2align	2
+a:
+	.word	90
+	.size	a, 4
+
+	.type	b,@object
+	.globl	b
+	.p2align	2
+b:
+	.word	34
+	.size	b, 4
+
 	.type	.L.str,@object
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .L.str:
-	.asciz	"hello world!"
+	.asciz	"Hello world!"
 	.size	.L.str, 13
 
-	.type	hi,@object
-	.section	.sdata,"aw",@progbits
-	.globl	hi
-	.p2align	2
-hi:
-	.word	.L.str
-	.size	hi, 4
-
 	.type	str,@object
-	.bss
+	.section	.sdata,"aw",@progbits
 	.globl	str
-str:
-	.zero	13
-	.size	str, 13
-
-	.type	z,@object
-	.section	.sbss,"aw",@nobits
-	.globl	z
 	.p2align	2
-z:
-	.word	0
-	.size	z, 4
+str:
+	.word	.L.str
+	.size	str, 4
 
 	.ident	"Homebrew clang version 14.0.6"
 	.section	".note.GNU-stack","",@progbits
@@ -192,4 +191,4 @@ z:
 	.addrsig_sym _data_start
 	.addrsig_sym _data_flash_start
 	.addrsig_sym _data_end
-	.addrsig_sym hi
+	.addrsig_sym str
