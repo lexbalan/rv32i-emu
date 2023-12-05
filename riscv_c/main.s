@@ -2,76 +2,6 @@
 	.attribute	4, 16
 	.attribute	5, "rv32i2p0"
 	.file	"main.c"
-	.section	boot,"ax",@progbits
-	.globl	__boot
-	.p2align	2
-	.type	__boot,@function
-__boot:
-	addi	sp, sp, -16
-	sw	ra, 12(sp)
-	sw	s0, 8(sp)
-	addi	s0, sp, 16
-	call	__rt0
-	call	main
-	#APP
-	ebreak	
-	#NO_APP
-	lw	ra, 12(sp)
-	lw	s0, 8(sp)
-	addi	sp, sp, 16
-	ret
-.Lfunc_end0:
-	.size	__boot, .Lfunc_end0-__boot
-
-	.text
-	.globl	__rt0
-	.p2align	2
-	.type	__rt0,@function
-__rt0:
-	addi	sp, sp, -32
-	sw	ra, 28(sp)
-	sw	s0, 24(sp)
-	addi	s0, sp, 32
-	lui	a0, %hi(_data_start)
-	addi	a1, a0, %lo(_data_start)
-	sw	a1, -12(s0)
-	lui	a0, %hi(_data_flash_start)
-	addi	a0, a0, %lo(_data_flash_start)
-	sw	a0, -16(s0)
-	lui	a0, %hi(_data_end)
-	addi	a0, a0, %lo(_data_end)
-	sub	a0, a0, a1
-	sw	a0, -20(s0)
-	li	a0, 0
-	sw	a0, -24(s0)
-	j	.LBB1_1
-.LBB1_1:
-	lw	a0, -24(s0)
-	lw	a1, -20(s0)
-	bgeu	a0, a1, .LBB1_3
-	j	.LBB1_2
-.LBB1_2:
-	lw	a1, -24(s0)
-	lui	a0, %hi(_data_flash_start)
-	addi	a0, a0, %lo(_data_flash_start)
-	add	a0, a1, a0
-	lb	a0, 0(a0)
-	lui	a2, %hi(_data_start)
-	addi	a2, a2, %lo(_data_start)
-	add	a1, a1, a2
-	sb	a0, 0(a1)
-	lw	a0, -24(s0)
-	addi	a0, a0, 1
-	sw	a0, -24(s0)
-	j	.LBB1_1
-.LBB1_3:
-	lw	ra, 28(sp)
-	lw	s0, 24(sp)
-	addi	sp, sp, 32
-	ret
-.Lfunc_end1:
-	.size	__rt0, .Lfunc_end1-__rt0
-
 	.globl	console_print_char8
 	.p2align	2
 	.type	console_print_char8,@function
@@ -88,8 +18,8 @@ console_print_char8:
 	lw	s0, 8(sp)
 	addi	sp, sp, 16
 	ret
-.Lfunc_end2:
-	.size	console_print_char8, .Lfunc_end2-console_print_char8
+.Lfunc_end0:
+	.size	console_print_char8, .Lfunc_end0-console_print_char8
 
 	.globl	console_print_int
 	.p2align	2
@@ -107,8 +37,8 @@ console_print_int:
 	lw	s0, 8(sp)
 	addi	sp, sp, 16
 	ret
-.Lfunc_end3:
-	.size	console_print_int, .Lfunc_end3-console_print_int
+.Lfunc_end1:
+	.size	console_print_int, .Lfunc_end1-console_print_int
 
 	.globl	console_print_uint
 	.p2align	2
@@ -126,8 +56,8 @@ console_print_uint:
 	lw	s0, 8(sp)
 	addi	sp, sp, 16
 	ret
-.Lfunc_end4:
-	.size	console_print_uint, .Lfunc_end4-console_print_uint
+.Lfunc_end2:
+	.size	console_print_uint, .Lfunc_end2-console_print_uint
 
 	.globl	console_print_uint_hex
 	.p2align	2
@@ -145,8 +75,8 @@ console_print_uint_hex:
 	lw	s0, 8(sp)
 	addi	sp, sp, 16
 	ret
-.Lfunc_end5:
-	.size	console_print_uint_hex, .Lfunc_end5-console_print_uint_hex
+.Lfunc_end3:
+	.size	console_print_uint_hex, .Lfunc_end3-console_print_uint_hex
 
 	.globl	write
 	.p2align	2
@@ -161,13 +91,13 @@ write:
 	sw	a2, -20(s0)
 	li	a0, 0
 	sw	a0, -24(s0)
-	j	.LBB6_1
-.LBB6_1:
+	j	.LBB4_1
+.LBB4_1:
 	lw	a0, -24(s0)
 	lw	a1, -20(s0)
-	bge	a0, a1, .LBB6_3
-	j	.LBB6_2
-.LBB6_2:
+	bge	a0, a1, .LBB4_3
+	j	.LBB4_2
+.LBB4_2:
 	lw	a0, -16(s0)
 	lw	a1, -24(s0)
 	add	a0, a0, a1
@@ -176,15 +106,15 @@ write:
 	lw	a0, -24(s0)
 	addi	a0, a0, 1
 	sw	a0, -24(s0)
-	j	.LBB6_1
-.LBB6_3:
+	j	.LBB4_1
+.LBB4_3:
 	lw	a0, -24(s0)
 	lw	ra, 28(sp)
 	lw	s0, 24(sp)
 	addi	sp, sp, 32
 	ret
-.Lfunc_end6:
-	.size	write, .Lfunc_end6-write
+.Lfunc_end4:
+	.size	write, .Lfunc_end4-write
 
 	.globl	main
 	.p2align	2
@@ -216,15 +146,15 @@ main:
 	lw	a0, -24(s0)
 	call	console_print_char8
 	lw	a0, -16(s0)
-	srai	a0, a0, 8
+	srli	a0, a0, 8
 	call	console_print_uint_hex
 	lw	a0, -20(s0)
 	lw	ra, 28(sp)
 	lw	s0, 24(sp)
 	addi	sp, sp, 32
 	ret
-.Lfunc_end7:
-	.size	main, .Lfunc_end7-main
+.Lfunc_end5:
+	.size	main, .Lfunc_end5-main
 
 	.type	a,@object
 	.section	.sdata,"aw",@progbits
@@ -258,14 +188,9 @@ str:
 	.ident	"Homebrew clang version 14.0.6"
 	.section	".note.GNU-stack","",@progbits
 	.addrsig
-	.addrsig_sym __rt0
 	.addrsig_sym console_print_char8
 	.addrsig_sym console_print_int
 	.addrsig_sym console_print_uint
 	.addrsig_sym console_print_uint_hex
 	.addrsig_sym write
-	.addrsig_sym main
-	.addrsig_sym _data_start
-	.addrsig_sym _data_flash_start
-	.addrsig_sym _data_end
 	.addrsig_sym str

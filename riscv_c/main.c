@@ -1,79 +1,10 @@
 
-#include <stdint.h>
-
-#define MMIO_START 0xF00C0000
-#define MMMIO_SIZE 0xFFFF
-#define MMIO_END   (MMIO_START + MMMIO_SIZE)
-
-#define CONSOLE_MMIO_ADR  (MMIO_START + 0x10)
-#define CONSOLE_PUT_ADR   (CONSOLE_MMIO_ADR + 0x00)
-#define CONSOLE_GET_ADR   (CONSOLE_MMIO_ADR + 0x01)
-
-#define CONSOLE_PRINT_INT32_ADR    (CONSOLE_MMIO_ADR + 0x10)
-#define CONSOLE_PRINT_UINT32_ADR   (CONSOLE_MMIO_ADR + 0x14)
-
-#define CONSOLE_PRINT_INT32_HEX_ADR    (CONSOLE_MMIO_ADR + 0x18)
-#define CONSOLE_PRINT_UINT32_HEX_ADR   (CONSOLE_MMIO_ADR + 0x1C)
-
-#define CONSOLE_PRINT_INT64_ADR    (CONSOLE_MMIO_ADR + 0x20)
-#define CONSOLE_PRINT_UINT64_ADR   (CONSOLE_MMIO_ADR + 0x28)
-
-
-#define CONSOLE_PUT  (*((volatile char *)CONSOLE_PUT_ADR))
-#define CONSOLE_GET  (*((volatile char *)CONSOLE_GET_ADR))
-
-int main();
-void __rt0 ();
-
-
-
-// first function (!)
-__attribute__ ((section ("boot"))) void __boot() {
-	__rt0();
-	main();
-
-	asm("ebreak");
-}
-
-
-void __rt0() {
-#if 0
-  // Зануление BSS сегмента
-  {
-    extern uint32_t _bss_start, _bss_end;
-    uint32_t *const p = &_bss_start;
-    const uint32_t bss_size = (uint32_t)&_bss_end - (uint32_t)&_bss_start;
-
-    uint32_t i = 0;
-    while (i < bss_size) {
-      p[i] = 0;
-      ++i;
-    }
-  }
-#endif
-
-
-#if 1
-  // Копирование .data сегмента из FLASH в RAM
-  {
-    extern void _data_start, _data_end, _data_flash_start;
-    uint8_t *const dst = &_data_start;
-    uint8_t *const src = &_data_flash_start;
-    const uint32_t data_size = (uint32_t)&_data_end - (uint32_t)&_data_start;
-
-    uint32_t i = 0;
-    while (i < data_size) {
-      dst[i] = src[i];
-      ++i;
-    }
-  }
-#endif
-}
+#include "vm_sys.h"
 
 
 
 void console_print_char8(char c) {
-	CONSOLE_PUT = c;
+	*((int8_t *)CONSOLE_PRINT_CHAR8_ADR) = (int8_t)c;
 }
 
 void console_print_int(int32_t i) {
