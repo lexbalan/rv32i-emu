@@ -3,7 +3,7 @@
 
 
 void __rt0() {
-#if 0
+#if 1
   // Зануление BSS сегмента
   {
     extern void _bss_start, _bss_end;
