@@ -4,4 +4,4 @@
 *dump.txt
 *.out
 *.ll
-out/
+out/*
