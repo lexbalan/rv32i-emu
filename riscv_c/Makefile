@@ -17,8 +17,10 @@ all:
 	# link OBJects to ELF
 	ld.lld -T mem.ld -o main.elf startup.o main.o system.o console.o
 	
+	rm *.o
+	
 	# extract sections from ELF to BIN file
-	llvm-objcopy -Iriscv32 main.elf --only-section=.boot --only-section=.text --only-section=.data -Obinary text.bin
+	llvm-objcopy -Iriscv32 main.elf --only-section=.boot --only-section=.text --only-section=.data -Obinary ../image.bin
 
 	# make ELF dump
 	llvm-objdump -d ./main.elf > ./dump.txt

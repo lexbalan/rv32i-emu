@@ -9,8 +9,7 @@ import "./mem.hm"
 import "./core.hm"
 
 
-const text_filename = "./riscv_c/text.bin" to *Str8
-const data_filename = "./riscv_c/data.bin" to *Str8
+const text_filename = "./image.bin" to *Str8
 
 
 const SHOW_TEXT = true
