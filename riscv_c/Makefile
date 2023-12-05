@@ -1,4 +1,5 @@
 
+
 # compile C to BIN
 all:
 	# translate C to ASM
@@ -9,17 +10,19 @@ all:
 	
 	clang --target=riscv32 -march=rv32i main.c -c -o main.o
 	clang --target=riscv32 -march=rv32i startup.c -c -o startup.o
+	clang --target=riscv32 -march=rv32i system.c -c -o system.o
 	clang --target=riscv32 -march=rv32i console.c -c -o console.o
 
 	
 	# link OBJects to ELF
-	ld.lld -T mem.ld -o main.elf startup.o main.o console.o
+	ld.lld -T mem.ld -o main.elf startup.o main.o system.o console.o
 	
 	# extract sections from ELF to BIN file
 	llvm-objcopy -Iriscv32 main.elf --only-section=.boot --only-section=.text --only-section=.data -Obinary text.bin
 
 	# make ELF dump
 	llvm-objdump -d ./main.elf > ./dump.txt
+
 
 
 # show ELF content
