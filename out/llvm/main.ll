@@ -210,10 +210,12 @@ declare void @vm_mem_write32(i32, i32)
 	i32,
 	i32,
 	i1,
-	%MemoryInterface*,
-	[0 x i32]*,
-	i32
+	%MemoryInterface*
 }
+
+
+
+
 
 
 

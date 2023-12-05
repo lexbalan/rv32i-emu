@@ -6,11 +6,21 @@
 #define MMIO_END   (MMIO_START + MMMIO_SIZE)
 
 #define CONSOLE_MMIO_ADR  (MMIO_START + 0x10)
-#define CONSOLE_PUT_ADR   (CONSOLE_MMIO_ADR + 0)
-#define CONSOLE_GET_ADR   (CONSOLE_MMIO_ADR + 1)
+#define CONSOLE_PUT_ADR   (CONSOLE_MMIO_ADR + 0x00)
+#define CONSOLE_GET_ADR   (CONSOLE_MMIO_ADR + 0x01)
+
+#define CONSOLE_PRINT_INT32_ADR    (CONSOLE_MMIO_ADR + 0x10)
+#define CONSOLE_PRINT_UINT32_ADR   (CONSOLE_MMIO_ADR + 0x14)
+
+#define CONSOLE_PRINT_INT32_HEX_ADR    (CONSOLE_MMIO_ADR + 0x18)
+#define CONSOLE_PRINT_UINT32_HEX_ADR   (CONSOLE_MMIO_ADR + 0x1C)
+
+#define CONSOLE_PRINT_INT64_ADR    (CONSOLE_MMIO_ADR + 0x20)
+#define CONSOLE_PRINT_UINT64_ADR   (CONSOLE_MMIO_ADR + 0x28)
+
 
 #define CONSOLE_PUT  (*((volatile char *)CONSOLE_PUT_ADR))
-#define CONSOLE_GET  (*((volatile char *)CONSOLE_PUT_ADR))
+#define CONSOLE_GET  (*((volatile char *)CONSOLE_GET_ADR))
 
 int main();
 void __rt0 ();
@@ -62,14 +72,27 @@ void __rt0() {
 
 
 
-void console_putc(char c) {
+void console_print_char8(char c) {
 	CONSOLE_PUT = c;
 }
+
+void console_print_int(int32_t i) {
+	*((int32_t *)CONSOLE_PRINT_INT32_ADR) = i;
+}
+
+void console_print_uint(uint32_t i) {
+	*((uint32_t *)CONSOLE_PRINT_INT32_ADR) = i;
+}
+
+void console_print_uint_hex(uint32_t i) {
+	*((uint32_t *)CONSOLE_PRINT_UINT32_HEX_ADR) = i;
+}
+
 
 int write(int fd, void *data, int len) {
 	int i = 0;
 	while (i < len) {
-		console_putc(((char *)data)[i]);
+		console_print_char8(((char *)data)[i]);
 		i = i + 1;
 	}
 	return i;
@@ -83,14 +106,25 @@ int write(int fd, void *data, int len) {
 // не кодируется жестко в инструкциях а лежит в секции data
 // для соотв переменной (!)
 
-int a = 0x5A;
-int b = 0x22;
+uint32_t a = 0x12345678;
+uint32_t b = 0xA5A5A5A5;
 
 char *str = "Hello world!";
 
 int main() {
 
 	write(0, str, 12);
+
+	volatile uint32_t x = 0x80001200;
+
+	console_print_char8('\n');
+	console_print_int(-123);
+	console_print_char8('\n');
+	console_print_uint(123);
+	console_print_char8('\n');
+	console_print_uint_hex(x >> 8);
+
+
 	/*int i = 0;
 	
 	while (1) {

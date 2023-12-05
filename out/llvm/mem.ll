@@ -98,6 +98,10 @@ declare void @perror(%ConstCharStr*)
 
 @str1 = private constant [30 x i8] [i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
 @str2 = private constant [3 x i8] [i8 37, i8 99, i8 0]
+@str3 = private constant [3 x i8] [i8 37, i8 100, i8 0]
+@str4 = private constant [3 x i8] [i8 37, i8 117, i8 0]
+@str5 = private constant [3 x i8] [i8 37, i8 120, i8 0]
+@str6 = private constant [3 x i8] [i8 37, i8 120, i8 0]
 
 
 
@@ -363,11 +367,47 @@ else_0:
     br i1 %10 , label %then_1, label %else_1
 then_1:
     %11 = icmp eq i32 %adr, 4027318288
-    br i1 %11 , label %then_2, label %endif_2
+    br i1 %11 , label %then_2, label %else_2
 then_2:
     %12 = bitcast i32 %value to i32
     %13 = call i32(i32) @putchar (i32 %12)
     ret void
+    br label %endif_2
+else_2:
+    %15 = icmp eq i32 %adr, 4027318304
+    br i1 %15 , label %then_3, label %else_3
+then_3:
+    %16 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([3 x i8]* @str3 to [0 x i8]*), i32 %value)
+    ret void
+    br label %endif_3
+else_3:
+    %18 = icmp eq i32 %adr, 4027318308
+    br i1 %18 , label %then_4, label %else_4
+then_4:
+    %19 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([3 x i8]* @str4 to [0 x i8]*), i32 %value)
+    ret void
+    br label %endif_4
+else_4:
+    %21 = icmp eq i32 %adr, 4027318312
+    br i1 %21 , label %then_5, label %else_5
+then_5:
+    %22 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([3 x i8]* @str5 to [0 x i8]*), i32 %value)
+    ret void
+    br label %endif_5
+else_5:
+    %24 = icmp eq i32 %adr, 4027318316
+    br i1 %24 , label %then_6, label %endif_6
+then_6:
+    %25 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([3 x i8]* @str6 to [0 x i8]*), i32 %value)
+    ret void
+    br label %endif_6
+endif_6:
+    br label %endif_5
+endif_5:
+    br label %endif_4
+endif_4:
+    br label %endif_3
+endif_3:
     br label %endif_2
 endif_2:
     br label %endif_1

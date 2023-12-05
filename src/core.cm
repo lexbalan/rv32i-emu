@@ -225,10 +225,10 @@ var cnt : Nat32
 func core_tick(core: *Core) -> Bool {
     let instr = fetch(core)
 
-	let b3 = ((instr >> 24) to Nat8) and 0xFF
-	let b2 = ((instr >> 16) to Nat8) and 0xFF
-	let b1 = ((instr >> 8) to Nat8) and 0xFF
-	let b0 = ((instr >> 0) to Nat8) and 0xFF
+	//let b3 = ((instr >> 24) to Nat8) and 0xFF
+	//let b2 = ((instr >> 16) to Nat8) and 0xFF
+	//let b1 = ((instr >> 8) to Nat8) and 0xFF
+	//let b0 = ((instr >> 0) to Nat8) and 0xFF
 	//printf("[%04x] %02x%02x%02x%02x ", core.ip, b0 to Nat32, b1 to Nat32, b2 to Nat32, b3 to Nat32)
     let op = extract_op(instr)
     let rd = extract_rd(instr)
@@ -247,20 +247,20 @@ func core_tick(core: *Core) -> Bool {
     } else if op == OP_R {
         r_type_op(core, instr)
     
-    } else if op == OPCODE_LUI {
+    } else if op == OP_LUI {
         // U-type
         let imm = extract_imm31_12(instr)
         //printf("lui x%d, 0x%X\n", rd, imm)
         core.reg[rd] = imm << 12
 
-    } else if op == OPCODE_AUI_PC {
+    } else if op == OP_AUI_PC {
         // U-type
         let imm = extract_imm31_12(instr)
 		let x = (core.ip to Int32) + (imm << 12)
         core.reg[rd] := x
 		//printf("auipc x%d, 0x%X\n", rd, imm)
 
-    } else if op == OPCODE_JAL {
+    } else if op == OP_JAL {
         // U-type
 		let raw_imm = jal_imm_recode(extract_imm31_12(instr) to Nat32)
 		let imm = expand20(raw_imm)
@@ -272,7 +272,7 @@ func core_tick(core: *Core) -> Bool {
 		core.ip := (core.ip to Int32 + imm) to Nat32
         core.need_step := false
 	
-    } else if op == OPCODE_JALR and funct3 == 0 {
+    } else if op == OP_JALR and funct3 == 0 {
         let imm = extract_imm12(instr)
 		//printf("jalr %d(x%d)\n", imm, rs1)
     	// pc <- (rs1 + imm) & ~1

@@ -130,7 +130,20 @@ func vm_mem_write32(adr: Nat32, value: Nat32) {
         if adr == CONSOLE_PUT_ADR {
             putchar(value to Int)
             return
-        }
+		} else if adr == CONSOLE_PRINT_INT32_ADR {
+			printf("%d", value)
+            return
+		} else if adr == CONSOLE_PRINT_UINT32_ADR {
+			printf("%u", value)
+            return
+		} else if adr == CONSOLE_PRINT_INT32_HEX_ADR {
+			printf("%x", value)
+            return
+		} else if adr == CONSOLE_PRINT_UINT32_HEX_ADR {
+			printf("%x", value)
+            return
+		}
+
     } else {
         mem_violation("w"[0], adr)
     }
