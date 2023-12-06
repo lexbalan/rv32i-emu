@@ -17,6 +17,8 @@ int main() {
 	// print "Hello world!"
 	write(0, str, 12);
 
+	asm("ecall");
+
 
 	//volatile uint32_t x = 0x80001200;
 

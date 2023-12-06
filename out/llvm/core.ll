@@ -1308,17 +1308,19 @@ else_35:
     br i1 %291 , label %then_39, label %else_39
 then_39:
     ;printf("ECALL\n")
+    %292 = bitcast %Core* %core to %Core*
+    call void(%Core*, i32) @core_irq (%Core* %292, i32 8)
     br label %endif_39
 else_39:
-    %292 = icmp eq i32 %14, 1048691
-    br i1 %292 , label %then_40, label %else_40
+    %293 = icmp eq i32 %14, 1048691
+    br i1 %293 , label %then_40, label %else_40
 then_40:
     ;printf("EBREAK\n")
     ret i1 0
     br label %endif_40
 else_40:
-    %294 = icmp eq i32 %14, 16777231
-    br i1 %294 , label %then_41, label %else_41
+    %295 = icmp eq i32 %14, 16777231
+    br i1 %295 , label %then_41, label %else_41
 then_41:
     ;printf("PAUSE\n")
     br label %endif_41
@@ -1348,19 +1350,19 @@ endif_4:
 endif_3:
     br label %endif_2
 endif_2:
-    %295 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    %296 = load i1, i1* %295
-    br i1 %296 , label %then_42, label %else_42
+    %296 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    %297 = load i1, i1* %296
+    br i1 %297 , label %then_42, label %else_42
 then_42:
-    %297 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %298 = load i32, i32* %297
-    %299 = add i32 %298, 4
-    %300 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %299, i32* %300
+    %298 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %299 = load i32, i32* %298
+    %300 = add i32 %299, 4
+    %301 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %300, i32* %301
     br label %endif_42
 else_42:
-    %301 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 1, i1* %301
+    %302 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 1, i1* %302
     br label %endif_42
 endif_42:
     ret i1 1

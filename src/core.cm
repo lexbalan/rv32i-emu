@@ -8,6 +8,7 @@ import "./core.hm"
 
 
 
+
 func core_init(core: *Core, memctl: *MemoryInterface) {
     memset(core, 0, sizeof(Core))
     core.memctl := memctl
@@ -447,6 +448,7 @@ func core_tick(core: *Core) -> Bool {
         
     } else if instr == OP_ECALL {
         //printf("ECALL\n")
+		core_irq(core, INT_SYS_CALL)
     } else if instr == OP_EBREAK {
         //printf("EBREAK\n")
         return false

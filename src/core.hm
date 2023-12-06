@@ -44,3 +44,9 @@ func core_init(core: *Core, memctl: *MemoryInterface)
 func core_irq(core: *Core, irq: Nat32)
 func core_tick(core: *Core) -> Bool
 
+
+const INT_SYS_CALL = 0x08
+const INT_MEM_VIOLATION = 0x0B
+
+
+

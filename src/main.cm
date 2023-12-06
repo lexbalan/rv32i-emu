@@ -84,7 +84,7 @@ func show_mem() {
 
 
 func mem_violation_event(reason: Nat32) {
-	core_irq(&core, 11)
+	core_irq(&core, INT_MEM_VIOLATION)
 }
 
 

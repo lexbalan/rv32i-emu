@@ -230,6 +230,7 @@ declare void @core_init(%Core*, %MemoryInterface*)
 declare void @core_irq(%Core*, i32)
 declare i1 @core_tick(%Core*)
 
+
 ; -- SOURCE: src/main.cm
 
 @str1 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]

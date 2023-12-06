@@ -8,6 +8,7 @@
 .global __mem_violation
 .global trap_empty
 .global _sstack
+.global system
 
 
 vectors:
@@ -27,7 +28,7 @@ vectors:
 	
     j trap_empty
 	
-    j trap_empty
+    j system
 	
     j trap_empty
 	
@@ -58,4 +59,6 @@ __mem_violation:
 	#j __mem_violation
 	ebreak
 
+system:
+	j system
 
