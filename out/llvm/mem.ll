@@ -120,10 +120,11 @@ define [0 x i8]* @get_rom_ptr() {
 
 
 declare void @exit(i32)
+declare void @mem_violation_event(i32)
 
 define void @mem_violation(i8 %rw, i32 %adr) {
     %1 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([30 x i8]* @str1 to [0 x i8]*), i8 %rw, i32 %adr)
-    call void(i32) @exit (i32 1)
+    call void(i32) @mem_violation_event (i32 85)
     ret void
 }
 

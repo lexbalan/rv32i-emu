@@ -18,14 +18,20 @@ int main() {
 	write(0, str, 12);
 
 
-	volatile uint32_t x = 0x80001200;
+	//volatile uint32_t x = 0x80001200;
 
-	console_print_char8('\n');
+	if (0) {
+		// memory violation
+		int *p = 0x222222;
+		*p = 0;
+	}
+
+	/*console_print_char8('\n');
 	console_print_int(-123);
 	console_print_char8('\n');
 	console_print_uint(123);
 	console_print_char8('\n');
-	console_print_uint_hex(x >> 8);
+	console_print_uint_hex(x >> 8);*/
 
     return 0;
 }

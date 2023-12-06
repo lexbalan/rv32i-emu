@@ -7,7 +7,7 @@ all:
 	# translate ASM to OBJ
 	#clang --target=riscv32 -march=rv32i main.s -c -o main.o
 	
-	
+	clang --target=riscv32 -march=rv32i vect.S -c -o vect.o
 	clang --target=riscv32 -march=rv32i main.c -c -o main.o
 	clang --target=riscv32 -march=rv32i startup.c -c -o startup.o
 	clang --target=riscv32 -march=rv32i system.c -c -o system.o
@@ -15,7 +15,7 @@ all:
 
 	
 	# link OBJects to ELF
-	ld.lld -T mem.ld -o main.elf startup.o main.o system.o console.o
+	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o
 	
 	rm *.o
 	

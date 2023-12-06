@@ -210,6 +210,7 @@ declare void @vm_mem_write32(i32, i32)
 	i32,
 	i32,
 	i1,
+	i32,
 	%MemoryInterface*
 }
 
@@ -225,7 +226,8 @@ declare void @vm_mem_write32(i32, i32)
 
 
 
-declare void @core_init(%Core*, %MemoryInterface*, i32)
+declare void @core_init(%Core*, %MemoryInterface*)
+declare void @core_irq(%Core*, i32)
 declare i1 @core_tick(%Core*)
 
 ; -- SOURCE: src/main.cm
@@ -372,6 +374,12 @@ break_1:
     ret void
 }
 
+define void @mem_violation_event(i32 %reason) {
+    %1 = bitcast %Core* @core to %Core*
+    call void(%Core*, i32) @core_irq (%Core* %1, i32 11)
+    ret void
+}
+
 define i32 @main() {
     %1 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([11 x i8]* @str14 to [0 x i8]*))
     ; memory controller initialize
@@ -391,7 +399,7 @@ define i32 @main() {
     %9 = call i32([0 x i8]*, [0 x i8]*, i32) @loader ([0 x i8]* bitcast ([12 x i8]* @str1 to [0 x i8]*), [0 x i8]* %8, i32 65536)
     %10 = bitcast %Core* @core to %Core*
     %11 = bitcast %MemoryInterface* @memctl to %MemoryInterface*
-    call void(%Core*, %MemoryInterface*, i32) @core_init (%Core* %10, %MemoryInterface* %11, i32 268435712)
+    call void(%Core*, %MemoryInterface*) @core_init (%Core* %10, %MemoryInterface* %11)
     %12 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([7 x i8]* @str15 to [0 x i8]*))
     br label %again_1
 again_1:

@@ -21,9 +21,12 @@ func get_rom_ptr() -> *[]Nat8 {
 extern func exit(code: Int32)
 
 
+extern func mem_violation_event(reason: Nat32)
+
+
 func mem_violation(rw: Char8, adr: Nat32) {
 	printf("MEMORY VIOLATION '%c' 0x%08x\n", rw, adr)
-	exit(1)
+	mem_violation_event(0x55)
 }
 
 

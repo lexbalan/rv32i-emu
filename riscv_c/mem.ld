@@ -11,7 +11,10 @@ MEMORY
 
 SECTIONS
 {
-	.boot : {*(boot)} > ROM
+	.boot : {
+		*(.isr_vector)
+		*(boot)
+	} > ROM
 	
 	.text : {
 		*(.text*)

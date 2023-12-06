@@ -18,13 +18,13 @@ type Core record {
     ip: Nat32
     sp: Nat32
     
-    need_step : Bool
+    need_step: Bool
+
+	interrupt: Nat32
     
     memctl: *MemoryInterface
 }
 
-
-const OP_NOP = 0
 
 const OP_LUI = 0x37
 const OP_AUI_PC = 0x17
@@ -39,9 +39,8 @@ const OP_ECALL = 0x00000073
 const OP_EBREAK = 0x00100073
 const OP_PAUSE = 0x0100000F
 
-const OP_STOP = 0
 
-
-func core_init(core: *Core, memctl: *MemoryInterface, sp: Nat32)
+func core_init(core: *Core, memctl: *MemoryInterface)
+func core_irq(core: *Core, irq: Nat32)
 func core_tick(core: *Core) -> Bool
 
