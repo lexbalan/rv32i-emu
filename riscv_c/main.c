@@ -17,12 +17,11 @@ int main() {
 	// print "Hello world!"
 	write(0, str, 12);
 
-	asm("ecall");
-
+	//asm("ecall");
 
 	//volatile uint32_t x = 0x80001200;
 
-	if (0) {
+	if (1) {
 		// memory violation
 		int *p = 0x222222;
 		*p = 0;
