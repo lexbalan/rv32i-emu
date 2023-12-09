@@ -59,6 +59,8 @@ __mem_violation:
 	#j __mem_violation
 	ebreak
 
+
 system:
+	ebreak
 	j system
 
