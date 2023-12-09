@@ -219,11 +219,6 @@ func r_type_op(core: *Core, instr: Nat32) {
 
 
 
-func fetch(core: *Core) -> Nat32 {
-	return core.memctl.read32(core.ip)
-}
-
-
 func core_tick(core: *Core) -> Bool {
 
 	if core.interrupt > 0 {
@@ -233,7 +228,8 @@ func core_tick(core: *Core) -> Bool {
 		core.interrupt := 0
 	}
 
-    let instr = fetch(core)
+	// instruction fetch
+    let instr = core.memctl.read32(core.ip)
 
     //let b3 = ((instr >> 24) to Nat8) and 0xFF
     //let b2 = ((instr >> 16) to Nat8) and 0xFF

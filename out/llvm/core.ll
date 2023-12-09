@@ -241,9 +241,9 @@ endif_0:
     ret void
 }
 
-define i32 @expand12(i32 %val12bit) {
+define i32 @expand12(i32 %val_12bit) {
     %v = alloca i32
-    store i32 %val12bit, i32* %v
+    store i32 %val_12bit, i32* %v
     %1 = load i32, i32* %v
     %2 = and i32 %1, 2048
     %3 = icmp ne i32 %2, 0
@@ -720,17 +720,6 @@ endif_1:
     ret void
 }
 
-define i32 @fetch(%Core* %core) {
-    %1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %2 = load i32, i32* %1
-    %3 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %4 = load %MemoryInterface*, %MemoryInterface** %3
-    %5 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %4, i32 0, i32 2
-    %6 = load i32(i32)*, i32(i32)** %5
-    %7 = call i32(i32) %6 (i32 %2)
-    ret i32 %7
-}
-
 define i1 @core_tick(%Core* %core) {
     %1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
     %2 = load i32, i32* %1
@@ -749,334 +738,340 @@ then_0:
     store i32 0, i32* %11
     br label %endif_0
 endif_0:
-    %12 = bitcast %Core* %core to %Core*
-    %13 = call i32(%Core*) @fetch (%Core* %12)
+    ; instruction fetch
+    %12 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %13 = load i32, i32* %12
+    %14 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %15 = load %MemoryInterface*, %MemoryInterface** %14
+    %16 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %15, i32 0, i32 2
+    %17 = load i32(i32)*, i32(i32)** %16
+    %18 = call i32(i32) %17 (i32 %13)
     ;let b3 = ((instr >> 24) to Nat8) and 0xFF
     ;let b2 = ((instr >> 16) to Nat8) and 0xFF
     ;let b1 = ((instr >> 8) to Nat8) and 0xFF
     ;let b0 = ((instr >> 0) to Nat8) and 0xFF
     ;printf("[%04x] %02x%02x%02x%02x ", core.ip, b0 to Nat32, b1 to Nat32, b2 to Nat32, b3 to Nat32)
-    %14 = call i8(i32) @extract_op (i32 %13)
-    %15 = call i8(i32) @extract_rd (i32 %13)
-    %16 = call i8(i32) @extract_rs1 (i32 %13)
-    %17 = call i8(i32) @extract_rs2 (i32 %13)
-    %18 = call i8(i32) @extract_funct3 (i32 %13)
+    %19 = call i8(i32) @extract_op (i32 %18)
+    %20 = call i8(i32) @extract_rd (i32 %18)
+    %21 = call i8(i32) @extract_rs1 (i32 %18)
+    %22 = call i8(i32) @extract_rs2 (i32 %18)
+    %23 = call i8(i32) @extract_funct3 (i32 %18)
     br i1 0 , label %then_1, label %endif_1
 then_1:
     ;printf("INSTR = 0x%x\n", instr)
     ;printf("OP = 0x%x\n", op)
     br label %endif_1
 endif_1:
-    %19 = icmp eq i8 %14, 19
-    br i1 %19 , label %then_2, label %else_2
+    %24 = icmp eq i8 %19, 19
+    br i1 %24 , label %then_2, label %else_2
 then_2:
-    %20 = bitcast %Core* %core to %Core*
-    call void(%Core*, i32) @i_type_op (%Core* %20, i32 %13)
+    %25 = bitcast %Core* %core to %Core*
+    call void(%Core*, i32) @i_type_op (%Core* %25, i32 %18)
     br label %endif_2
 else_2:
-    %21 = icmp eq i8 %14, 51
-    br i1 %21 , label %then_3, label %else_3
+    %26 = icmp eq i8 %19, 51
+    br i1 %26 , label %then_3, label %else_3
 then_3:
-    %22 = bitcast %Core* %core to %Core*
-    call void(%Core*, i32) @r_type_op (%Core* %22, i32 %13)
+    %27 = bitcast %Core* %core to %Core*
+    call void(%Core*, i32) @r_type_op (%Core* %27, i32 %18)
     br label %endif_3
 else_3:
-    %23 = icmp eq i8 %14, 55
-    br i1 %23 , label %then_4, label %else_4
+    %28 = icmp eq i8 %19, 55
+    br i1 %28 , label %then_4, label %else_4
 then_4:
     ; U-type
-    %24 = call i32(i32) @extract_imm31_12 (i32 %13)
-    %25 = call i32(i32) @expand12 (i32 %24)
+    %29 = call i32(i32) @extract_imm31_12 (i32 %18)
+    %30 = call i32(i32) @expand12 (i32 %29)
     ;printf("lui x%d, 0x%X\n", rd, imm)
-    %26 = shl i32 %25, 12
-    %27 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %28 = getelementptr inbounds [32 x i32], [32 x i32]* %27, i32 0, i8 %15
-    store i32 %26, i32* %28
+    %31 = shl i32 %30, 12
+    %32 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %33 = getelementptr inbounds [32 x i32], [32 x i32]* %32, i32 0, i8 %20
+    store i32 %31, i32* %33
     br label %endif_4
 else_4:
-    %29 = icmp eq i8 %14, 23
-    br i1 %29 , label %then_5, label %else_5
+    %34 = icmp eq i8 %19, 23
+    br i1 %34 , label %then_5, label %else_5
 then_5:
     ; U-type
-    %30 = call i32(i32) @extract_imm31_12 (i32 %13)
-    %31 = call i32(i32) @expand12 (i32 %30)
-    %32 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %33 = load i32, i32* %32
-    %34 = bitcast i32 %33 to i32
-    %35 = shl i32 %31, 12
-    %36 = add i32 %34, %35
-    %37 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %38 = getelementptr inbounds [32 x i32], [32 x i32]* %37, i32 0, i8 %15
-    store i32 %36, i32* %38
+    %35 = call i32(i32) @extract_imm31_12 (i32 %18)
+    %36 = call i32(i32) @expand12 (i32 %35)
+    %37 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %38 = load i32, i32* %37
+    %39 = bitcast i32 %38 to i32
+    %40 = shl i32 %36, 12
+    %41 = add i32 %39, %40
+    %42 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %43 = getelementptr inbounds [32 x i32], [32 x i32]* %42, i32 0, i8 %20
+    store i32 %41, i32* %43
     ;printf("auipc x%d, 0x%X\n", rd, imm)
     br label %endif_5
 else_5:
-    %39 = icmp eq i8 %14, 111
-    br i1 %39 , label %then_6, label %else_6
+    %44 = icmp eq i8 %19, 111
+    br i1 %44 , label %then_6, label %else_6
 then_6:
     ; U-type
-    %40 = call i32(i32) @extract_jal_imm (i32 %13)
-    %41 = call i32(i32) @expand20 (i32 %40)
+    %45 = call i32(i32) @extract_jal_imm (i32 %18)
+    %46 = call i32(i32) @expand20 (i32 %45)
     ;printf("jal x%d, %d\n", rd, imm)
-    %42 = icmp ne i8 %15, 0
-    br i1 %42 , label %then_7, label %endif_7
+    %47 = icmp ne i8 %20, 0
+    br i1 %47 , label %then_7, label %endif_7
 then_7:
-    %43 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %44 = load i32, i32* %43
-    %45 = add i32 %44, 4
-    %46 = bitcast i32 %45 to i32
-    %47 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %48 = getelementptr inbounds [32 x i32], [32 x i32]* %47, i32 0, i8 %15
-    store i32 %46, i32* %48
+    %48 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %49 = load i32, i32* %48
+    %50 = add i32 %49, 4
+    %51 = bitcast i32 %50 to i32
+    %52 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %53 = getelementptr inbounds [32 x i32], [32 x i32]* %52, i32 0, i8 %20
+    store i32 %51, i32* %53
     br label %endif_7
 endif_7:
-    %49 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %50 = load i32, i32* %49
-    %51 = bitcast i32 %50 to i32
-    %52 = add i32 %51, %41
-    %53 = bitcast i32 %52 to i32
     %54 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %53, i32* %54
-    %55 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %55
+    %55 = load i32, i32* %54
+    %56 = bitcast i32 %55 to i32
+    %57 = add i32 %56, %46
+    %58 = bitcast i32 %57 to i32
+    %59 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %58, i32* %59
+    %60 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %60
     br label %endif_6
 else_6:
-    %56 = icmp eq i8 %14, 103
-    %57 = icmp eq i8 %18, 0
-    %58 = and i1 %56, %57
-    br i1 %58 , label %then_8, label %else_8
+    %61 = icmp eq i8 %19, 103
+    %62 = icmp eq i8 %23, 0
+    %63 = and i1 %61, %62
+    br i1 %63 , label %then_8, label %else_8
 then_8:
-    %59 = call i32(i32) @extract_imm12 (i32 %13)
-    %60 = call i32(i32) @expand12 (i32 %59)
+    %64 = call i32(i32) @extract_imm12 (i32 %18)
+    %65 = call i32(i32) @expand12 (i32 %64)
     ;printf("jalr %d(x%d)\n", imm, rs1)
     ; rd <- pc + 4
     ; pc <- (rs1 + imm) & ~1
-    %61 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %62 = load i32, i32* %61
-    %63 = add i32 %62, 4
-    %64 = bitcast i32 %63 to i32
-    %65 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %66 = getelementptr inbounds [32 x i32], [32 x i32]* %65, i32 0, i8 %16
+    %66 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
     %67 = load i32, i32* %66
-    %68 = add i32 %67, %60
+    %68 = add i32 %67, 4
     %69 = bitcast i32 %68 to i32
-    %70 = and i32 %69, 4294967294
-    %71 = icmp ne i8 %15, 0
-    br i1 %71 , label %then_9, label %endif_9
+    %70 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %71 = getelementptr inbounds [32 x i32], [32 x i32]* %70, i32 0, i8 %21
+    %72 = load i32, i32* %71
+    %73 = add i32 %72, %65
+    %74 = bitcast i32 %73 to i32
+    %75 = and i32 %74, 4294967294
+    %76 = icmp ne i8 %20, 0
+    br i1 %76 , label %then_9, label %endif_9
 then_9:
-    %72 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %73 = getelementptr inbounds [32 x i32], [32 x i32]* %72, i32 0, i8 %15
-    store i32 %64, i32* %73
+    %77 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %78 = getelementptr inbounds [32 x i32], [32 x i32]* %77, i32 0, i8 %20
+    store i32 %69, i32* %78
     br label %endif_9
 endif_9:
-    %74 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %70, i32* %74
-    %75 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %75
+    %79 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %75, i32* %79
+    %80 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %80
     br label %endif_8
 else_8:
-    %76 = icmp eq i8 %14, 99
-    br i1 %76 , label %then_10, label %else_10
+    %81 = icmp eq i8 %19, 99
+    br i1 %81 , label %then_10, label %else_10
 then_10:
-    %77 = call i8(i32) @extract_funct7 (i32 %13)
-    %78 = call i8(i32) @extract_rd (i32 %13)
-    %79 = and i8 %78, 30
-    %80 = zext i8 %79 to i16
-    %81 = and i8 %77, 63
-    %82 = zext i8 %81 to i16
-    %83 = shl i16 %82, 5
-    %84 = and i8 %78, 1
+    %82 = call i8(i32) @extract_funct7 (i32 %18)
+    %83 = call i8(i32) @extract_rd (i32 %18)
+    %84 = and i8 %83, 30
     %85 = zext i8 %84 to i16
-    %86 = shl i16 %85, 11
-    %87 = and i8 %77, 64
-    %88 = zext i8 %87 to i16
-    %89 = shl i16 %88, 6
-    %90 = or i16 %83, %80
-    %91 = or i16 %86, %90
-    %92 = or i16 %89, %91
+    %86 = and i8 %82, 63
+    %87 = zext i8 %86 to i16
+    %88 = shl i16 %87, 5
+    %89 = and i8 %83, 1
+    %90 = zext i8 %89 to i16
+    %91 = shl i16 %90, 11
+    %92 = and i8 %82, 64
+    %93 = zext i8 %92 to i16
+    %94 = shl i16 %93, 6
+    %95 = or i16 %88, %85
+    %96 = or i16 %91, %95
+    %97 = or i16 %94, %96
     %bits = alloca i16
-    store i16 %92, i16* %bits
-    ; распространяем знак, если он есть
-    %93 = load i16, i16* %bits
-    %94 = and i16 %93, 4096
-    %95 = icmp ne i16 %94, 0
-    br i1 %95 , label %then_11, label %endif_11
-then_11:
-    %96 = load i16, i16* %bits
-    %97 = or i16 61440, %96
     store i16 %97, i16* %bits
+    ; распространяем знак, если он есть
+    %98 = load i16, i16* %bits
+    %99 = and i16 %98, 4096
+    %100 = icmp ne i16 %99, 0
+    br i1 %100 , label %then_11, label %endif_11
+then_11:
+    %101 = load i16, i16* %bits
+    %102 = or i16 61440, %101
+    store i16 %102, i16* %bits
     br label %endif_11
 endif_11:
-    %98 = load i16, i16* %bits
-    %99 = bitcast i16 %98 to i16
-    %100 = icmp eq i8 %18, 0
-    br i1 %100 , label %then_12, label %else_12
+    %103 = load i16, i16* %bits
+    %104 = bitcast i16 %103 to i16
+    %105 = icmp eq i8 %23, 0
+    br i1 %105 , label %then_12, label %else_12
 then_12:
     ;beq
     ;printf("beq x%d, x%d, %d\n", rs1, rs2, imm to Int32)
-    %101 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %102 = getelementptr inbounds [32 x i32], [32 x i32]* %101, i32 0, i8 %16
-    %103 = load i32, i32* %102
-    %104 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %105 = getelementptr inbounds [32 x i32], [32 x i32]* %104, i32 0, i8 %17
-    %106 = load i32, i32* %105
-    %107 = icmp eq i32 %103, %106
-    br i1 %107 , label %then_13, label %endif_13
+    %106 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %107 = getelementptr inbounds [32 x i32], [32 x i32]* %106, i32 0, i8 %21
+    %108 = load i32, i32* %107
+    %109 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %110 = getelementptr inbounds [32 x i32], [32 x i32]* %109, i32 0, i8 %22
+    %111 = load i32, i32* %110
+    %112 = icmp eq i32 %108, %111
+    br i1 %112 , label %then_13, label %endif_13
 then_13:
-    %108 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %109 = load i32, i32* %108
-    %110 = bitcast i32 %109 to i32
-    %111 = sext i16 %99 to i32
-    %112 = add i32 %110, %111
-    %113 = bitcast i32 %112 to i32
-    %114 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %113, i32* %114
-    %115 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %115
+    %113 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %114 = load i32, i32* %113
+    %115 = bitcast i32 %114 to i32
+    %116 = sext i16 %104 to i32
+    %117 = add i32 %115, %116
+    %118 = bitcast i32 %117 to i32
+    %119 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %118, i32* %119
+    %120 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %120
     br label %endif_13
 endif_13:
     br label %endif_12
 else_12:
-    %116 = icmp eq i8 %18, 1
-    br i1 %116 , label %then_14, label %else_14
+    %121 = icmp eq i8 %23, 1
+    br i1 %121 , label %then_14, label %else_14
 then_14:
     ;bne
     ;printf("bne x%d, x%d, %d\n", rs1, rs2, imm to Int32)
-    %117 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %118 = getelementptr inbounds [32 x i32], [32 x i32]* %117, i32 0, i8 %16
-    %119 = load i32, i32* %118
-    %120 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %121 = getelementptr inbounds [32 x i32], [32 x i32]* %120, i32 0, i8 %17
-    %122 = load i32, i32* %121
-    %123 = icmp ne i32 %119, %122
-    br i1 %123 , label %then_15, label %endif_15
+    %122 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %123 = getelementptr inbounds [32 x i32], [32 x i32]* %122, i32 0, i8 %21
+    %124 = load i32, i32* %123
+    %125 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %126 = getelementptr inbounds [32 x i32], [32 x i32]* %125, i32 0, i8 %22
+    %127 = load i32, i32* %126
+    %128 = icmp ne i32 %124, %127
+    br i1 %128 , label %then_15, label %endif_15
 then_15:
-    %124 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %125 = load i32, i32* %124
-    %126 = bitcast i32 %125 to i32
-    %127 = sext i16 %99 to i32
-    %128 = add i32 %126, %127
-    %129 = bitcast i32 %128 to i32
-    %130 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %129, i32* %130
-    %131 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %131
+    %129 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %130 = load i32, i32* %129
+    %131 = bitcast i32 %130 to i32
+    %132 = sext i16 %104 to i32
+    %133 = add i32 %131, %132
+    %134 = bitcast i32 %133 to i32
+    %135 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %134, i32* %135
+    %136 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %136
     br label %endif_15
 endif_15:
     br label %endif_14
 else_14:
-    %132 = icmp eq i8 %18, 4
-    br i1 %132 , label %then_16, label %else_16
+    %137 = icmp eq i8 %23, 4
+    br i1 %137 , label %then_16, label %else_16
 then_16:
     ;blt
     ;printf("blt x%d, x%d, %d\n", rs1, rs2, imm to Int32)
-    %133 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %134 = getelementptr inbounds [32 x i32], [32 x i32]* %133, i32 0, i8 %16
-    %135 = load i32, i32* %134
-    %136 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %137 = getelementptr inbounds [32 x i32], [32 x i32]* %136, i32 0, i8 %17
-    %138 = load i32, i32* %137
-    %139 = icmp slt i32 %135, %138
-    br i1 %139 , label %then_17, label %endif_17
+    %138 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %139 = getelementptr inbounds [32 x i32], [32 x i32]* %138, i32 0, i8 %21
+    %140 = load i32, i32* %139
+    %141 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %142 = getelementptr inbounds [32 x i32], [32 x i32]* %141, i32 0, i8 %22
+    %143 = load i32, i32* %142
+    %144 = icmp slt i32 %140, %143
+    br i1 %144 , label %then_17, label %endif_17
 then_17:
-    %140 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %141 = load i32, i32* %140
-    %142 = bitcast i32 %141 to i32
-    %143 = sext i16 %99 to i32
-    %144 = add i32 %142, %143
-    %145 = bitcast i32 %144 to i32
-    %146 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %145, i32* %146
-    %147 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %147
+    %145 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %146 = load i32, i32* %145
+    %147 = bitcast i32 %146 to i32
+    %148 = sext i16 %104 to i32
+    %149 = add i32 %147, %148
+    %150 = bitcast i32 %149 to i32
+    %151 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %150, i32* %151
+    %152 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %152
     br label %endif_17
 endif_17:
     br label %endif_16
 else_16:
-    %148 = icmp eq i8 %18, 5
-    br i1 %148 , label %then_18, label %else_18
+    %153 = icmp eq i8 %23, 5
+    br i1 %153 , label %then_18, label %else_18
 then_18:
     ;bge
     ;printf("bge x%d, x%d, %d\n", rs1, rs2, imm to Int32)
-    %149 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %150 = getelementptr inbounds [32 x i32], [32 x i32]* %149, i32 0, i8 %16
-    %151 = load i32, i32* %150
-    %152 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %153 = getelementptr inbounds [32 x i32], [32 x i32]* %152, i32 0, i8 %17
-    %154 = load i32, i32* %153
-    %155 = icmp sge i32 %151, %154
-    br i1 %155 , label %then_19, label %endif_19
+    %154 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %155 = getelementptr inbounds [32 x i32], [32 x i32]* %154, i32 0, i8 %21
+    %156 = load i32, i32* %155
+    %157 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %158 = getelementptr inbounds [32 x i32], [32 x i32]* %157, i32 0, i8 %22
+    %159 = load i32, i32* %158
+    %160 = icmp sge i32 %156, %159
+    br i1 %160 , label %then_19, label %endif_19
 then_19:
-    %156 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %157 = load i32, i32* %156
-    %158 = bitcast i32 %157 to i32
-    %159 = sext i16 %99 to i32
-    %160 = add i32 %158, %159
-    %161 = bitcast i32 %160 to i32
-    %162 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %161, i32* %162
-    %163 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %163
+    %161 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %162 = load i32, i32* %161
+    %163 = bitcast i32 %162 to i32
+    %164 = sext i16 %104 to i32
+    %165 = add i32 %163, %164
+    %166 = bitcast i32 %165 to i32
+    %167 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %166, i32* %167
+    %168 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %168
     br label %endif_19
 endif_19:
     br label %endif_18
 else_18:
-    %164 = icmp eq i8 %18, 6
-    br i1 %164 , label %then_20, label %else_20
+    %169 = icmp eq i8 %23, 6
+    br i1 %169 , label %then_20, label %else_20
 then_20:
     ;bltu
     ;printf("bltu x%d, x%d, %d\n", rs1, rs2, imm to Int32)
-    %165 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %166 = getelementptr inbounds [32 x i32], [32 x i32]* %165, i32 0, i8 %16
-    %167 = load i32, i32* %166
-    %168 = bitcast i32 %167 to i32
-    %169 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %170 = getelementptr inbounds [32 x i32], [32 x i32]* %169, i32 0, i8 %17
-    %171 = load i32, i32* %170
-    %172 = bitcast i32 %171 to i32
-    %173 = icmp ult i32 %168, %172
-    br i1 %173 , label %then_21, label %endif_21
+    %170 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %171 = getelementptr inbounds [32 x i32], [32 x i32]* %170, i32 0, i8 %21
+    %172 = load i32, i32* %171
+    %173 = bitcast i32 %172 to i32
+    %174 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %175 = getelementptr inbounds [32 x i32], [32 x i32]* %174, i32 0, i8 %22
+    %176 = load i32, i32* %175
+    %177 = bitcast i32 %176 to i32
+    %178 = icmp ult i32 %173, %177
+    br i1 %178 , label %then_21, label %endif_21
 then_21:
-    %174 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %175 = load i32, i32* %174
-    %176 = bitcast i32 %175 to i32
-    %177 = sext i16 %99 to i32
-    %178 = add i32 %176, %177
-    %179 = bitcast i32 %178 to i32
-    %180 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %179, i32* %180
-    %181 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %181
+    %179 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %180 = load i32, i32* %179
+    %181 = bitcast i32 %180 to i32
+    %182 = sext i16 %104 to i32
+    %183 = add i32 %181, %182
+    %184 = bitcast i32 %183 to i32
+    %185 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %184, i32* %185
+    %186 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %186
     br label %endif_21
 endif_21:
     br label %endif_20
 else_20:
-    %182 = icmp eq i8 %18, 7
-    br i1 %182 , label %then_22, label %endif_22
+    %187 = icmp eq i8 %23, 7
+    br i1 %187 , label %then_22, label %endif_22
 then_22:
     ;bgeu
     ;printf("bgeu x%d, x%d, %d\n", rs1, rs2, imm to Int32)
-    %183 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %184 = getelementptr inbounds [32 x i32], [32 x i32]* %183, i32 0, i8 %16
-    %185 = load i32, i32* %184
-    %186 = bitcast i32 %185 to i32
-    %187 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %188 = getelementptr inbounds [32 x i32], [32 x i32]* %187, i32 0, i8 %17
-    %189 = load i32, i32* %188
-    %190 = bitcast i32 %189 to i32
-    %191 = icmp uge i32 %186, %190
-    br i1 %191 , label %then_23, label %else_23
+    %188 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %189 = getelementptr inbounds [32 x i32], [32 x i32]* %188, i32 0, i8 %21
+    %190 = load i32, i32* %189
+    %191 = bitcast i32 %190 to i32
+    %192 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %193 = getelementptr inbounds [32 x i32], [32 x i32]* %192, i32 0, i8 %22
+    %194 = load i32, i32* %193
+    %195 = bitcast i32 %194 to i32
+    %196 = icmp uge i32 %191, %195
+    br i1 %196 , label %then_23, label %else_23
 then_23:
-    %192 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %193 = load i32, i32* %192
-    %194 = bitcast i32 %193 to i32
-    %195 = sext i16 %99 to i32
-    %196 = add i32 %194, %195
-    %197 = bitcast i32 %196 to i32
-    %198 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %197, i32* %198
-    %199 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 0, i1* %199
+    %197 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %198 = load i32, i32* %197
+    %199 = bitcast i32 %198 to i32
+    %200 = sext i16 %104 to i32
+    %201 = add i32 %199, %200
+    %202 = bitcast i32 %201 to i32
+    %203 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %202, i32* %203
+    %204 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 0, i1* %204
     br label %endif_23
 else_23:
     br label %endif_23
@@ -1095,121 +1090,121 @@ endif_14:
 endif_12:
     br label %endif_10
 else_10:
-    %200 = icmp eq i8 %14, 3
-    br i1 %200 , label %then_24, label %else_24
+    %205 = icmp eq i8 %19, 3
+    br i1 %205 , label %then_24, label %else_24
 then_24:
-    %201 = call i32(i32) @extract_imm12 (i32 %13)
-    %202 = call i32(i32) @expand12 (i32 %201)
-    %203 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %204 = getelementptr inbounds [32 x i32], [32 x i32]* %203, i32 0, i8 %16
-    %205 = load i32, i32* %204
-    %206 = add i32 %205, %202
-    %207 = bitcast i32 %206 to i32
-    %208 = icmp eq i8 %18, 0
-    br i1 %208 , label %then_25, label %else_25
+    %206 = call i32(i32) @extract_imm12 (i32 %18)
+    %207 = call i32(i32) @expand12 (i32 %206)
+    %208 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %209 = getelementptr inbounds [32 x i32], [32 x i32]* %208, i32 0, i8 %21
+    %210 = load i32, i32* %209
+    %211 = add i32 %210, %207
+    %212 = bitcast i32 %211 to i32
+    %213 = icmp eq i8 %23, 0
+    br i1 %213 , label %then_25, label %else_25
 then_25:
     ; lb
     ;printf("lb x%d, %d(x%d)\n", rd, imm, rs1)
-    %209 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %210 = load %MemoryInterface*, %MemoryInterface** %209
-    %211 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %210, i32 0, i32 0
-    %212 = load i8(i32)*, i8(i32)** %211
-    %213 = call i8(i32) %212 (i32 %207)
-    %214 = sext i8 %213 to i32
-    %215 = icmp ne i8 %15, 0
-    br i1 %215 , label %then_26, label %endif_26
+    %214 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %215 = load %MemoryInterface*, %MemoryInterface** %214
+    %216 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %215, i32 0, i32 0
+    %217 = load i8(i32)*, i8(i32)** %216
+    %218 = call i8(i32) %217 (i32 %212)
+    %219 = sext i8 %218 to i32
+    %220 = icmp ne i8 %20, 0
+    br i1 %220 , label %then_26, label %endif_26
 then_26:
-    %216 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %217 = getelementptr inbounds [32 x i32], [32 x i32]* %216, i32 0, i8 %15
-    store i32 %214, i32* %217
+    %221 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %222 = getelementptr inbounds [32 x i32], [32 x i32]* %221, i32 0, i8 %20
+    store i32 %219, i32* %222
     br label %endif_26
 endif_26:
     br label %endif_25
 else_25:
-    %218 = icmp eq i8 %18, 1
-    br i1 %218 , label %then_27, label %else_27
+    %223 = icmp eq i8 %23, 1
+    br i1 %223 , label %then_27, label %else_27
 then_27:
     ; lh
     ;printf("lh x%d, %d(x%d)\n", rd, imm, rs1)
-    %219 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %220 = load %MemoryInterface*, %MemoryInterface** %219
-    %221 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %220, i32 0, i32 1
-    %222 = load i16(i32)*, i16(i32)** %221
-    %223 = call i16(i32) %222 (i32 %207)
-    %224 = sext i16 %223 to i32
-    %225 = icmp ne i8 %15, 0
-    br i1 %225 , label %then_28, label %endif_28
+    %224 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %225 = load %MemoryInterface*, %MemoryInterface** %224
+    %226 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %225, i32 0, i32 1
+    %227 = load i16(i32)*, i16(i32)** %226
+    %228 = call i16(i32) %227 (i32 %212)
+    %229 = sext i16 %228 to i32
+    %230 = icmp ne i8 %20, 0
+    br i1 %230 , label %then_28, label %endif_28
 then_28:
-    %226 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %227 = getelementptr inbounds [32 x i32], [32 x i32]* %226, i32 0, i8 %15
-    store i32 %224, i32* %227
+    %231 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %232 = getelementptr inbounds [32 x i32], [32 x i32]* %231, i32 0, i8 %20
+    store i32 %229, i32* %232
     br label %endif_28
 endif_28:
     br label %endif_27
 else_27:
-    %228 = icmp eq i8 %18, 2
-    br i1 %228 , label %then_29, label %else_29
+    %233 = icmp eq i8 %23, 2
+    br i1 %233 , label %then_29, label %else_29
 then_29:
     ; lw
     ;printf("lw x%d, %d(x%d)\n", rd, imm, rs1)
-    %229 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %230 = load %MemoryInterface*, %MemoryInterface** %229
-    %231 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %230, i32 0, i32 2
-    %232 = load i32(i32)*, i32(i32)** %231
-    %233 = call i32(i32) %232 (i32 %207)
-    %234 = bitcast i32 %233 to i32
+    %234 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %235 = load %MemoryInterface*, %MemoryInterface** %234
+    %236 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %235, i32 0, i32 2
+    %237 = load i32(i32)*, i32(i32)** %236
+    %238 = call i32(i32) %237 (i32 %212)
+    %239 = bitcast i32 %238 to i32
     ;printf("LW [0x%x] (0x%x)\n", adr, val)
-    %235 = icmp ne i8 %15, 0
-    br i1 %235 , label %then_30, label %endif_30
+    %240 = icmp ne i8 %20, 0
+    br i1 %240 , label %then_30, label %endif_30
 then_30:
-    %236 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %237 = getelementptr inbounds [32 x i32], [32 x i32]* %236, i32 0, i8 %15
-    store i32 %234, i32* %237
+    %241 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %242 = getelementptr inbounds [32 x i32], [32 x i32]* %241, i32 0, i8 %20
+    store i32 %239, i32* %242
     br label %endif_30
 endif_30:
     br label %endif_29
 else_29:
-    %238 = icmp eq i8 %18, 4
-    br i1 %238 , label %then_31, label %else_31
+    %243 = icmp eq i8 %23, 4
+    br i1 %243 , label %then_31, label %else_31
 then_31:
     ; lbu
     ;printf("lbu x%d, %d(x%d)\n", rd, imm, rs1)
-    %239 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %240 = load %MemoryInterface*, %MemoryInterface** %239
-    %241 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %240, i32 0, i32 0
-    %242 = load i8(i32)*, i8(i32)** %241
-    %243 = call i8(i32) %242 (i32 %207)
-    %244 = zext i8 %243 to i32
-    %245 = bitcast i32 %244 to i32
+    %244 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %245 = load %MemoryInterface*, %MemoryInterface** %244
+    %246 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %245, i32 0, i32 0
+    %247 = load i8(i32)*, i8(i32)** %246
+    %248 = call i8(i32) %247 (i32 %212)
+    %249 = zext i8 %248 to i32
+    %250 = bitcast i32 %249 to i32
     ;printf("LBU[0x%x] (0x%x)\n", adr, val)
-    %246 = icmp ne i8 %15, 0
-    br i1 %246 , label %then_32, label %endif_32
+    %251 = icmp ne i8 %20, 0
+    br i1 %251 , label %then_32, label %endif_32
 then_32:
-    %247 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %248 = getelementptr inbounds [32 x i32], [32 x i32]* %247, i32 0, i8 %15
-    store i32 %245, i32* %248
+    %252 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %253 = getelementptr inbounds [32 x i32], [32 x i32]* %252, i32 0, i8 %20
+    store i32 %250, i32* %253
     br label %endif_32
 endif_32:
     br label %endif_31
 else_31:
-    %249 = icmp eq i8 %18, 5
-    br i1 %249 , label %then_33, label %endif_33
+    %254 = icmp eq i8 %23, 5
+    br i1 %254 , label %then_33, label %endif_33
 then_33:
     ; lhu
     ;printf("lhu x%d, %d(x%d)\n", rd, imm, rs1)
-    %250 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %251 = load %MemoryInterface*, %MemoryInterface** %250
-    %252 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %251, i32 0, i32 1
-    %253 = load i16(i32)*, i16(i32)** %252
-    %254 = call i16(i32) %253 (i32 %207)
-    %255 = zext i16 %254 to i32
-    %256 = bitcast i32 %255 to i32
-    %257 = icmp ne i8 %15, 0
-    br i1 %257 , label %then_34, label %endif_34
+    %255 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %256 = load %MemoryInterface*, %MemoryInterface** %255
+    %257 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %256, i32 0, i32 1
+    %258 = load i16(i32)*, i16(i32)** %257
+    %259 = call i16(i32) %258 (i32 %212)
+    %260 = zext i16 %259 to i32
+    %261 = bitcast i32 %260 to i32
+    %262 = icmp ne i8 %20, 0
+    br i1 %262 , label %then_34, label %endif_34
 then_34:
-    %258 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %259 = getelementptr inbounds [32 x i32], [32 x i32]* %258, i32 0, i8 %15
-    store i32 %256, i32* %259
+    %263 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %264 = getelementptr inbounds [32 x i32], [32 x i32]* %263, i32 0, i8 %20
+    store i32 %261, i32* %264
     br label %endif_34
 endif_34:
     br label %endif_33
@@ -1224,60 +1219,60 @@ endif_27:
 endif_25:
     br label %endif_24
 else_24:
-    %260 = icmp eq i8 %14, 35
-    br i1 %260 , label %then_35, label %else_35
+    %265 = icmp eq i8 %19, 35
+    br i1 %265 , label %then_35, label %else_35
 then_35:
-    %261 = call i8(i32) @extract_funct7 (i32 %13)
-    %262 = zext i8 %261 to i32
-    %263 = shl i32 %262, 5
-    %264 = zext i8 %15 to i32
-    %265 = or i32 %263, %264
-    %266 = call i32(i32) @expand12 (i32 %265)
-    %267 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %268 = getelementptr inbounds [32 x i32], [32 x i32]* %267, i32 0, i8 %16
-    %269 = load i32, i32* %268
-    %270 = add i32 %269, %266
-    %271 = bitcast i32 %270 to i32
+    %266 = call i8(i32) @extract_funct7 (i32 %18)
+    %267 = zext i8 %266 to i32
+    %268 = shl i32 %267, 5
+    %269 = zext i8 %20 to i32
+    %270 = or i32 %268, %269
+    %271 = call i32(i32) @expand12 (i32 %270)
     %272 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-    %273 = getelementptr inbounds [32 x i32], [32 x i32]* %272, i32 0, i8 %17
+    %273 = getelementptr inbounds [32 x i32], [32 x i32]* %272, i32 0, i8 %21
     %274 = load i32, i32* %273
-    %275 = icmp eq i8 %18, 0
-    br i1 %275 , label %then_36, label %else_36
+    %275 = add i32 %274, %271
+    %276 = bitcast i32 %275 to i32
+    %277 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
+    %278 = getelementptr inbounds [32 x i32], [32 x i32]* %277, i32 0, i8 %22
+    %279 = load i32, i32* %278
+    %280 = icmp eq i8 %23, 0
+    br i1 %280 , label %then_36, label %else_36
 then_36:
     ; sb
     ;printf("sb x%d, %d(x%d)\n", rs2, imm, rs1)
-    %276 = trunc i32 %274 to i8
-    %277 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %278 = load %MemoryInterface*, %MemoryInterface** %277
-    %279 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %278, i32 0, i32 3
-    %280 = load void(i32, i8)*, void(i32, i8)** %279
-    call void(i32, i8) %280 (i32 %271, i8 %276)
+    %281 = trunc i32 %279 to i8
+    %282 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %283 = load %MemoryInterface*, %MemoryInterface** %282
+    %284 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %283, i32 0, i32 3
+    %285 = load void(i32, i8)*, void(i32, i8)** %284
+    call void(i32, i8) %285 (i32 %276, i8 %281)
     br label %endif_36
 else_36:
-    %281 = icmp eq i8 %18, 1
-    br i1 %281 , label %then_37, label %else_37
+    %286 = icmp eq i8 %23, 1
+    br i1 %286 , label %then_37, label %else_37
 then_37:
     ; sh
     ;printf("sh x%d, %d(x%d)\n", rs2, imm, rs1)
-    %282 = trunc i32 %274 to i16
-    %283 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %284 = load %MemoryInterface*, %MemoryInterface** %283
-    %285 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %284, i32 0, i32 4
-    %286 = load void(i32, i16)*, void(i32, i16)** %285
-    call void(i32, i16) %286 (i32 %271, i16 %282)
+    %287 = trunc i32 %279 to i16
+    %288 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %289 = load %MemoryInterface*, %MemoryInterface** %288
+    %290 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %289, i32 0, i32 4
+    %291 = load void(i32, i16)*, void(i32, i16)** %290
+    call void(i32, i16) %291 (i32 %276, i16 %287)
     br label %endif_37
 else_37:
-    %287 = icmp eq i8 %18, 2
-    br i1 %287 , label %then_38, label %endif_38
+    %292 = icmp eq i8 %23, 2
+    br i1 %292 , label %then_38, label %endif_38
 then_38:
     ; sw
     ;printf("sw x%d, %d(x%d)\n", rs2, imm, rs1)
-    %288 = bitcast i32 %274 to i32
-    %289 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-    %290 = load %MemoryInterface*, %MemoryInterface** %289
-    %291 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %290, i32 0, i32 5
-    %292 = load void(i32, i32)*, void(i32, i32)** %291
-    call void(i32, i32) %292 (i32 %271, i32 %288)
+    %293 = bitcast i32 %279 to i32
+    %294 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+    %295 = load %MemoryInterface*, %MemoryInterface** %294
+    %296 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %295, i32 0, i32 5
+    %297 = load void(i32, i32)*, void(i32, i32)** %296
+    call void(i32, i32) %297 (i32 %276, i32 %293)
     br label %endif_38
 endif_38:
     br label %endif_37
@@ -1286,23 +1281,23 @@ endif_37:
 endif_36:
     br label %endif_35
 else_35:
-    %293 = icmp eq i32 %13, 115
-    br i1 %293 , label %then_39, label %else_39
+    %298 = icmp eq i32 %18, 115
+    br i1 %298 , label %then_39, label %else_39
 then_39:
     ;printf("ECALL\n")
-    %294 = bitcast %Core* %core to %Core*
-    call void(%Core*, i32) @core_irq (%Core* %294, i32 8)
+    %299 = bitcast %Core* %core to %Core*
+    call void(%Core*, i32) @core_irq (%Core* %299, i32 8)
     br label %endif_39
 else_39:
-    %295 = icmp eq i32 %13, 1048691
-    br i1 %295 , label %then_40, label %else_40
+    %300 = icmp eq i32 %18, 1048691
+    br i1 %300 , label %then_40, label %else_40
 then_40:
     ;printf("EBREAK\n")
     ret i1 0
     br label %endif_40
 else_40:
-    %297 = icmp eq i32 %13, 16777231
-    br i1 %297 , label %then_41, label %else_41
+    %302 = icmp eq i32 %18, 16777231
+    br i1 %302 , label %then_41, label %else_41
 then_41:
     ;printf("PAUSE\n")
     br label %endif_41
@@ -1332,19 +1327,19 @@ endif_4:
 endif_3:
     br label %endif_2
 endif_2:
-    %298 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    %299 = load i1, i1* %298
-    br i1 %299 , label %then_42, label %else_42
+    %303 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    %304 = load i1, i1* %303
+    br i1 %304 , label %then_42, label %else_42
 then_42:
-    %300 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    %301 = load i32, i32* %300
-    %302 = add i32 %301, 4
-    %303 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-    store i32 %302, i32* %303
+    %305 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    %306 = load i32, i32* %305
+    %307 = add i32 %306, 4
+    %308 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+    store i32 %307, i32* %308
     br label %endif_42
 else_42:
-    %304 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 1, i1* %304
+    %309 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 1, i1* %309
     br label %endif_42
 endif_42:
     ret i1 1
