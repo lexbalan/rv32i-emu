@@ -24,8 +24,8 @@ func core_irq(core: *Core, irq: Nat32) {
 
 
 
-func expand12(val12bit: Nat32) -> Int32 {
-	var v := val12bit
+func expand12(val_12bit: Nat32) -> Int32 {
+	var v := val_12bit
     if (v and 0x800) != 0 {
         v := v or 0xFFFFF000
     }
