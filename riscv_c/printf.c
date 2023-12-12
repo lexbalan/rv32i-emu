@@ -7,8 +7,8 @@ void putchar(char c) {
 }
 
 
-void printf_hex32(int d);
-void printf_dec32(int d);
+char *sprintf_hex32(char *buf, int d);
+char *sprintf_dec32(char *buf, int d);
 void printf_str8(char *s);
 
 
@@ -29,29 +29,35 @@ int printf(char *str, ...)
 			++i;
 			c = str[i];
 
+			// буффер для печати всего кроме строк
+			char buf[10+1];
+			char *sptr = &buf[0];
+
 			if (c == 'd') {
 				int d = va_arg(a_list, int);
 
 				if (d < 0) {
 					putchar('-');
-					//d = 7546234;
 					//asm("ebreak");
-					d = 0 - d;
+					d = -d;
 				}
 
-				printf_dec32(d);
+				sprintf_dec32(sptr, d);
 			} else if (c == 'x') {
 				int d = va_arg(a_list, int);
-				printf_hex32(d);
+				sprintf_hex32(sptr, d);
 			} else if (c == 's') {
 				char *s = va_arg(a_list, char*);
-				printf_str8(s);
+				sptr = s;
 			} else if (c == 'c') {
 				int c = va_arg(a_list, char);
-				putchar(c);
+				sptr[0] = c;
+				sptr[1] = 0;
 			} else if (c == '%') {
-				putchar('%');
+				sptr = "%";
 			}
+
+			printf_str8(sptr);
 
 		} else {
 			putchar(c);
@@ -66,7 +72,7 @@ int printf(char *str, ...)
 }
 
 
-void printf_hex32(int d)
+char *sprintf_hex32(char *buf, int d)
 {
 	char cc[8] = {0};
 	int pos = 8;
@@ -89,14 +95,21 @@ void printf_hex32(int d)
 		i = i + 1;
 	} while (d);
 
+
+	int j = 0;
 	while(i) {
 		--i;
-		putchar(cc[i]);
+		buf[j] = cc[i];
+		++j;
 	}
+
+	buf[j] = 0;
+
+	return buf;
 }
 
 
-void printf_dec32(int d)
+char *sprintf_dec32(char *buf, int d)
 {
 	char cc[10] = {0};
 	int i = 0;
@@ -108,10 +121,17 @@ void printf_dec32(int d)
 		i = i + 1;
 	} while (d);
 
+
+	int j = 0;
 	while(i) {
 		--i;
-		putchar(cc[i]);
+		buf[j] = cc[i];
+		++j;
 	}
+
+	buf[j] = 0;
+
+	return buf;
 }
 
 
