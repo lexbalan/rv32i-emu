@@ -42,6 +42,8 @@ int printf(char *str, ...)
 			} else if (c == 'c') {
 				int c = va_arg(a_list, char);
 				putchar(c);
+			} else if (c == '%') {
+				putchar('%');
 			}
 
 		} else {

@@ -26,19 +26,22 @@ main:
 	call	printf
 	lui	a0, %hi(.L.str.2)
 	addi	a0, a0, %lo(.L.str.2)
-	li	a1, 36
 	call	printf
 	lui	a0, %hi(.L.str.3)
 	addi	a0, a0, %lo(.L.str.3)
-	lui	a1, %hi(.L.str.4)
-	addi	a1, a1, %lo(.L.str.4)
+	li	a1, 36
 	call	printf
-	lui	a0, %hi(.L.str.5)
-	addi	a0, a0, %lo(.L.str.5)
-	li	a1, 123
+	lui	a0, %hi(.L.str.4)
+	addi	a0, a0, %lo(.L.str.4)
+	lui	a1, %hi(.L.str.5)
+	addi	a1, a1, %lo(.L.str.5)
 	call	printf
 	lui	a0, %hi(.L.str.6)
 	addi	a0, a0, %lo(.L.str.6)
+	li	a1, 123
+	call	printf
+	lui	a0, %hi(.L.str.7)
+	addi	a0, a0, %lo(.L.str.7)
 	lui	a1, 74565
 	addi	a1, a1, 1663
 	call	printf
@@ -87,28 +90,33 @@ str:
 
 	.type	.L.str.2,@object
 .L.str.2:
-	.asciz	"c = '%c'\n"
-	.size	.L.str.2, 10
+	.asciz	"%% = '%%'\n"
+	.size	.L.str.2, 11
 
 	.type	.L.str.3,@object
 .L.str.3:
-	.asciz	"s = \"%s\"\n"
+	.asciz	"c = '%c'\n"
 	.size	.L.str.3, 10
 
 	.type	.L.str.4,@object
 .L.str.4:
-	.asciz	"Hi!"
-	.size	.L.str.4, 4
+	.asciz	"s = \"%s\"\n"
+	.size	.L.str.4, 10
 
 	.type	.L.str.5,@object
 .L.str.5:
-	.asciz	"d = %d\n"
-	.size	.L.str.5, 8
+	.asciz	"Hi!"
+	.size	.L.str.5, 4
 
 	.type	.L.str.6,@object
 .L.str.6:
+	.asciz	"d = %d\n"
+	.size	.L.str.6, 8
+
+	.type	.L.str.7,@object
+.L.str.7:
 	.asciz	"x = 0x%x\n"
-	.size	.L.str.6, 10
+	.size	.L.str.7, 10
 
 	.ident	"Homebrew clang version 14.0.6"
 	.section	".note.GNU-stack","",@progbits

@@ -25,6 +25,7 @@ int main()
 	//console_print_int(b - a);
 
 	printf("Hello World!\n");
+	printf("%% = '%%'\n");
 	printf("c = '%c'\n", '$');
 	printf("s = \"%s\"\n", "Hi!");
 	printf("d = %d\n", 123);
