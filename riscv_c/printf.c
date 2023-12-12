@@ -61,8 +61,8 @@ int printf(char *str, ...)
 				char *s = va_arg(a_list, char*);
 				sptr = s;
 			} else if (c == 'c') {
-				int c = va_arg(a_list, char);
-				sptr[0] = c;
+				char cc = va_arg(a_list, char);
+				sptr[0] = cc;
 				sptr[1] = 0;
 			} else if (c == '%') {
 				sptr = "%";
