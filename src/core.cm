@@ -232,6 +232,8 @@ func core_tick(core: *Core) -> Bool {
 	// instruction fetch
     let instr = core.memctl.read32(core.ip)
 
+	core.cnt := core.cnt + 1
+
 	// assert
 	if core.reg[0] != 0 {
 		printf("FATAL: x0 != 0!\n")

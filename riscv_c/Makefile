@@ -13,10 +13,11 @@ all:
 	clang --target=riscv32 -march=rv32i system.c -c -o system.o
 	clang --target=riscv32 -march=rv32i console.c -c -o console.o
 	clang --target=riscv32 -march=rv32i printf.c -c -o printf.o
+	clang --target=riscv32 -march=rv32i muldivmod.c -c -o muldivmod.o
 
 	
 	# link OBJects to ELF
-	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o printf.o
+	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o printf.o muldivmod.o
 	
 	rm *.o
 	

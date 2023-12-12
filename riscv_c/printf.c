@@ -76,7 +76,21 @@ void printf_hex32(int d) {
 
 
 
-void printf_dec32(int d) {
 
+void printf_dec32(int d) {
+	char cc[16] = {0};
+	int i = 0;
+	int n;
+	do {
+		n = d % 10;
+		d = d / 10;
+		cc[i] = '0' + n;
+		i = i + 1;
+	} while (d);
+
+	while(i) {
+		--i;
+		putchar(cc[i]);
+	}
 }
 

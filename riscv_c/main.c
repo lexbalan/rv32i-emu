@@ -26,6 +26,7 @@ int main()
 
 	printf("Hello World!! 0x%x\n", 0x1234567F);
 	printf("c = %c\n", '$');
+	printf("d = %d\n", 123);
 
 	//asm("ecall");
 

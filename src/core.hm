@@ -18,6 +18,8 @@ type Core record {
     ip: Nat32
     sp: Nat32
     
+	cnt: Nat32
+
     need_step: Bool
 
 	interrupt: Nat32

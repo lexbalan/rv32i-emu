@@ -124,6 +124,8 @@ func main() -> Int {
             break
         }
     }
+
+	printf("core.cnt = %d\n", core.cnt)
     
     printf("\nCore dump:\n")
     

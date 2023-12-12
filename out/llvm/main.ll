@@ -209,6 +209,7 @@ declare void @vm_mem_write32(i32, i32)
 	[32 x i32],
 	i32,
 	i32,
+	i32,
 	i1,
 	i32,
 	%MemoryInterface*
@@ -248,7 +249,8 @@ declare i1 @core_tick(%Core*)
 @str13 = private constant [2 x i8] [i8 10, i8 0]
 @str14 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
 @str15 = private constant [7 x i8] [i8 83, i8 84, i8 65, i8 82, i8 84, i8 10, i8 0]
-@str16 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
+@str16 = private constant [15 x i8] [i8 99, i8 111, i8 114, i8 101, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 100, i8 10, i8 0]
+@str17 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 
 
 
@@ -419,7 +421,10 @@ then_0:
 endif_0:
     br label %again_1
 break_1:
-    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str16 to [0 x i8]*))
+    %17 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 3
+    %18 = load i32, i32* %17
+    %19 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([15 x i8]* @str16 to [0 x i8]*), i32 %18)
+    %20 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str17 to [0 x i8]*))
     call void() @show_regs ()
     call void() @show_mem ()
     ret i32 0
