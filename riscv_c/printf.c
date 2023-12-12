@@ -60,19 +60,30 @@ int printf(char *str, ...)
 
 void printf_hex32(int d)
 {
-	char c = 'Z';
+	char cc[8] = {0};
 	int pos = 8;
-	while(pos) {
-		--pos;
-		int x = (d >> (pos * 4)) & 0xF;
 
-		if (x <= 9) {
-			c = '0' + x;
+	int i = 0;
+	int n;
+
+	do {
+		n = d % 16;
+		d = d / 16;
+
+		char c;
+		if (n <= 9) {
+			c = '0' + n;
 		} else {
-			c = 'A' + (x - 10);
+			c = 'A' + (n - 10);
 		}
 
-		putchar(c);
+		cc[i] = c;
+		i = i + 1;
+	} while (d);
+
+	while(i) {
+		--i;
+		putchar(cc[i]);
 	}
 }
 
