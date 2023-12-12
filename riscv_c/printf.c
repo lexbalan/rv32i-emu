@@ -8,8 +8,8 @@ void putchar(char c) {
 
 
 
-void print_hex32(int d);
-void print_dec32(int d);
+void printf_hex32(int d);
+void printf_dec32(int d);
 
 
 int printf(char *str, ...)
@@ -32,10 +32,10 @@ int printf(char *str, ...)
 
 			if (c == 'd') {
 				int d = va_arg(a_list, int);
-				print_dec32(d);
+				printf_dec32(d);
 			} else if (c == 'x') {
 				int d = va_arg(a_list, int);
-				print_hex32(d);
+				printf_hex32(d);
 			} else if (c == 'c') {
 				int c = va_arg(a_list, char);
 				putchar(c);
@@ -57,7 +57,7 @@ int printf(char *str, ...)
 }
 
 
-void print_hex32(int d) {
+void printf_hex32(int d) {
 	char c = 'Z';
 	int pos = 8;
 	while(pos) {
@@ -76,7 +76,7 @@ void print_hex32(int d) {
 
 
 
-void print_dec32(int d) {
+void printf_dec32(int d) {
 
 }
 
