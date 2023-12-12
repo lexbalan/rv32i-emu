@@ -7,7 +7,6 @@ void putchar(char c) {
 }
 
 
-
 void printf_hex32(int d);
 void printf_dec32(int d);
 void printf_str8(char *s);

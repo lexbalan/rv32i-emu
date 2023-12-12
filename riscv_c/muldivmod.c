@@ -13,7 +13,6 @@ int __mulsi3(int a, int b) {
 int __modsi3(int divident, int divisor) {
 	if (divisor == 0) {
 		// x / 0 (!)
-		return 0;
 	}
 
 	while (divident > divisor) {
@@ -27,7 +26,6 @@ int __modsi3(int divident, int divisor) {
 int __divsi3(int divident, int divisor) {
 	if (divisor == 0) {
 		// x / 0 (!)
-		return 0;
 	}
 
 	int r = 0;
