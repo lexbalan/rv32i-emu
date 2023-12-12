@@ -42,6 +42,10 @@ main:
 	call	printf
 	lui	a0, %hi(.L.str.7)
 	addi	a0, a0, %lo(.L.str.7)
+	li	a1, -103
+	call	printf
+	lui	a0, %hi(.L.str.8)
+	addi	a0, a0, %lo(.L.str.8)
 	lui	a1, 74565
 	addi	a1, a1, 1663
 	call	printf
@@ -115,8 +119,13 @@ str:
 
 	.type	.L.str.7,@object
 .L.str.7:
+	.asciz	"-d = %d\n"
+	.size	.L.str.7, 9
+
+	.type	.L.str.8,@object
+.L.str.8:
 	.asciz	"x = 0x%x\n"
-	.size	.L.str.7, 10
+	.size	.L.str.8, 10
 
 	.ident	"Homebrew clang version 14.0.6"
 	.section	".note.GNU-stack","",@progbits

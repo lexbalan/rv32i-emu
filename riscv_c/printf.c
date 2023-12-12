@@ -31,6 +31,14 @@ int printf(char *str, ...)
 
 			if (c == 'd') {
 				int d = va_arg(a_list, int);
+
+				if (d < 0) {
+					putchar('-');
+					//d = 7546234;
+					//asm("ebreak");
+					d = 0 - d;
+				}
+
 				printf_dec32(d);
 			} else if (c == 'x') {
 				int d = va_arg(a_list, int);

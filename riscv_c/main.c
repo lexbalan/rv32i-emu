@@ -29,6 +29,7 @@ int main()
 	printf("c = '%c'\n", '$');
 	printf("s = \"%s\"\n", "Hi!");
 	printf("d = %d\n", 123);
+	printf("-d = %d\n", -103);
 	printf("x = 0x%x\n", 0x1234567F);
 
 	//asm("ecall");

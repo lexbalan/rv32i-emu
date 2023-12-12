@@ -15,7 +15,7 @@ int __modsi3(int divident, int divisor) {
 		// x / 0 (!)
 	}
 
-	while (divident > divisor) {
+	while (divident >= divisor) {
 		divident = divident - divisor;
 	}
 
@@ -31,10 +31,16 @@ int __divsi3(int divident, int divisor) {
 	int r = 0;
 	while (1) {
 		divident = divident - divisor;
-		if (divident <= 0) {
+
+		if (divident < 0) {
 			break;
 		}
+
 		r = r + 1;
+
+		if (divident == 0) {
+			break;
+		}
 	}
 
 	return r;
