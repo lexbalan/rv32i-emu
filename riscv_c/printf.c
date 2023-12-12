@@ -6,10 +6,21 @@ void putchar(char c) {
 	write(0, &c, 1);
 }
 
+void put_str8(char *s)
+{
+	while (1) {
+		const char c = *s;
+		if (c == 0) {
+			break;
+		}
+		putchar(c);
+		++s;
+	}
+}
+
 
 char *sprintf_hex32(char *buf, int d);
 char *sprintf_dec32(char *buf, int d);
-void printf_str8(char *s);
 
 
 int printf(char *str, ...)
@@ -57,7 +68,7 @@ int printf(char *str, ...)
 				sptr = "%";
 			}
 
-			printf_str8(sptr);
+			put_str8(sptr);
 
 		} else {
 			putchar(c);
@@ -96,6 +107,7 @@ char *sprintf_hex32(char *buf, int d)
 	} while (d);
 
 
+	// mirroring into buffer
 	int j = 0;
 	while(i) {
 		--i;
@@ -134,16 +146,4 @@ char *sprintf_dec32(char *buf, int d)
 	return buf;
 }
 
-
-void printf_str8(char *s)
-{
-	while (1) {
-		const char c = *s;
-		if (c == 0) {
-			break;
-		}
-		putchar(c);
-		++s;
-	}
-}
 
