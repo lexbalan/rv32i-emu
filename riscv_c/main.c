@@ -24,9 +24,11 @@ int main()
 	int c = b - a;
 	//console_print_int(b - a);
 
-	printf("Hello World!! 0x%x\n", 0x1234567F);
-	printf("c = %c\n", '$');
+	printf("Hello World!\n");
+	printf("c = '%c'\n", '$');
+	printf("s = \"%s\"\n", "Hi!");
 	printf("d = %d\n", 123);
+	printf("x = 0x%x\n", 0x1234567F);
 
 	//asm("ecall");
 

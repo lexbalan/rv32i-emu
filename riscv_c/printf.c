@@ -36,6 +36,16 @@ int printf(char *str, ...)
 			} else if (c == 'x') {
 				int d = va_arg(a_list, int);
 				printf_hex32(d);
+			} else if (c == 's') {
+				char *s = va_arg(a_list, char*);
+				while (1) {
+					c = *s;
+					++s;
+					if (c == 0) {
+						break;
+					}
+					putchar(c);
+				}
 			} else if (c == 'c') {
 				int c = va_arg(a_list, char);
 				putchar(c);
@@ -75,10 +85,8 @@ void printf_hex32(int d) {
 }
 
 
-
-
 void printf_dec32(int d) {
-	char cc[16] = {0};
+	char cc[10] = {0};
 	int i = 0;
 	int n;
 	do {
@@ -93,4 +101,5 @@ void printf_dec32(int d) {
 		putchar(cc[i]);
 	}
 }
+
 

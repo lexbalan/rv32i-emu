@@ -23,8 +23,6 @@ main:
 	sw	a0, -24(s0)
 	lui	a0, %hi(.L.str.1)
 	addi	a0, a0, %lo(.L.str.1)
-	lui	a1, 74565
-	addi	a1, a1, 1663
 	call	printf
 	lui	a0, %hi(.L.str.2)
 	addi	a0, a0, %lo(.L.str.2)
@@ -32,7 +30,17 @@ main:
 	call	printf
 	lui	a0, %hi(.L.str.3)
 	addi	a0, a0, %lo(.L.str.3)
+	lui	a1, %hi(.L.str.4)
+	addi	a1, a1, %lo(.L.str.4)
+	call	printf
+	lui	a0, %hi(.L.str.5)
+	addi	a0, a0, %lo(.L.str.5)
 	li	a1, 123
+	call	printf
+	lui	a0, %hi(.L.str.6)
+	addi	a0, a0, %lo(.L.str.6)
+	lui	a1, 74565
+	addi	a1, a1, 1663
 	call	printf
 	lw	a0, -28(s0)
 	lw	ra, 28(sp)
@@ -74,18 +82,33 @@ str:
 	.type	.L.str.1,@object
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .L.str.1:
-	.asciz	"Hello World!! 0x%x\n"
-	.size	.L.str.1, 20
+	.asciz	"Hello World!\n"
+	.size	.L.str.1, 14
 
 	.type	.L.str.2,@object
 .L.str.2:
-	.asciz	"c = %c\n"
-	.size	.L.str.2, 8
+	.asciz	"c = '%c'\n"
+	.size	.L.str.2, 10
 
 	.type	.L.str.3,@object
 .L.str.3:
+	.asciz	"s = \"%s\"\n"
+	.size	.L.str.3, 10
+
+	.type	.L.str.4,@object
+.L.str.4:
+	.asciz	"Hi!"
+	.size	.L.str.4, 4
+
+	.type	.L.str.5,@object
+.L.str.5:
 	.asciz	"d = %d\n"
-	.size	.L.str.3, 8
+	.size	.L.str.5, 8
+
+	.type	.L.str.6,@object
+.L.str.6:
+	.asciz	"x = 0x%x\n"
+	.size	.L.str.6, 10
 
 	.ident	"Homebrew clang version 14.0.6"
 	.section	".note.GNU-stack","",@progbits
