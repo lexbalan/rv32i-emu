@@ -3,7 +3,7 @@
 # compile C to BIN
 all:
 	# translate C to ASM
-	#clang --target=riscv32 -march=rv32i -S main.c
+	clang --target=riscv32 -march=rv32i -S main.c
 	# translate ASM to OBJ
 	#clang --target=riscv32 -march=rv32i main.s -c -o main.o
 	
@@ -12,10 +12,11 @@ all:
 	clang --target=riscv32 -march=rv32i startup.c -c -o startup.o
 	clang --target=riscv32 -march=rv32i system.c -c -o system.o
 	clang --target=riscv32 -march=rv32i console.c -c -o console.o
+	clang --target=riscv32 -march=rv32i printf.c -c -o printf.o
 
 	
 	# link OBJects to ELF
-	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o
+	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o printf.o
 	
 	rm *.o
 	

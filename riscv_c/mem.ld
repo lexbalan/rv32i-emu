@@ -1,12 +1,13 @@
 /* Thanks https://github.com/darklife/darkriscv */
-  __heap_size  = 0x20;  /* required amount of heap */
-  __stack_size = 0x40;  /* required amount of stack */
+
+__heap_size  = 0x20;
+__stack_size = 0x1FF;
 
 
 MEMORY
 {
 	ROM (rx) : ORIGIN = 0x00000000, LENGTH = 0x10000
-	RAM (rw) : ORIGIN = 0x10000000, LENGTH = 256
+	RAM (rw) : ORIGIN = 0x10000000, LENGTH = 4096
 }
 
 SECTIONS

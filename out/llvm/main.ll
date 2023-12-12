@@ -272,7 +272,7 @@ endif_0:
     %7 = zext i32 %buf_size to i64
     %8 = call i64(i8*, i64, i64, %FILE*) @fread (i8* %6, i64 1, i64 %7, %FILE* %2)
     %9 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([18 x i8]* @str5 to [0 x i8]*), i64 %8)
-    br i1 1 , label %then_1, label %endif_1
+    br i1 0 , label %then_1, label %endif_1
 then_1:
     %i = alloca i64
     store i64 0, i64* %i

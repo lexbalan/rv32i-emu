@@ -99,7 +99,8 @@ func extract_jal_imm(instr: Nat32) -> Nat32 {
 func i_type_op(core: *Core, instr: Nat32) {
     let funct3 = extract_funct3(instr)
     let funct7 = extract_funct7(instr)
-	let imm = expand12(extract_imm12(instr))
+	let imm12 = extract_imm12(instr)
+	let imm = expand12(imm12)
     let rd = extract_rd(instr)
     let rs1 = extract_rs1(instr)
 
@@ -222,7 +223,7 @@ func r_type_op(core: *Core, instr: Nat32) {
 func core_tick(core: *Core) -> Bool {
 
 	if core.interrupt > 0 {
-		printf("\nINT #%02X\n", core.interrupt)
+		//printf("\nINT #%02X\n", core.interrupt)
 		let vect_offset = core.interrupt * 4
 		core.ip := vect_offset
 		core.interrupt := 0
@@ -231,11 +232,19 @@ func core_tick(core: *Core) -> Bool {
 	// instruction fetch
     let instr = core.memctl.read32(core.ip)
 
+	// assert
+	if core.reg[0] != 0 {
+		printf("FATAL: x0 != 0!\n")
+		exit(1)
+	}
+
+	//printf("X8 = %x\n", core.reg[8]);
+
     //let b3 = ((instr >> 24) to Nat8) and 0xFF
     //let b2 = ((instr >> 16) to Nat8) and 0xFF
     //let b1 = ((instr >> 8) to Nat8) and 0xFF
     //let b0 = ((instr >> 0) to Nat8) and 0xFF
-    //printf("[%04x] %02x%02x%02x%02x ", core.ip, b0 to Nat32, b1 to Nat32, b2 to Nat32, b3 to Nat32)
+//    //printf("[%04x] %02x%02x%02x%02x ", core.ip, b0 to Nat32, b1 to Nat32, b2 to Nat32, b3 to Nat32)
     let op = extract_op(instr)
     let rd = extract_rd(instr)
     let rs1 = extract_rs1(instr)

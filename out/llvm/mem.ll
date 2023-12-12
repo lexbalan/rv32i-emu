@@ -106,10 +106,10 @@ declare void @perror(%ConstCharStr*)
 
 
 @rom = global [65536 x i8] zeroinitializer
-@ram = global [256 x i8] zeroinitializer
+@ram = global [4096 x i8] zeroinitializer
 
 define [0 x i8]* @get_ram_ptr() {
-    %1 = bitcast [256 x i8]* @ram to [0 x i8]*
+    %1 = bitcast [4096 x i8]* @ram to [0 x i8]*
     ret [0 x i8]* %1
 }
 
@@ -132,12 +132,12 @@ define i8 @vm_mem_read8(i32 %adr) {
     %x = alloca i8
     store i8 0, i8* %x
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268435712
+    %2 = icmp ule i32 %adr, 268439552
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [4096 x i8], [4096 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i8*
     %8 = load i8, i8* %7
@@ -182,12 +182,12 @@ define i16 @vm_mem_read16(i32 %adr) {
     %x = alloca i16
     store i16 0, i16* %x
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268435712
+    %2 = icmp ule i32 %adr, 268439552
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [4096 x i8], [4096 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i16*
     %8 = load i16, i16* %7
@@ -245,12 +245,12 @@ then_0:
     br label %endif_0
 else_0:
     %9 = icmp uge i32 %adr, 268435456
-    %10 = icmp ule i32 %adr, 268435712
+    %10 = icmp ule i32 %adr, 268439552
     %11 = and i1 %9, %10
     br i1 %11 , label %then_1, label %else_1
 then_1:
     %12 = sub i32 %adr, 268435456
-    %13 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %12
+    %13 = getelementptr inbounds [4096 x i8], [4096 x i8]* @ram, i32 0, i32 %12
     %14 = bitcast i8* %13 to i8*
     %15 = bitcast i8* %14 to i32*
     %16 = load i32, i32* %15
@@ -279,12 +279,12 @@ endif_0:
 
 define void @vm_mem_write8(i32 %adr, i8 %value) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268435712
+    %2 = icmp ule i32 %adr, 268439552
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [4096 x i8], [4096 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i8*
     store i8 %value, i8* %7
@@ -315,12 +315,12 @@ endif_0:
 
 define void @vm_mem_write16(i32 %adr, i16 %value) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268435712
+    %2 = icmp ule i32 %adr, 268439552
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [4096 x i8], [4096 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i16*
     store i16 %value, i16* %7
@@ -351,12 +351,12 @@ endif_0:
 
 define void @vm_mem_write32(i32 %adr, i32 %value) {
     %1 = icmp uge i32 %adr, 268435456
-    %2 = icmp ule i32 %adr, 268435712
+    %2 = icmp ule i32 %adr, 268439552
     %3 = and i1 %1, %2
     br i1 %3 , label %then_0, label %else_0
 then_0:
     %4 = sub i32 %adr, 268435456
-    %5 = getelementptr inbounds [256 x i8], [256 x i8]* @ram, i32 0, i32 %4
+    %5 = getelementptr inbounds [4096 x i8], [4096 x i8]* @ram, i32 0, i32 %4
     %6 = bitcast i8* %5 to i8*
     %7 = bitcast i8* %6 to i32*
     store i32 %value, i32* %7

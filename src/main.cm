@@ -12,7 +12,8 @@ import "./core.hm"
 const text_filename = "./image.bin" to *Str8
 
 
-const SHOW_TEXT = true
+const SHOW_TEXT = false
+
 
 var memctl: MemoryInterface
 var core: Core
