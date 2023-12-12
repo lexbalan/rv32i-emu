@@ -7,6 +7,11 @@ void putchar(char c) {
 }
 
 
+
+void print_hex32(int d);
+void print_dec32(int d);
+
+
 int printf(char *str, ...)
 {
     va_list a_list;
@@ -25,23 +30,15 @@ int printf(char *str, ...)
 			c = str[i];
 			++i;
 
-			if (c == 'x') {
+			if (c == 'd') {
 				int d = va_arg(a_list, int);
-
-				int pos = 8;
-				while(pos) {
-					--pos;
-					int x = (d >> (pos * 4)) & 0xF;
-
-					c = 'z';
-					if (x <= 9) {
-						c = '0' + x;
-					} else {
-						c = 'A' + (x - 10);
-					}
-
-					putchar(c);
-				}
+				print_dec32(d);
+			} else if (c == 'x') {
+				int d = va_arg(a_list, int);
+				print_hex32(d);
+			} else if (c == 'c') {
+				int c = va_arg(a_list, char);
+				putchar(c);
 			}
 
 			continue;
@@ -57,5 +54,29 @@ int printf(char *str, ...)
 	va_end(a_list);
 
 	return 0;
+}
+
+
+void print_hex32(int d) {
+	char c = 'Z';
+	int pos = 8;
+	while(pos) {
+		--pos;
+		int x = (d >> (pos * 4)) & 0xF;
+
+		if (x <= 9) {
+			c = '0' + x;
+		} else {
+			c = 'A' + (x - 10);
+		}
+
+		putchar(c);
+	}
+}
+
+
+
+void print_dec32(int d) {
+
 }
 

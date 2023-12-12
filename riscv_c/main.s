@@ -26,6 +26,10 @@ main:
 	lui	a1, 74565
 	addi	a1, a1, 1663
 	call	printf
+	lui	a0, %hi(.L.str.2)
+	addi	a0, a0, %lo(.L.str.2)
+	li	a1, 36
+	call	printf
 	lw	a0, -28(s0)
 	lw	ra, 28(sp)
 	lw	s0, 24(sp)
@@ -68,6 +72,11 @@ str:
 .L.str.1:
 	.asciz	"Hello World!! 0x%x\n"
 	.size	.L.str.1, 20
+
+	.type	.L.str.2,@object
+.L.str.2:
+	.asciz	"c = %c\n"
+	.size	.L.str.2, 8
 
 	.ident	"Homebrew clang version 14.0.6"
 	.section	".note.GNU-stack","",@progbits

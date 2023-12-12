@@ -25,6 +25,7 @@ int main()
 	//console_print_int(b - a);
 
 	printf("Hello World!! 0x%x\n", 0x1234567F);
+	printf("c = %c\n", '$');
 
 	//asm("ecall");
 
