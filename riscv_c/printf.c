@@ -29,7 +29,6 @@ int printf(char *str, ...)
 		if (c == '%') {
 			++i;
 			c = str[i];
-			++i;
 
 			if (c == 'd') {
 				int d = va_arg(a_list, int);
@@ -45,12 +44,11 @@ int printf(char *str, ...)
 				putchar(c);
 			}
 
-			continue;
-
 		} else {
 			putchar(c);
-			i = i + 1;
 		}
+
+		i = i + 1;
 	}
 
 	va_end(a_list);
