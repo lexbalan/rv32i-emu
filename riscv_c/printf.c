@@ -10,6 +10,7 @@ void putchar(char c) {
 
 void printf_hex32(int d);
 void printf_dec32(int d);
+void printf_str8(char *s);
 
 
 int printf(char *str, ...)
@@ -38,14 +39,7 @@ int printf(char *str, ...)
 				printf_hex32(d);
 			} else if (c == 's') {
 				char *s = va_arg(a_list, char*);
-				while (1) {
-					c = *s;
-					++s;
-					if (c == 0) {
-						break;
-					}
-					putchar(c);
-				}
+				printf_str8(s);
 			} else if (c == 'c') {
 				int c = va_arg(a_list, char);
 				putchar(c);
@@ -57,8 +51,6 @@ int printf(char *str, ...)
 			putchar(c);
 			i = i + 1;
 		}
-
-
 	}
 
 	va_end(a_list);
@@ -67,7 +59,8 @@ int printf(char *str, ...)
 }
 
 
-void printf_hex32(int d) {
+void printf_hex32(int d)
+{
 	char c = 'Z';
 	int pos = 8;
 	while(pos) {
@@ -85,7 +78,8 @@ void printf_hex32(int d) {
 }
 
 
-void printf_dec32(int d) {
+void printf_dec32(int d)
+{
 	char cc[10] = {0};
 	int i = 0;
 	int n;
@@ -102,4 +96,16 @@ void printf_dec32(int d) {
 	}
 }
 
+
+void printf_str8(char *s)
+{
+	while (1) {
+		const char c = *s;
+		if (c == 0) {
+			break;
+		}
+		putchar(c);
+		++s;
+	}
+}
 
