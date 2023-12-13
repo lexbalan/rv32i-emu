@@ -46,13 +46,6 @@ int printf(char *str, ...)
 
 			if (c == 'd') {
 				int d = va_arg(a_list, int);
-
-				if (d < 0) {
-					putchar('-');
-					//asm("ebreak");
-					d = -d;
-				}
-
 				sprintf_dec32(sptr, d);
 			} else if (c == 'x') {
 				int d = va_arg(a_list, int);
@@ -123,11 +116,17 @@ char *sprintf_hex32(char *buf, int d)
 
 char *sprintf_dec32(char *buf, int d)
 {
-	char cc[10] = {0};
+	char cc[11] = {0};
+
+	const int neg = d < 0;
+
+	if (neg) {
+		d = -d;
+	}
+
 	int i = 0;
-	int n;
 	do {
-		n = d % 10;
+		const int n = d % 10;
 		d = d / 10;
 		cc[i] = '0' + n;
 		i = i + 1;
@@ -135,6 +134,11 @@ char *sprintf_dec32(char *buf, int d)
 
 
 	int j = 0;
+	if (neg) {
+		buf[0] = '-';
+		++j;
+	}
+
 	while(i) {
 		--i;
 		buf[j] = cc[i];
