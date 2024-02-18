@@ -35,14 +35,14 @@ func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
     
     let n = fread(bufptr, 1, buf_size to SizeT, fp)
 
-    printf("LOADED: %d bytes\n", n)
+    printf("LOADED: %zu bytes\n", n)
     
 
 	if SHOW_TEXT {
-		var i := 0 to SizeT
+		var i = 0 to SizeT
 		while i < (n / 4) {
-			printf("%08x: 0x%08x\n", i, (bufptr to *[]Nat32)[i])
-			i := i + 4
+			printf("%08zx: 0x%08x\n", i, (bufptr to *[]Nat32)[i])
+			i = i + 4
 		}
 
 		printf("-----------\n")
@@ -55,30 +55,30 @@ func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
 
 
 func show_regs() {
-	var i := 0
+	var i = 0
     while i < 16 {
         printf("x%02d = 0x%08x", i, core.reg[i])
 		printf("    ")
 		printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
-        i := i + 1
+        i = i + 1
     }
 }
 
 func show_mem() {
-	var i := 0
+	var i = 0
 	let ramptr = get_ram_ptr()
     while i < 256 {
 		printf("%08X", i * 16)
 
-		var j := 0
+		var j = 0
 		while j < 16 {
 			printf(" %02X", ramptr[i + j]);
-			j := j + 1
+			j = j + 1
 		}
 
 		printf("\n")
 
-		i := i + 16
+		i = i + 16
 	}
 }
 
@@ -93,13 +93,13 @@ func main() -> Int {
     printf("RISC-V VM\n")
     
     // memory controller initialize
-    memctl.read8 := &vm_mem_read8
-    memctl.read16 := &vm_mem_read16
-    memctl.read32 := &vm_mem_read32
+    memctl.read8 = &vm_mem_read8
+    memctl.read16 = &vm_mem_read16
+    memctl.read32 = &vm_mem_read32
 
-    memctl.write8 := &vm_mem_write8
-    memctl.write16 := &vm_mem_write16
-    memctl.write32 := &vm_mem_write32
+    memctl.write8 = &vm_mem_write8
+    memctl.write16 = &vm_mem_write16
+    memctl.write32 = &vm_mem_write32
 
     
 	let romptr = get_rom_ptr()

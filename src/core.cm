@@ -10,33 +10,34 @@ import "./core.hm"
 
 
 func core_init(core: *Core, memctl: *MemoryInterface) {
-    memset(core, 0, sizeof(Core))
-    core.memctl := memctl
-    core.need_step := true
+    //memset(core, 0, sizeof(Core))
+    *core = {}
+    core.memctl = memctl
+    core.need_step = true
 }
 
 
 func core_irq(core: *Core, irq: Nat32) {
     if core.interrupt == 0 {
-        core.interrupt := irq
+        core.interrupt = irq
     }
 }
 
 
 
 func expand12(val_12bit: Nat32) -> Int32 {
-    var v := val_12bit
+    var v = val_12bit
     if (v and 0x800) != 0 {
-        v := v or 0xFFFFF000
+        v = v or 0xFFFFF000
     }
     return v to Int32
 }
 
 
 func expand20(val_20bit: Nat32) -> Int32 {
-    var v := val_20bit
+    var v = val_20bit
     if (v and 0x80000) != 0 {
-        v := v or 0xFFF00000
+        v = v or 0xFFF00000
     }
     return v to Int32
 }
@@ -111,56 +112,56 @@ func i_type_op(core: *Core, instr: Nat32) {
     if funct3 == 0 {
         //printf("addi x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := core.reg[rs1] + imm
+            core.reg[rd] = core.reg[rs1] + imm
         }
     } else if (funct3 == 1) and (funct7 == 0) {
         /* SLLI is a logical left shift (zeros are shifted
-into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
-is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). */
+        into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
+        is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). */
         //printf("slli x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := (core.reg[rs1] to Nat32 << imm) to Int32
+            core.reg[rd] = (core.reg[rs1] to Nat32 << imm) to Int32
         }
 
     } else if funct3 == 2 {
         // SLTI - set [1 to rd if rs1] less than immediate
         //printf("slti x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := (core.reg[rs1] < imm) to Int32
+            core.reg[rd] = (core.reg[rs1] < imm) to Int32
         }
 
     } else if funct3 == 3 {
         //printf("sltiu x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := (core.reg[rs1] to Nat32 < imm to Nat32) to Int32
+            core.reg[rd] = (core.reg[rs1] to Nat32 < imm to Nat32) to Int32
         }
 
     } else if funct3 == 4 {
         //printf("xori x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := core.reg[rs1] xor imm
+            core.reg[rd] = core.reg[rs1] xor imm
         }
     } else if (funct3 == 5) and (funct7 == 0) {
         //printf("srli x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := (core.reg[rs1] to Nat32 >> imm) to Int32
+            core.reg[rd] = (core.reg[rs1] to Nat32 >> imm) to Int32
         }
     } else if (funct3 == 5) and (funct7 == 0x20) {
         //printf("srai x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := core.reg[rs1] >> imm
+            core.reg[rd] = core.reg[rs1] >> imm
         }
 
     } else if funct3 == 6 {
         //printf("ori x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := core.reg[rs1] or imm
+            core.reg[rd] = core.reg[rs1] or imm
         }
 
     } else if funct3 == 7 {
         //printf("andi x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
-            core.reg[rd] := core.reg[rs1] and imm
+            core.reg[rd] = core.reg[rs1] and imm
         }
     }
 }
@@ -181,39 +182,39 @@ func r_type_op(core: *Core, instr: Nat32) {
     
     if funct3 == 0 and funct7 == 0x00 {
         //printf("add x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := v1 + v2
+        core.reg[rd] = v1 + v2
     } else if funct3 == 0 and funct7 == 0x20 {
         //printf("sub x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := v1 - v2
+        core.reg[rd] = v1 - v2
     } else if funct3 == 1 {
         // shift left logical
         //printf("sll x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := v1 << v2
+        core.reg[rd] = v1 << v2
     } else if funct3 == 2 {
         // set less than
         //printf("slt x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := (v1 < v2) to Int32
+        core.reg[rd] = (v1 < v2) to Int32
     } else if funct3 == 3 {
         // set less than unsigned
         //printf("sltu x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := (v1 to Nat32 < v2 to Nat32) to Int32
+        core.reg[rd] = (v1 to Nat32 < v2 to Nat32) to Int32
     } else if funct3 == 4 {
         //printf("xor x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := v1 xor v2
+        core.reg[rd] = v1 xor v2
     } else if funct3 == 5 and funct7 == 0 {
         // shift right logical
         //printf("srl x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := (v1 to Nat32 >> v2) to Int32
+        core.reg[rd] = (v1 to Nat32 >> v2) to Int32
     } else if funct3 == 5 and funct7 == 0x20 {
         // shift right arithmetical
         //printf("sra x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := v1 >> v2
+        core.reg[rd] = v1 >> v2
     } else if funct3 == 6 {
         //printf("or x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := v1 or v2
+        core.reg[rd] = v1 or v2
     } else if funct3 == 7 {
         //printf("and x%d, x%d, x%d\n", rd, rs1, rs2)
-        core.reg[rd] := v1 and v2
+        core.reg[rd] = v1 and v2
     }
 }
 
@@ -244,14 +245,14 @@ func core_tick(core: *Core) -> Bool {
     if core.interrupt > 0 {
         //printf("\nINT #%02X\n", core.interrupt)
         let vect_offset = core.interrupt * 4
-        core.ip := vect_offset
-        core.interrupt := 0
+        core.ip = vect_offset
+        core.interrupt = 0
     }
 
     // instruction fetch
     let instr = core.memctl.read32(core.ip)
 
-    core.cnt := core.cnt + 1
+    core.cnt = core.cnt + 1
 
     // assert
     if core.reg[0] != 0 {
@@ -293,7 +294,7 @@ func core_tick(core: *Core) -> Bool {
         // U-type
         let imm = expand12(extract_imm31_12(instr))
         let x = (core.ip to Int32) + (imm << 12)
-        core.reg[rd] := x
+        core.reg[rd] = x
         //printf("auipc x%d, 0x%X\n", rd, imm)
 
     } else if op == OP_JAL {
@@ -303,11 +304,11 @@ func core_tick(core: *Core) -> Bool {
 
         //printf("jal x%d, %d\n", rd, imm)
         if rd != 0 {
-            core.reg[rd] := (core.ip + 4) to Int32
+            core.reg[rd] = (core.ip + 4) to Int32
         }
 
-        core.ip := (core.ip to Int32 + imm) to Nat32
-        core.need_step := false
+        core.ip = (core.ip to Int32 + imm) to Nat32
+        core.need_step = false
 
     } else if op == OP_JALR and funct3 == 0 {
         let imm = expand12(extract_imm12(instr))
@@ -319,12 +320,12 @@ func core_tick(core: *Core) -> Bool {
         let jump_to = (core.reg[rs1] + imm) to Nat32 and 0xFFFFFFFE
 
         if rd != 0 {
-            core.reg[rd] := next_instr_ptr
+            core.reg[rd] = next_instr_ptr
         }
 
-        core.ip := jump_to
+        core.ip = jump_to
 
-        core.need_step := false
+        core.need_step = false
 
     } else if op == OP_B {
         let imm12_10to5 = extract_funct7(instr)
@@ -335,11 +336,11 @@ func core_tick(core: *Core) -> Bool {
         let bit11 = (imm4to1_11 and 0x1) to Nat16 << 11
         let bit12 = (imm12_10to5 and 0x40) to Nat16 << 6
         
-        var bits := (bit12 or bit11 or bit10to5 or bit4to1)
+        var bits = (bit12 or bit11 or bit10to5 or bit4to1)
         
         // распространяем знак, если он есть
         if (bits and (1 to Nat16 << 12)) != 0 {
-            bits := 0xF000 or bits
+            bits = 0xF000 or bits
         }
         
         let imm = bits to Int16
@@ -348,40 +349,40 @@ func core_tick(core: *Core) -> Bool {
             //beq
             //printf("beq x%d, x%d, %d\n", rs1, rs2, imm to Int32)
             if core.reg[rs1] == core.reg[rs2] {
-                core.ip := (core.ip to Int32 + imm to Int32) to Nat32
-                core.need_step := false
+                core.ip = (core.ip to Int32 + imm to Int32) to Nat32
+                core.need_step = false
             }
 
         } else if funct3 == 1 {
             //bne
             //printf("bne x%d, x%d, %d\n", rs1, rs2, imm to Int32)
             if core.reg[rs1] != core.reg[rs2] {
-                core.ip := (core.ip to Int32 + imm to Int32) to Nat32
-                core.need_step := false
+                core.ip = (core.ip to Int32 + imm to Int32) to Nat32
+                core.need_step = false
             }
 
         } else if funct3 == 4 {
             //blt
             //printf("blt x%d, x%d, %d\n", rs1, rs2, imm to Int32)
             if core.reg[rs1] < core.reg[rs2] {
-                core.ip := (core.ip to Int32 + imm to Int32) to Nat32
-                core.need_step := false
+                core.ip = (core.ip to Int32 + imm to Int32) to Nat32
+                core.need_step = false
             }
 
         } else if funct3 == 5 {
             //bge
             //printf("bge x%d, x%d, %d\n", rs1, rs2, imm to Int32)
             if core.reg[rs1] >= core.reg[rs2] {
-                core.ip := (core.ip to Int32 + imm to Int32) to Nat32
-                core.need_step := false
+                core.ip = (core.ip to Int32 + imm to Int32) to Nat32
+                core.need_step = false
             }
 
         } else if funct3 == 6 {
             //bltu
             //printf("bltu x%d, x%d, %d\n", rs1, rs2, imm to Int32)
             if core.reg[rs1] to Nat32 < core.reg[rs2] to Nat32 {
-                core.ip := (core.ip to Int32 + imm to Int32) to Nat32
-                core.need_step := false
+                core.ip = (core.ip to Int32 + imm to Int32) to Nat32
+                core.need_step = false
             }
 
         } else if funct3 == 7 {
@@ -389,8 +390,8 @@ func core_tick(core: *Core) -> Bool {
             //printf("bgeu x%d, x%d, %d\n", rs1, rs2, imm to Int32)
 
             if core.reg[rs1] to Nat32 >= core.reg[rs2] to Nat32 {
-                core.ip := (core.ip to Int32 + imm to Int32) to Nat32
-                core.need_step := false
+                core.ip = (core.ip to Int32 + imm to Int32) to Nat32
+                core.need_step = false
             } else {
             }
         }
@@ -405,14 +406,14 @@ func core_tick(core: *Core) -> Bool {
             //printf("lb x%d, %d(x%d)\n", rd, imm, rs1)
             let val = core.memctl.read8(adr) to Int32
             if rd != 0 {
-                core.reg[rd] := val
+                core.reg[rd] = val
             }
         } else if funct3 == 1 {
             // lh
             //printf("lh x%d, %d(x%d)\n", rd, imm, rs1)
             let val = core.memctl.read16(adr) to Int32
             if rd != 0 {
-                core.reg[rd] := val
+                core.reg[rd] = val
             }
         } else if funct3 == 2 {
             // lw
@@ -420,7 +421,7 @@ func core_tick(core: *Core) -> Bool {
             let val = core.memctl.read32(adr) to Int32
             //printf("LW [0x%x] (0x%x)\n", adr, val)
             if rd != 0 {
-                core.reg[rd] := val
+                core.reg[rd] = val
             }
         } else if funct3 == 4 {
             // lbu
@@ -428,14 +429,14 @@ func core_tick(core: *Core) -> Bool {
             let val = core.memctl.read8(adr) to Nat32 to Int32
             //printf("LBU[0x%x] (0x%x)\n", adr, val)
             if rd != 0 {
-                core.reg[rd] := val
+                core.reg[rd] = val
             }
         } else if funct3 == 5 {
             // lhu
             //printf("lhu x%d, %d(x%d)\n", rd, imm, rs1)
             let val = core.memctl.read16(adr) to Nat32 to Int32
             if rd != 0 {
-                core.reg[rd] := val
+                core.reg[rd] = val
             }
         }
 
@@ -484,13 +485,12 @@ func core_tick(core: *Core) -> Bool {
         } else if funct3 == FUNCT3_CSRRSI {
         } else if funct3 == FUNCT3_CSRRCI {
         
-        
         } else {
             printf("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
             printf("funct3 = %x\n", funct3)
             return false
         }
-        
+
     } else if op == OP_FENCE {
         if instr == INSTR_PAUSE {
             //printf("PAUSE\n")
@@ -500,9 +500,9 @@ func core_tick(core: *Core) -> Bool {
     }
     
     if core.need_step {
-        core.ip := core.ip + 4
+        core.ip = core.ip + 4
     } else {
-        core.need_step := true
+        core.need_step = true
     }
     
     return true

@@ -4,6 +4,7 @@
 all:
 	# translate C to ASM
 	clang --target=riscv32 -march=rv32i -S main.c
+	clang --target=riscv32 -march=rv32i -S printf.c
 	# translate ASM to OBJ
 	#clang --target=riscv32 -march=rv32i main.s -c -o main.o
 	
@@ -14,10 +15,11 @@ all:
 	clang --target=riscv32 -march=rv32i console.c -c -o console.o
 	clang --target=riscv32 -march=rv32i printf.c -c -o printf.o
 	clang --target=riscv32 -march=rv32i muldivmod.c -c -o muldivmod.o
+	clang --target=riscv32 -march=rv32i base.S -c -o base.o
 
 	
 	# link OBJects to ELF
-	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o printf.o muldivmod.o
+	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o printf.o muldivmod.o base.o
 	
 	rm *.o
 	

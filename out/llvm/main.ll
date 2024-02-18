@@ -2,13 +2,45 @@
 target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
 target triple = "arm64-apple-macosx12.0.0"
 
+
+%Unit = type i1
+%Bool = type i1
+%Byte = type i8
+%Char8 = type i8
+%Char16 = type i16
+%Char32 = type i32
+%Int8 = type i8
+%Int16 = type i16
+%Int32 = type i32
+%Int64 = type i64
+%Int128 = type i128
+%Nat8 = type i8
+%Nat16 = type i16
+%Nat32 = type i32
+%Nat64 = type i64
+%Nat128 = type i128
+%Float32 = type float
+%Float64 = type double
+%Pointer = type i8*
+%Str8 = type [0 x %Char8]
+%Str16 = type [0 x %Char16]
+%Str32 = type [0 x %Char32]
+%VA_List = type i8*
+declare void @llvm.memcpy.p0.p0.i32(i8*, i8*, i32, i1)
+declare void @llvm.memset.p0.i32(i8*, i8, i32, i1)
+
+; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/system.hm
+
+
+
+
 ; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/ctypes64.hm
 
 
 
-%Str = type [0 x i8]
+%Str = type %Str8
 %Char = type i8
-%ConstChar = type i8
+%ConstChar = type %Char
 %SignedChar = type i8
 %UnsignedChar = type i8
 %Short = type i16
@@ -28,6 +60,7 @@ target triple = "arm64-apple-macosx12.0.0"
 %LongDouble = type double
 %SizeT = type i64
 %SSizeT = type i64
+
 
 ; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/ctypes.hm
 
@@ -74,21 +107,18 @@ target triple = "arm64-apple-macosx12.0.0"
 
 
 declare i64 @clock()
-declare i8* @malloc(i64)
-declare i8* @memset(i8*, i32, i64)
-declare i8* @memcpy(i8*, i8*, i64)
-declare i32 @memcmp(i8*, i8*, i64)
-declare void @free(i8*)
-declare i32 @strncmp([0 x i8]*, [0 x i8]*, i64)
-declare i32 @strcmp([0 x i8]*, [0 x i8]*)
-declare [0 x i8]* @strcpy([0 x i8]*, [0 x i8]*)
-declare i64 @strlen([0 x i8]*)
+declare i8* @malloc(%SizeT %size)
+declare i8* @memset(i8* %mem, %Int %c, %SizeT %n)
+declare i8* @memcpy(i8* %dst, i8* %src, %SizeT %len)
+declare %Int @memcmp(i8* %ptr1, i8* %ptr2, %SizeT %num)
+declare void @free(i8* %ptr)
+declare %Int @strncmp([0 x %ConstChar]* %s1, [0 x %ConstChar]* %s2, %SizeT %n)
+declare %Int @strcmp([0 x %ConstChar]* %s1, [0 x %ConstChar]* %s2)
+declare [0 x %Char]* @strcpy([0 x %Char]* %dst, [0 x %ConstChar]* %src)
+declare %SizeT @strlen([0 x %ConstChar]* %s)
 
 
-declare i32 @ftruncate(i32, i32)
-
-
-
+declare %Int @ftruncate(%Int %fd, %OffT %size)
 
 
 
@@ -102,81 +132,86 @@ declare i32 @ftruncate(i32, i32)
 
 
 
-declare i32 @creat(%Str*, i32)
-declare i32 @open(%Str*, i32)
-declare i32 @read(i32, i8*, i32)
-declare i32 @write(i32, i8*, i32)
-declare i32 @lseek(i32, i32, i32)
-declare i32 @close(i32)
-declare void @exit(i32)
 
 
-declare %DIR* @opendir(%Str*)
-declare i32 @closedir(%DIR*)
+
+declare %Int @creat(%Str* %path, %ModeT %mode)
+declare %Int @open(%Str* %path, %Int %oflags)
+declare %Int @read(%Int %fd, i8* %buf, i32 %len)
+declare %Int @write(%Int %fd, i8* %buf, i32 %len)
+declare %OffT @lseek(%Int %fd, %OffT %offset, %Int %whence)
+declare %Int @close(%Int %fd)
+declare void @exit(%Int %rc)
 
 
-declare %Str* @getcwd(%Str*, i64)
-declare %Str* @getenv(%Str*)
+declare %DIR* @opendir(%Str* %name)
+declare %Int @closedir(%DIR* %dir)
 
 
-declare void @bzero(i8*, i64)
+declare %Str* @getcwd(%Str* %buf, %SizeT %size)
+declare %Str* @getenv(%Str* %name)
 
 
-declare void @bcopy(i8*, i8*, i64)
+declare void @bzero(i8* %s, %SizeT %n)
+
+
+declare void @bcopy(i8* %src, i8* %dst, %SizeT %n)
+
 
 ; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/stdio.hm
 
 
 
 
-%FposT = type opaque
 %FILE = type opaque
+%FposT = type opaque
 
-%CharStr = type [0 x i8]
-%ConstCharStr = type [0 x i8]
-
-
-declare i32 @fclose(%FILE*)
-declare i32 @feof(%FILE*)
-declare i32 @ferror(%FILE*)
-declare i32 @fflush(%FILE*)
-declare i32 @fgetpos(%FILE*, %FposT*)
-declare %FILE* @fopen(%ConstCharStr*, %ConstCharStr*)
-declare i64 @fread(i8*, i64, i64, %FILE*)
-declare i64 @fwrite(i8*, i64, i64, %FILE*)
-declare %FILE* @freopen(%ConstCharStr*, %ConstCharStr*, %FILE*)
-declare i32 @fseek(%FILE*, i64, i32)
-declare i32 @fsetpos(%FILE*, %FposT*)
-declare i64 @ftell(%FILE*)
-declare i32 @remove(%ConstCharStr*)
-declare i32 @rename(%ConstCharStr*, %ConstCharStr*)
-declare void @rewind(%FILE*)
-declare void @setbuf(%FILE*, %CharStr*)
+%CharStr = type %Str
+%ConstCharStr = type %CharStr
 
 
-declare i32 @setvbuf(%FILE*, %CharStr*, i32, i64)
+declare %Int @fclose(%FILE* %f)
+declare %Int @feof(%FILE* %f)
+declare %Int @ferror(%FILE* %f)
+declare %Int @fflush(%FILE* %f)
+declare %Int @fgetpos(%FILE* %f, %FposT* %pos)
+declare %FILE* @fopen(%ConstCharStr* %fname, %ConstCharStr* %mode)
+declare %SizeT @fread(i8* %buf, %SizeT %size, %SizeT %count, %FILE* %f)
+declare %SizeT @fwrite(i8* %buf, %SizeT %size, %SizeT %count, %FILE* %f)
+declare %FILE* @freopen(%ConstCharStr* %filename, %ConstCharStr* %mode, %FILE* %f)
+declare %Int @fseek(%FILE* %stream, %LongInt %offset, %Int %whence)
+declare %Int @fsetpos(%FILE* %f, %FposT* %pos)
+declare %LongInt @ftell(%FILE* %f)
+declare %Int @remove(%ConstCharStr* %filename)
+declare %Int @rename(%ConstCharStr* %old_filename, %ConstCharStr* %new_filename)
+declare void @rewind(%FILE* %f)
+declare void @setbuf(%FILE* %f, %CharStr* %buffer)
+
+
+declare %Int @setvbuf(%FILE* %f, %CharStr* %buffer, %Int %mode, %SizeT %size)
 declare %FILE* @tmpfile()
-declare %CharStr* @tmpnam(%CharStr*)
-declare i32 @printf(%ConstCharStr*, ...)
-declare i32 @scanf(%ConstCharStr*, ...)
-declare i32 @fprintf(%FILE*, %Str*, ...)
-declare i32 @fscanf(%FILE*, %ConstCharStr*, ...)
-declare i32 @sscanf(%ConstCharStr*, %ConstCharStr*, ...)
-declare i32 @sprintf(%CharStr*, %ConstCharStr*, ...)
+declare %CharStr* @tmpnam(%CharStr* %str)
+declare %Int @printf(%ConstCharStr* %s, ...)
+declare %Int @scanf(%ConstCharStr* %s, ...)
+declare %Int @fprintf(%FILE* %stream, %Str* %format, ...)
+declare %Int @fscanf(%FILE* %f, %ConstCharStr* %format, ...)
+declare %Int @sscanf(%ConstCharStr* %buf, %ConstCharStr* %format, ...)
+declare %Int @sprintf(%CharStr* %buf, %ConstCharStr* %format, ...)
 
 
-declare i32 @fgetc(%FILE*)
-declare i32 @fputc(i32, %FILE*)
-declare %CharStr* @fgets(%CharStr*, i32, %FILE*)
-declare i32 @fputs(%ConstCharStr*, %FILE*)
-declare i32 @getc(%FILE*)
-declare i32 @getchar()
-declare %CharStr* @gets(%CharStr*)
-declare i32 @putc(i32, %FILE*)
-declare i32 @putchar(i32)
-declare i32 @puts(%ConstCharStr*)
-declare i32 @ungetc(i32, %FILE*)
-declare void @perror(%ConstCharStr*)
+declare %Int @fgetc(%FILE* %f)
+declare %Int @fputc(%Int %char, %FILE* %f)
+declare %CharStr* @fgets(%CharStr* %str, %Int %n, %FILE* %f)
+declare %Int @fputs(%ConstCharStr* %str, %FILE* %f)
+declare %Int @getc(%FILE* %f)
+declare %Int @getchar()
+declare %CharStr* @gets(%CharStr* %str)
+declare %Int @putc(%Int %char, %FILE* %f)
+declare %Int @putchar(%Int %char)
+declare %Int @puts(%ConstCharStr* %str)
+declare %Int @ungetc(%Int %char, %FILE* %f)
+declare void @perror(%ConstCharStr* %str)
+
 
 ; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/mem.hm
 
@@ -185,34 +220,35 @@ declare void @perror(%ConstCharStr*)
 
 declare [0 x i8]* @get_ram_ptr()
 declare [0 x i8]* @get_rom_ptr()
-declare i8 @vm_mem_read8(i32)
-declare i16 @vm_mem_read16(i32)
-declare i32 @vm_mem_read32(i32)
-declare void @vm_mem_write8(i32, i8)
-declare void @vm_mem_write16(i32, i16)
-declare void @vm_mem_write32(i32, i32)
+declare i8 @vm_mem_read8(i32 %adr)
+declare i16 @vm_mem_read16(i32 %adr)
+declare i32 @vm_mem_read32(i32 %adr)
+declare void @vm_mem_write8(i32 %adr, i8 %value)
+declare void @vm_mem_write16(i32 %adr, i16 %value)
+declare void @vm_mem_write32(i32 %adr, i32 %value)
+
 
 ; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/core.hm
 
 
 
+
 %MemoryInterface = type {
-	i8(i32)*,
-	i16(i32)*,
-	i32(i32)*,
-	void(i32, i8)*,
-	void(i32, i16)*,
-	void(i32, i32)*
+	i8 (i32)*,
+	i16 (i32)*,
+	i32 (i32)*,
+	void (i32, i8)*,
+	void (i32, i16)*,
+	void (i32, i32)*
 }
 
 %Core = type {
 	[32 x i32],
 	i32,
-	i32,
-	i32,
+	%MemoryInterface*,
 	i1,
 	i32,
-	%MemoryInterface*
+	i32
 }
 
 
@@ -227,9 +263,10 @@ declare void @vm_mem_write32(i32, i32)
 
 
 
-declare void @core_init(%Core*, %MemoryInterface*)
-declare void @core_irq(%Core*, i32)
-declare i1 @core_tick(%Core*)
+declare void @core_init(%Core* %core, %MemoryInterface* %memctl)
+declare void @core_irq(%Core* %core, i32 %irq)
+declare i1 @core_tick(%Core* %core)
+
 
 
 ; -- SOURCE: src/main.cm
@@ -238,8 +275,8 @@ declare i1 @core_tick(%Core*)
 @str2 = private constant [10 x i8] [i8 76, i8 79, i8 65, i8 68, i8 58, i8 32, i8 37, i8 115, i8 10, i8 0]
 @str3 = private constant [3 x i8] [i8 114, i8 98, i8 0]
 @str4 = private constant [29 x i8] [i8 101, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 99, i8 97, i8 110, i8 110, i8 111, i8 116, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 102, i8 105, i8 108, i8 101, i8 32, i8 39, i8 37, i8 115, i8 39, i8 0]
-@str5 = private constant [18 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 100, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
-@str6 = private constant [14 x i8] [i8 37, i8 48, i8 56, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
+@str5 = private constant [19 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 122, i8 117, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
+@str6 = private constant [16 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 122, i8 120, i8 10, i8 0]
 @str7 = private constant [13 x i8] [i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 10, i8 0]
 @str8 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
 @str9 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
@@ -260,174 +297,169 @@ declare i1 @core_tick(%Core*)
 
 @text = global [4096 x i32] zeroinitializer
 
-define i32 @loader([0 x i8]* %filename, [0 x i8]* %bufptr, i32 %buf_size) {
-    %1 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([10 x i8]* @str2 to [0 x i8]*), [0 x i8]* %filename)
-    %2 = call %FILE*(%ConstCharStr*, %ConstCharStr*) @fopen ([0 x i8]* %filename, %ConstCharStr* bitcast ([3 x i8]* @str3 to [0 x i8]*))
+define i32 @loader(%Str8* %filename, [0 x i8]* %bufptr, i32 %buf_size) {
+    %1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str2 to [0 x i8]*), %Str8* %filename)
+    %2 = call %FILE* (%ConstCharStr*, %ConstCharStr*) @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str3 to [0 x i8]*))
     %3 = icmp eq %FILE* %2, null
     br i1 %3 , label %then_0, label %endif_0
 then_0:
-    %4 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([29 x i8]* @str4 to [0 x i8]*), [0 x i8]* %filename)
+    %4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str4 to [0 x i8]*), %Str8* %filename)
     ret i32 0
     br label %endif_0
 endif_0:
     %6 = bitcast [0 x i8]* %bufptr to i8*
-    %7 = zext i32 %buf_size to i64
-    %8 = call i64(i8*, i64, i64, %FILE*) @fread (i8* %6, i64 1, i64 %7, %FILE* %2)
-    %9 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([18 x i8]* @str5 to [0 x i8]*), i64 %8)
+    %7 = zext i32 %buf_size to %SizeT
+    %8 = call %SizeT (i8*, %SizeT, %SizeT, %FILE*) @fread(i8* %6, %SizeT 1, %SizeT %7, %FILE* %2)
+    %9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str5 to [0 x i8]*), %SizeT %8)
     br i1 0 , label %then_1, label %endif_1
 then_1:
-    %i = alloca i64
-    store i64 0, i64* %i
+    %10 = alloca %SizeT
+    store %SizeT 0, %SizeT* %10
     br label %again_1
 again_1:
-    %10 = load i64, i64* %i
-    %11 = udiv i64 %8, 4
-    %12 = icmp ult i64 %10, %11
-    br i1 %12 , label %body_1, label %break_1
+    %11 = udiv %SizeT %8, 4
+    %12 = load %SizeT, %SizeT* %10
+    %13 = icmp ult %SizeT %12, %11
+    br i1 %13 , label %body_1, label %break_1
 body_1:
-    %13 = load i64, i64* %i
-    %14 = bitcast [0 x i8]* %bufptr to [0 x i32]*
-    %15 = load i64, i64* %i
-    %16 = getelementptr inbounds [0 x i32], [0 x i32]* %14, i32 0, i64 %15
-    %17 = load i32, i32* %16
-    %18 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([14 x i8]* @str6 to [0 x i8]*), i64 %13, i32 %17)
-    %19 = load i64, i64* %i
-    %20 = add i64 %19, 4
-    store i64 %20, i64* %i
+    %14 = load %SizeT, %SizeT* %10
+    %15 = bitcast [0 x i8]* %bufptr to [0 x i32]*
+    %16 = load %SizeT, %SizeT* %10
+    %17 = getelementptr inbounds [0 x i32], [0 x i32]* %15, i32 0, %SizeT %16
+    %18 = load i32, i32* %17
+    %19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([16 x i8]* @str6 to [0 x i8]*), %SizeT %14, i32 %18)
+    %20 = load %SizeT, %SizeT* %10
+    %21 = add %SizeT %20, 4
+    store %SizeT %21, %SizeT* %10
     br label %again_1
 break_1:
-    %21 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str7 to [0 x i8]*))
+    %22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str7 to [0 x i8]*))
     br label %endif_1
 endif_1:
-    %22 = call i32(%FILE*) @fclose (%FILE* %2)
-    %23 = trunc i64 %8 to i32
-    ret i32 %23
+    %23 = call %Int (%FILE*) @fclose(%FILE* %2)
+    %24 = trunc %SizeT %8 to i32
+    ret i32 %24
 }
 
 define void @show_regs() {
-    %i = alloca i32
-    store i32 0, i32* %i
+    %1 = alloca i32
+    store i32 0, i32* %1
     br label %again_1
 again_1:
-    %1 = load i32, i32* %i
-    %2 = icmp slt i32 %1, 16
-    br i1 %2 , label %body_1, label %break_1
+    %2 = load i32, i32* %1
+    %3 = icmp slt i32 %2, 16
+    br i1 %3 , label %body_1, label %break_1
 body_1:
-    %3 = load i32, i32* %i
-    %4 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 0
-    %5 = load i32, i32* %i
-    %6 = getelementptr inbounds [32 x i32], [32 x i32]* %4, i32 0, i32 %5
-    %7 = load i32, i32* %6
-    %8 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([15 x i8]* @str8 to [0 x i8]*), i32 %3, i32 %7)
-    %9 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([5 x i8]* @str9 to [0 x i8]*))
-    %10 = load i32, i32* %i
-    %11 = add i32 %10, 16
-    %12 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 0
-    %13 = load i32, i32* %i
-    %14 = add i32 %13, 16
-    %15 = getelementptr inbounds [32 x i32], [32 x i32]* %12, i32 0, i32 %14
-    %16 = load i32, i32* %15
-    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([16 x i8]* @str10 to [0 x i8]*), i32 %11, i32 %16)
-    %18 = load i32, i32* %i
-    %19 = add i32 %18, 1
-    store i32 %19, i32* %i
+    %4 = load i32, i32* %1
+    %5 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 0
+    %6 = load i32, i32* %1
+    %7 = getelementptr inbounds [32 x i32], [32 x i32]* %5, i32 0, i32 %6
+    %8 = load i32, i32* %7
+    %9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str8 to [0 x i8]*), i32 %4, i32 %8)
+    %10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str9 to [0 x i8]*))
+    %11 = load i32, i32* %1
+    %12 = add i32 %11, 16
+    %13 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 0
+    %14 = load i32, i32* %1
+    %15 = add i32 %14, 16
+    %16 = getelementptr inbounds [32 x i32], [32 x i32]* %13, i32 0, i32 %15
+    %17 = load i32, i32* %16
+    %18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([16 x i8]* @str10 to [0 x i8]*), i32 %12, i32 %17)
+    %19 = load i32, i32* %1
+    %20 = add i32 %19, 1
+    store i32 %20, i32* %1
     br label %again_1
 break_1:
     ret void
 }
 
 define void @show_mem() {
-    %i = alloca i32
-    store i32 0, i32* %i
-    %1 = call [0 x i8]*() @get_ram_ptr ()
+    %1 = alloca i32
+    store i32 0, i32* %1
+    %2 = call [0 x i8]* () @get_ram_ptr()
     br label %again_1
 again_1:
-    %2 = load i32, i32* %i
-    %3 = icmp slt i32 %2, 256
-    br i1 %3 , label %body_1, label %break_1
+    %3 = load i32, i32* %1
+    %4 = icmp slt i32 %3, 256
+    br i1 %4 , label %body_1, label %break_1
 body_1:
-    %4 = load i32, i32* %i
-    %5 = mul i32 %4, 16
-    %6 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([5 x i8]* @str11 to [0 x i8]*), i32 %5)
-    %j = alloca i32
-    store i32 0, i32* %j
+    %5 = load i32, i32* %1
+    %6 = mul i32 %5, 16
+    %7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str11 to [0 x i8]*), i32 %6)
+    %8 = alloca i32
+    store i32 0, i32* %8
     br label %again_2
 again_2:
-    %7 = load i32, i32* %j
-    %8 = icmp slt i32 %7, 16
-    br i1 %8 , label %body_2, label %break_2
+    %9 = load i32, i32* %8
+    %10 = icmp slt i32 %9, 16
+    br i1 %10 , label %body_2, label %break_2
 body_2:
-    %9 = load i32, i32* %i
-    %10 = load i32, i32* %j
-    %11 = add i32 %9, %10
-    %12 = getelementptr inbounds [0 x i8], [0 x i8]* %1, i32 0, i32 %11
-    %13 = load i8, i8* %12
-    %14 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([6 x i8]* @str12 to [0 x i8]*), i8 %13)
-    %15 = load i32, i32* %j
-    %16 = add i32 %15, 1
-    store i32 %16, i32* %j
+    %11 = load i32, i32* %1
+    %12 = load i32, i32* %8
+    %13 = add i32 %11, %12
+    %14 = getelementptr inbounds [0 x i8], [0 x i8]* %2, i32 0, i32 %13
+    %15 = load i8, i8* %14
+    %16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str12 to [0 x i8]*), i8 %15)
+    %17 = load i32, i32* %8
+    %18 = add i32 %17, 1
+    store i32 %18, i32* %8
     br label %again_2
 break_2:
-    %17 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([2 x i8]* @str13 to [0 x i8]*))
-    %18 = load i32, i32* %i
-    %19 = add i32 %18, 16
-    store i32 %19, i32* %i
+    %19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str13 to [0 x i8]*))
+    %20 = load i32, i32* %1
+    %21 = add i32 %20, 16
+    store i32 %21, i32* %1
     br label %again_1
 break_1:
     ret void
 }
 
 define void @mem_violation_event(i32 %reason) {
-    %1 = bitcast %Core* @core to %Core*
-    call void(%Core*, i32) @core_irq (%Core* %1, i32 11)
+    call void (%Core*, i32) @core_irq(%Core* @core, i32 11)
     ret void
 }
 
-define i32 @main() {
-    %1 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([11 x i8]* @str14 to [0 x i8]*))
+define %Int @main() {
+    %1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str14 to [0 x i8]*))
     ; memory controller initialize
     %2 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 0
-    store i8(i32)* @vm_mem_read8, i8(i32)** %2
+    store i8 (i32)* @vm_mem_read8, i8 (i32)** %2
     %3 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 1
-    store i16(i32)* @vm_mem_read16, i16(i32)** %3
+    store i16 (i32)* @vm_mem_read16, i16 (i32)** %3
     %4 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 2
-    store i32(i32)* @vm_mem_read32, i32(i32)** %4
+    store i32 (i32)* @vm_mem_read32, i32 (i32)** %4
     %5 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 3
-    store void(i32, i8)* @vm_mem_write8, void(i32, i8)** %5
+    store void (i32, i8)* @vm_mem_write8, void (i32, i8)** %5
     %6 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 4
-    store void(i32, i16)* @vm_mem_write16, void(i32, i16)** %6
+    store void (i32, i16)* @vm_mem_write16, void (i32, i16)** %6
     %7 = getelementptr inbounds %MemoryInterface, %MemoryInterface* @memctl, i32 0, i32 5
-    store void(i32, i32)* @vm_mem_write32, void(i32, i32)** %7
-    %8 = call [0 x i8]*() @get_rom_ptr ()
-    %9 = call i32([0 x i8]*, [0 x i8]*, i32) @loader ([0 x i8]* bitcast ([12 x i8]* @str1 to [0 x i8]*), [0 x i8]* %8, i32 65536)
-    %10 = bitcast %Core* @core to %Core*
-    %11 = bitcast %MemoryInterface* @memctl to %MemoryInterface*
-    call void(%Core*, %MemoryInterface*) @core_init (%Core* %10, %MemoryInterface* %11)
-    %12 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([7 x i8]* @str15 to [0 x i8]*))
+    store void (i32, i32)* @vm_mem_write32, void (i32, i32)** %7
+    %8 = call [0 x i8]* () @get_rom_ptr()
+    %9 = call i32 (%Str8*, [0 x i8]*, i32) @loader(%Str8* bitcast ([12 x i8]* @str1 to [0 x i8]*), [0 x i8]* %8, i32 65536)
+    call void (%Core*, %MemoryInterface*) @core_init(%Core* @core, %MemoryInterface* @memctl)
+    %10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([7 x i8]* @str15 to [0 x i8]*))
     br label %again_1
 again_1:
     br i1 1 , label %body_1, label %break_1
 body_1:
     ;var cmd: [8]Char8
     ;scanf("%c", &cmd[0])
-
-    %13 = bitcast %Core* @core to %Core*
-    %14 = call i1(%Core*) @core_tick (%Core* %13)
-    %15 = xor  i1 %14, -1
-    br i1 %15 , label %then_0, label %endif_0
+    %11 = call i1 (%Core*) @core_tick(%Core* @core)
+    %12 = xor i1 %11, -1
+    br i1 %12 , label %then_0, label %endif_0
 then_0:
     br label %break_1
     br label %endif_0
 endif_0:
     br label %again_1
 break_1:
-    %17 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 3
-    %18 = load i32, i32* %17
-    %19 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([15 x i8]* @str16 to [0 x i8]*), i32 %18)
-    %20 = call i32(%ConstCharStr*, ...) @printf (%ConstCharStr* bitcast ([13 x i8]* @str17 to [0 x i8]*))
-    call void() @show_regs ()
-    call void() @show_mem ()
-    ret i32 0
+    %14 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 5
+    %15 = load i32, i32* %14
+    %16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str16 to [0 x i8]*), i32 %15)
+    %17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str17 to [0 x i8]*))
+    call void () @show_regs()
+    call void () @show_mem()
+    ret %Int 0
 }
 
 

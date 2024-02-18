@@ -65,5 +65,6 @@ __mem_violation:
 
 system:
 	ebreak
-	j system
+	mret
+	#j system
 

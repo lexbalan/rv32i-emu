@@ -1,3 +1,6 @@
+// CSR's
+//https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
+
 
 const NREGS = 32
 
@@ -16,15 +19,12 @@ type MemoryInterface record {
 type Core record {
     reg: [NREGS]Int32
     ip: Nat32
-    sp: Nat32
-    
-	cnt: Nat32
 
-    need_step: Bool
-
-	interrupt: Nat32
-    
     memctl: *MemoryInterface
+    
+    need_step: Bool
+    interrupt: Nat32
+    cnt: Nat32
 }
 
 
@@ -32,15 +32,25 @@ const OP_LUI = 0x37
 const OP_AUI_PC = 0x17
 const OP_JAL = 0x6F
 const OP_JALR = 0x67
-const OP_B = 0x63  // branch
 const OP_L = 0x03  // load
-const OP_S = 0x23  // store
 const OP_I = 0x13  // immediate
+const OP_S = 0x23  // store
 const OP_R = 0x33  // reg
-const OP_ECALL = 0x00000073
-const OP_EBREAK = 0x00100073
-const OP_PAUSE = 0x0100000F
+const OP_B = 0x63  // branch
+const OP_SYSTEM = 0x73
+const OP_FENCE = 0x0F
 
+const INSTR_ECALL = OP_SYSTEM or 0x00000000
+const INSTR_EBREAK = OP_SYSTEM or 0x00100000
+const INSTR_PAUSE = OP_FENCE or 0x01000000
+
+
+const FUNCT3_CSRRW = 1
+const FUNCT3_CSRRS = 2
+const FUNCT3_CSRRC = 3
+const FUNCT3_CSRRWI = 4
+const FUNCT3_CSRRSI = 5
+const FUNCT3_CSRRCI = 6
 
 func core_init(core: *Core, memctl: *MemoryInterface)
 func core_irq(core: *Core, irq: Nat32)
@@ -49,6 +59,4 @@ func core_tick(core: *Core) -> Bool
 
 const INT_SYS_CALL = 0x08
 const INT_MEM_VIOLATION = 0x0B
-
-
 

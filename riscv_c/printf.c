@@ -1,5 +1,11 @@
 
+#include <stdint.h>
 #include <stdarg.h>
+
+
+uint64_t sum64(uint32_t a, uint32_t b) {
+    return (uint64_t)a + (uint64_t)b;
+}
 
 
 void putchar(char c) {
@@ -27,6 +33,9 @@ int printf(char *str, ...)
 {
     va_list a_list;
     va_start(a_list, str);
+    
+    va_list a_list2;
+    va_copy(a_list2, a_list);
 
 	char c;
 	int i = 0;
