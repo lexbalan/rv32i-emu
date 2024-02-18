@@ -276,7 +276,7 @@ declare i1 @core_tick(%Core* %core)
 @str3 = private constant [3 x i8] [i8 114, i8 98, i8 0]
 @str4 = private constant [29 x i8] [i8 101, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 99, i8 97, i8 110, i8 110, i8 111, i8 116, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 102, i8 105, i8 108, i8 101, i8 32, i8 39, i8 37, i8 115, i8 39, i8 0]
 @str5 = private constant [19 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 122, i8 117, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
-@str6 = private constant [16 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 122, i8 120, i8 10, i8 0]
+@str6 = private constant [15 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
 @str7 = private constant [13 x i8] [i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 10, i8 0]
 @str8 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
 @str9 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
@@ -327,7 +327,7 @@ body_1:
     %16 = load %SizeT, %SizeT* %10
     %17 = getelementptr inbounds [0 x i32], [0 x i32]* %15, i32 0, %SizeT %16
     %18 = load i32, i32* %17
-    %19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([16 x i8]* @str6 to [0 x i8]*), %SizeT %14, i32 %18)
+    %19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str6 to [0 x i8]*), %SizeT %14, i32 %18)
     %20 = load %SizeT, %SizeT* %10
     %21 = add %SizeT %20, 4
     store %SizeT %21, %SizeT* %10

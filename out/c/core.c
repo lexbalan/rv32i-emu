@@ -18,10 +18,14 @@
 
 void core_init(Core *core, MemoryInterface *memctl)
 {
-    //memset(core, 0, sizeof(Core))
-    *core = (Core){};
+    memset((void *)core, 0, sizeof(Core));
     core->memctl = memctl;
     core->need_step = true;
+
+    //    *core = {
+    //        memctl = memctl
+    //        need_step = true
+    //    } to Core
 }
 
 

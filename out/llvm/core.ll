@@ -26,7 +26,6 @@ target triple = "arm64-apple-macosx12.0.0"
 %Str16 = type [0 x %Char16]
 %Str32 = type [0 x %Char32]
 %VA_List = type i8*
-
 declare void @llvm.memcpy.p0.p0.i32(i8*, i8*, i32, i1)
 declare void @llvm.memset.p0.i32(i8*, i8, i32, i1)
 
@@ -260,12 +259,16 @@ declare void @perror(%ConstCharStr* %str)
 
 
 define void @core_init(%Core* %core, %MemoryInterface* %memctl) {
-    ;memset(core, 0, sizeof(Core))
-    store %Core zeroinitializer, %Core* %core
-    %1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 2
-    store %MemoryInterface* %memctl, %MemoryInterface** %1
-    %2 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-    store i1 1, i1* %2
+    %1 = bitcast %Core* %core to i8*
+    %2 = call i8* (i8*, %Int, %SizeT) @memset(i8* %1, %Int 0, %SizeT 152)
+    %3 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 2
+    store %MemoryInterface* %memctl, %MemoryInterface** %3
+    %4 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+    store i1 1, i1* %4
+    ;    *core = {
+    ;        memctl = memctl
+    ;        need_step = true
+    ;    } to Core
     ret void
 }
 

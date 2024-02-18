@@ -10,10 +10,14 @@ import "./core.hm"
 
 
 func core_init(core: *Core, memctl: *MemoryInterface) {
-    //memset(core, 0, sizeof(Core))
-    *core = {}
-    core.memctl = memctl
-    core.need_step = true
+//    memset(core, 0, sizeof(Core))
+//    core.memctl = memctl
+//    core.need_step = true
+    
+    *core = {
+        memctl = memctl
+        need_step = true
+    } to Core
 }
 
 
