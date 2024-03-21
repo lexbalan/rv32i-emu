@@ -310,26 +310,26 @@ bool core_tick(Core *core)
         //printf("OP = 0x%x\n", op)
     }
 
-    if (op == OP_I) {
+    if (op == opI) {
         i_type_op(core, instr);
 
-    } else if (op == OP_R) {
+    } else if (op == opR) {
         r_type_op(core, instr);
 
-    } else if (op == OP_LUI) {
+    } else if (op == opLUI) {
         // U-type
         const int32_t imm = expand12(extract_imm31_12(instr));
         //printf("lui x%d, 0x%X\n", rd, imm)
         core->reg[rd] = imm << 12;
 
-    } else if (op == OP_AUI_PC) {
+    } else if (op == opAUI_PC) {
         // U-type
         const int32_t imm = expand12(extract_imm31_12(instr));
         const int32_t x = (int32_t)core->ip + (imm << 12);
         core->reg[rd] = x;
         //printf("auipc x%d, 0x%X\n", rd, imm)
 
-    } else if (op == OP_JAL) {
+    } else if (op == opJAL) {
         // U-type
         const uint32_t raw_imm = extract_jal_imm(instr);
         const int32_t imm = expand20(raw_imm);
@@ -342,7 +342,7 @@ bool core_tick(Core *core)
         core->ip = (uint32_t)((int32_t)core->ip + imm);
         core->need_step = false;
 
-    } else if ((op == OP_JALR) && (funct3 == 0)) {
+    } else if ((op == opJALR) && (funct3 == 0)) {
         const int32_t imm = expand12(extract_imm12(instr));
         //printf("jalr %d(x%d)\n", imm, rs1)
         // rd <- pc + 4
@@ -359,7 +359,7 @@ bool core_tick(Core *core)
 
         core->need_step = false;
 
-    } else if (op == OP_B) {
+    } else if (op == opB) {
         const uint8_t imm12_10to5 = extract_funct7(instr);
         const uint8_t imm4to1_11 = extract_rd(instr);
 
@@ -429,7 +429,7 @@ bool core_tick(Core *core)
             }
         }
 
-    } else if (op == OP_L) {
+    } else if (op == opL) {
         const int32_t imm = expand12(extract_imm12(instr));
 
         const uint32_t adr = (uint32_t)(core->reg[rs1] + imm);
@@ -473,7 +473,7 @@ bool core_tick(Core *core)
             }
         }
 
-    } else if (op == OP_S) {
+    } else if (op == opS) {
         const uint8_t imm4to0 = rd;
         const uint8_t imm11to5 = extract_funct7(instr);
 
@@ -497,26 +497,26 @@ bool core_tick(Core *core)
             ((void (*) (uint32_t adr, uint32_t value))core->memctl->write32)(adr, (uint32_t)val);
         }
 
-    } else if (op == OP_SYSTEM) {
-        if (instr == INSTR_ECALL) {
+    } else if (op == opSYSTEM) {
+        if (instr == instrECALL) {
             printf("ECALL\n");
-            core_irq(core, INT_SYS_CALL);
+            core_irq(core, intSysCall);
 
-        } else if (instr == INSTR_EBREAK) {
+        } else if (instr == instrEBREAK) {
             printf("EBREAK\n");
             return false;
 
             // CSR instructions
-        } else if (funct3 == FUNCT3_CSRRW) {
+        } else if (funct3 == funct3_CSRRW) {
             //riscv_csr_rw(core, csr, rd, rs1)
-        } else if (funct3 == FUNCT3_CSRRS) {
+        } else if (funct3 == funct3_CSRRS) {
             //riscv_csr_rs(core, csr, rd, rs1)
-        } else if (funct3 == FUNCT3_CSRRC) {
+        } else if (funct3 == funct3_CSRRC) {
             //riscv_csr_rc(core, csr, rd, rs1)
 
-        } else if (funct3 == FUNCT3_CSRRWI) {
-        } else if (funct3 == FUNCT3_CSRRSI) {
-        } else if (funct3 == FUNCT3_CSRRCI) {
+        } else if (funct3 == funct3_CSRRWI) {
+        } else if (funct3 == funct3_CSRRSI) {
+        } else if (funct3 == funct3_CSRRCI) {
 
         } else {
             printf("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr);
@@ -524,8 +524,8 @@ bool core_tick(Core *core)
             return false;
         }
 
-    } else if (op == OP_FENCE) {
-        if (instr == INSTR_PAUSE) {
+    } else if (op == opFENCE) {
+        if (instr == instrPAUSE) {
             //printf("PAUSE\n")
         }
     } else {

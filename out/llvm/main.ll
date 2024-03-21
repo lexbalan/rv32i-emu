@@ -58,14 +58,26 @@ declare void @llvm.memset.p0.i32(i8*, i8, i32, i1)
 %Float = type double
 %Double = type double
 %LongDouble = type double
-%SizeT = type i64
-%SSizeT = type i64
 
 
 ; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/ctypes.hm
 
 
 
+
+%Clock_T = type %UnsignedLong
+%Socklen_T = type i32
+%Time_T = type %LongInt
+%SizeT = type %UnsignedLongInt
+%SSizeT = type %LongInt
+%PidT = type i32
+%UidT = type i32
+%GidT = type i32
+%USecondsT = type i32
+%IntptrT = type i64
+
+
+%OffT = type i64
 
 
 ; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/libc.hm
@@ -80,9 +92,6 @@ declare void @llvm.memset.p0.i32(i8*, i8, i32, i1)
 
 
 %BlkCntT = type i32
-
-
-%OffT = type i32
 
 
 %NlinkT = type i16
@@ -314,31 +323,32 @@ endif_0:
     br i1 0 , label %then_1, label %endif_1
 then_1:
     %10 = alloca %SizeT
-    store %SizeT 0, %SizeT* %10
+    %11 = zext i8 0 to %SizeT
+    store %SizeT %11, %SizeT* %10
     br label %again_1
 again_1:
-    %11 = udiv %SizeT %8, 4
     %12 = load %SizeT, %SizeT* %10
-    %13 = icmp ult %SizeT %12, %11
-    br i1 %13 , label %body_1, label %break_1
+    %13 = udiv %SizeT %8, 4
+    %14 = icmp ult %SizeT %12, %13
+    br i1 %14 , label %body_1, label %break_1
 body_1:
-    %14 = load %SizeT, %SizeT* %10
-    %15 = bitcast [0 x i8]* %bufptr to [0 x i32]*
-    %16 = load %SizeT, %SizeT* %10
-    %17 = getelementptr inbounds [0 x i32], [0 x i32]* %15, i32 0, %SizeT %16
-    %18 = load i32, i32* %17
-    %19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str6 to [0 x i8]*), %SizeT %14, i32 %18)
-    %20 = load %SizeT, %SizeT* %10
-    %21 = add %SizeT %20, 4
-    store %SizeT %21, %SizeT* %10
+    %15 = load %SizeT, %SizeT* %10
+    %16 = bitcast [0 x i8]* %bufptr to [0 x i32]*
+    %17 = load %SizeT, %SizeT* %10
+    %18 = getelementptr inbounds [0 x i32], [0 x i32]* %16, i32 0, %SizeT %17
+    %19 = load i32, i32* %18
+    %20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str6 to [0 x i8]*), %SizeT %15, i32 %19)
+    %21 = load %SizeT, %SizeT* %10
+    %22 = add %SizeT %21, 4
+    store %SizeT %22, %SizeT* %10
     br label %again_1
 break_1:
-    %22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str7 to [0 x i8]*))
+    %23 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str7 to [0 x i8]*))
     br label %endif_1
 endif_1:
-    %23 = call %Int (%FILE*) @fclose(%FILE* %2)
-    %24 = trunc %SizeT %8 to i32
-    ret i32 %24
+    %24 = call %Int (%FILE*) @fclose(%FILE* %2)
+    %25 = trunc %SizeT %8 to i32
+    ret i32 %25
 }
 
 define void @show_regs() {

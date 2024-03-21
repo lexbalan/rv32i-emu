@@ -1,26 +1,23 @@
 
-@attribute("c-no-print")
-import "libc/libc.hm"
+import "libc/libc"
+import "libc/stdio"
 
-@attribute("c-no-print")
-import "libc/stdio.hm"
-
-import "./mem.hm"
-import "./core.hm"
+import "mem"
+import "core"
 
 
-const text_filename = "./image.bin" to *Str8
+const text_filename = *Str8 "./image.bin"
 
 
-const SHOW_TEXT = false
+const showText = false
 
 
 var memctl: MemoryInterface
 var core: Core
 
 
-const TEXT_BUFFER_SIZE = 4096
-var text: [TEXT_BUFFER_SIZE]Nat32
+const textBufferSize = 4096
+var text: [textBufferSize]Nat32
 
 
 func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
@@ -33,15 +30,15 @@ func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
         return 0
     }
     
-    let n = fread(bufptr, 1, buf_size to SizeT, fp)
+    let n = fread(bufptr, 1, SizeT buf_size, fp)
 
     printf("LOADED: %zu bytes\n", n)
     
 
-	if SHOW_TEXT {
-		var i = 0 to SizeT
+	if showText {
+		var i = SizeT 0
 		while i < (n / 4) {
-			printf("%08zx: 0x%08x\n", i, (bufptr to *[]Nat32)[i])
+			printf("%08zx: 0x%08x\n", i, (*[]Nat32 bufptr)[i])
 			i = i + 4
 		}
 
@@ -50,7 +47,7 @@ func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
 
     fclose(fp)
     
-    return n to Nat32
+    return Nat32 n
 }
 
 
@@ -85,7 +82,7 @@ func show_mem() {
 
 
 func mem_violation_event(reason: Nat32) {
-	core_irq(&core, INT_MEM_VIOLATION)
+	core_irq(&core, intMemViolation)
 }
 
 
@@ -103,7 +100,7 @@ func main() -> Int {
 
     
 	let romptr = get_rom_ptr()
-	let loaded_bytes_text = loader(text_filename, romptr, ROM_SIZE)
+	let loaded_bytes_text = loader(text_filename, romptr, romSize)
     
     core_init(&core, &memctl)
     

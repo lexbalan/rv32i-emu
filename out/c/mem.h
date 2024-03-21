@@ -9,31 +9,31 @@
 
 
 // see mem.ld
-#define RAM_START  0x10000000
-#define RAM_SIZE  4096
-#define RAM_END  (RAM_START + RAM_SIZE)
+#define ramStart  0x10000000
+#define ramSize  4096
+#define ramEnd  (ramStart + ramSize)
 
 
-#define ROM_START  0x00000000
-#define ROM_SIZE  0x10000
-#define ROM_END  (ROM_START + ROM_SIZE)
+#define romStart  0x00000000
+#define romSize  0x10000
+#define romEnd  (romStart + romSize)
 
 
-#define MMIO_START  0xF00C0000
-#define MMMIO_SIZE  0xFFFF
-#define MMIO_END  (MMIO_START + MMMIO_SIZE)
+#define mmioStart  0xF00C0000
+#define mmioSize  0xFFFF
+#define mmioEnd  (mmioStart + mmioSize)
 
-#define CONSOLE_MMIO_ADR  (MMIO_START + 0x10)
-#define CONSOLE_PUT_ADR  (CONSOLE_MMIO_ADR + 0)
-#define CONSOLE_GET_ADR  (CONSOLE_MMIO_ADR + 1)
+#define consoleMMIOAdr  (mmioStart + 0x10)
+#define consolePutAdr  (consoleMMIOAdr + 0)
+#define consoleGetAdr  (consoleMMIOAdr + 1)
 
-#define CONSOLE_PRINT_INT32_ADR  (CONSOLE_MMIO_ADR + 0x10)
-#define CONSOLE_PRINT_UINT32_ADR  (CONSOLE_MMIO_ADR + 0x14)
-#define CONSOLE_PRINT_INT32_HEX_ADR  (CONSOLE_MMIO_ADR + 0x18)
-#define CONSOLE_PRINT_UINT32_HEX_ADR  (CONSOLE_MMIO_ADR + 0x1C)
+#define consolePrintInt32Adr  (consoleMMIOAdr + 0x10)
+#define consolePrintUInt32Adr  (consoleMMIOAdr + 0x14)
+#define consolePrintInt32HexAdr  (consoleMMIOAdr + 0x18)
+#define consolePrintUInt32HexAdr  (consoleMMIOAdr + 0x1C)
 
-#define CONSOLE_PRINT_INT64_ADR  (CONSOLE_MMIO_ADR + 0x20)
-#define CONSOLE_PRINT_UINT64_ADR  (CONSOLE_MMIO_ADR + 0x28)
+#define consolePrintInt64Adr  (consoleMMIOAdr + 0x20)
+#define consolePrintUInt64Adr  (consoleMMIOAdr + 0x28)
 
 
 uint8_t *get_ram_ptr();

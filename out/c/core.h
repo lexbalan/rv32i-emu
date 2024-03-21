@@ -10,7 +10,7 @@
 
 
 
-#define NREGS  32
+#define nRegs  32
 
 
 typedef struct {
@@ -25,7 +25,7 @@ typedef struct {
 
 
 typedef struct {
-    int32_t reg[NREGS];
+    int32_t reg[nRegs];
     uint32_t ip;
 
     MemoryInterface *memctl;
@@ -36,36 +36,36 @@ typedef struct {
 } Core;
 
 
-#define OP_LUI  0x37
-#define OP_AUI_PC  0x17
-#define OP_JAL  0x6F
-#define OP_JALR  0x67
-#define OP_L  0x03// load
-#define OP_I  0x13// immediate
-#define OP_S  0x23// store
-#define OP_R  0x33// reg
-#define OP_B  0x63// branch
-#define OP_SYSTEM  0x73
-#define OP_FENCE  0x0F
+#define opLUI  0x37
+#define opAUI_PC  0x17
+#define opJAL  0x6F
+#define opJALR  0x67
+#define opL  0x03// load
+#define opI  0x13// immediate
+#define opS  0x23// store
+#define opR  0x33// reg
+#define opB  0x63// branch
+#define opSYSTEM  0x73
+#define opFENCE  0x0F
 
-#define INSTR_ECALL  (OP_SYSTEM | 0x00000000)
-#define INSTR_EBREAK  (OP_SYSTEM | 0x00100000)
-#define INSTR_PAUSE  (OP_FENCE | 0x01000000)
+#define instrECALL  (opSYSTEM | 0x00000000)
+#define instrEBREAK  (opSYSTEM | 0x00100000)
+#define instrPAUSE  (opFENCE | 0x01000000)
 
 
-#define FUNCT3_CSRRW  1
-#define FUNCT3_CSRRS  2
-#define FUNCT3_CSRRC  3
-#define FUNCT3_CSRRWI  4
-#define FUNCT3_CSRRSI  5
-#define FUNCT3_CSRRCI  6
+#define funct3_CSRRW  1
+#define funct3_CSRRS  2
+#define funct3_CSRRC  3
+#define funct3_CSRRWI  4
+#define funct3_CSRRSI  5
+#define funct3_CSRRCI  6
 
 void core_init(Core *core, MemoryInterface *memctl);
 void core_irq(Core *core, uint32_t irq);
 bool core_tick(Core *core);
 
 
-#define INT_SYS_CALL  0x08
-#define INT_MEM_VIOLATION  0x0B
+#define intSysCall  0x08
+#define intMemViolation  0x0B
 
 #endif /* CORE_H */

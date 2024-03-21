@@ -10,8 +10,8 @@
 #include "./mem.h"
 
 
-static uint8_t rom[ROM_SIZE];
-static uint8_t ram[RAM_SIZE];
+static uint8_t rom[romSize];
+static uint8_t ram[ramSize];
 
 uint8_t *get_ram_ptr()
 {
@@ -41,13 +41,13 @@ uint8_t vm_mem_read8(uint32_t adr)
     uint8_t x;
     x = 0;
 
-    if ((adr >= RAM_START) && (adr <= RAM_END)) {
-        uint8_t *const p = (uint8_t *)(void *)&ram[adr - RAM_START];
+    if ((adr >= ramStart) && (adr <= ramEnd)) {
+        uint8_t *const p = (uint8_t *)(void *)&ram[adr - ramStart];
         x = *p;
-    } else if ((adr >= MMIO_START) && (adr <= MMIO_END)) {
+    } else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
         x = 0;
-    } else if ((adr >= ROM_START) && (adr <= ROM_END)) {
-        uint8_t *const p = (uint8_t *)(void *)&rom[adr - ROM_START];
+    } else if ((adr >= romStart) && (adr <= romEnd)) {
+        uint8_t *const p = (uint8_t *)(void *)&rom[adr - romStart];
         x = *p;
     } else {
         mem_violation('r', adr);
@@ -65,13 +65,13 @@ uint16_t vm_mem_read16(uint32_t adr)
     uint16_t x;
     x = 0;
 
-    if ((adr >= RAM_START) && (adr <= RAM_END)) {
-        uint16_t *const p = (uint16_t *)(void *)&ram[adr - RAM_START];
+    if ((adr >= ramStart) && (adr <= ramEnd)) {
+        uint16_t *const p = (uint16_t *)(void *)&ram[adr - ramStart];
         x = *p;
-    } else if ((adr >= MMIO_START) && (adr <= MMIO_END)) {
+    } else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
         x = 0;
-    } else if ((adr >= ROM_START) && (adr <= ROM_END)) {
-        uint16_t *const p = (uint16_t *)(void *)&rom[adr - ROM_START];
+    } else if ((adr >= romStart) && (adr <= romEnd)) {
+        uint16_t *const p = (uint16_t *)(void *)&rom[adr - romStart];
         x = *p;
     } else {
         mem_violation('r', adr);
@@ -89,13 +89,13 @@ uint32_t vm_mem_read32(uint32_t adr)
     uint32_t x;
     x = 0;
 
-    if ((adr >= ROM_START) && (adr <= ROM_END)) {
-        uint32_t *const p = (uint32_t *)(void *)&rom[adr - ROM_START];
+    if ((adr >= romStart) && (adr <= romEnd)) {
+        uint32_t *const p = (uint32_t *)(void *)&rom[adr - romStart];
         x = *p;
-    } else if ((adr >= RAM_START) && (adr <= RAM_END)) {
-        uint32_t *const p = (uint32_t *)(void *)&ram[adr - RAM_START];
+    } else if ((adr >= ramStart) && (adr <= ramEnd)) {
+        uint32_t *const p = (uint32_t *)(void *)&ram[adr - ramStart];
         x = *p;
-    } else if ((adr >= MMIO_START) && (adr <= MMIO_END)) {
+    } else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
         x = 0;
     } else {
         mem_violation('r', adr);
@@ -110,11 +110,11 @@ uint32_t vm_mem_read32(uint32_t adr)
 
 void vm_mem_write8(uint32_t adr, uint8_t value)
 {
-    if ((adr >= RAM_START) && (adr <= RAM_END)) {
-        uint8_t *const p = (uint8_t *)(void *)&ram[adr - RAM_START];
+    if ((adr >= ramStart) && (adr <= ramEnd)) {
+        uint8_t *const p = (uint8_t *)(void *)&ram[adr - ramStart];
         *p = value;
-    } else if ((adr >= MMIO_START) && (adr <= MMIO_END)) {
-        if (adr == CONSOLE_PUT_ADR) {
+    } else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
+        if (adr == consolePutAdr) {
             const char v = (char)value;
             printf("%c", v);
             return;
@@ -126,11 +126,11 @@ void vm_mem_write8(uint32_t adr, uint8_t value)
 
 void vm_mem_write16(uint32_t adr, uint16_t value)
 {
-    if ((adr >= RAM_START) && (adr <= RAM_END)) {
-        uint16_t *const p = (uint16_t *)(void *)&ram[adr - RAM_START];
+    if ((adr >= ramStart) && (adr <= ramEnd)) {
+        uint16_t *const p = (uint16_t *)(void *)&ram[adr - ramStart];
         *p = value;
-    } else if ((adr >= MMIO_START) && (adr <= MMIO_END)) {
-        if (adr == CONSOLE_PUT_ADR) {
+    } else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
+        if (adr == consolePutAdr) {
             putchar((int)value);
             return;
         }
@@ -141,23 +141,23 @@ void vm_mem_write16(uint32_t adr, uint16_t value)
 
 void vm_mem_write32(uint32_t adr, uint32_t value)
 {
-    if ((adr >= RAM_START) && (adr <= RAM_END)) {
-        uint32_t *const p = (uint32_t *)(void *)&ram[adr - RAM_START];
+    if ((adr >= ramStart) && (adr <= ramEnd)) {
+        uint32_t *const p = (uint32_t *)(void *)&ram[adr - ramStart];
         *p = value;
-    } else if ((adr >= MMIO_START) && (adr <= MMIO_END)) {
-        if (adr == CONSOLE_PUT_ADR) {
+    } else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
+        if (adr == consolePutAdr) {
             putchar((int)value);
             return;
-        } else if (adr == CONSOLE_PRINT_INT32_ADR) {
+        } else if (adr == consolePrintInt32Adr) {
             printf("%d", value);
             return;
-        } else if (adr == CONSOLE_PRINT_UINT32_ADR) {
+        } else if (adr == consolePrintUInt32Adr) {
             printf("%u", value);
             return;
-        } else if (adr == CONSOLE_PRINT_INT32_HEX_ADR) {
+        } else if (adr == consolePrintInt32HexAdr) {
             printf("%x", value);
             return;
-        } else if (adr == CONSOLE_PRINT_UINT32_HEX_ADR) {
+        } else if (adr == consolePrintUInt32HexAdr) {
             printf("%x", value);
             return;
         }

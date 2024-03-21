@@ -18,15 +18,15 @@
 #define text_filename  "./image.bin"
 
 
-#define SHOW_TEXT  false
+#define showText  false
 
 
 static MemoryInterface memctl;
 static Core core;
 
 
-#define TEXT_BUFFER_SIZE  4096
-static uint32_t text[TEXT_BUFFER_SIZE];
+#define textBufferSize  4096
+static uint32_t text[textBufferSize];
 
 
 uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
@@ -45,7 +45,7 @@ uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
     printf("LOADED: %zu bytes\n", n);
 
 
-    if (SHOW_TEXT) {
+    if (showText) {
         size_t i;
         i = 0;
         while (i < n / 4) {
@@ -99,7 +99,7 @@ void show_mem()
 
 void mem_violation_event(uint32_t reason)
 {
-    core_irq(&core, INT_MEM_VIOLATION);
+    core_irq(&core, intMemViolation);
 }
 
 
