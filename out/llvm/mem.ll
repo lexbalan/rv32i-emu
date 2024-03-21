@@ -145,7 +145,7 @@ declare void @perror(%ConstCharStr* %str)
 
 @str1 = private constant [30 x i8] [i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
 @str2 = private constant [3 x i8] [i8 37, i8 99, i8 0]
-@str3 = private constant [3 x i8] [i8 37, i8 100, i8 0]
+@str3 = private constant [3 x i8] [i8 37, i8 117, i8 0]
 @str4 = private constant [3 x i8] [i8 37, i8 117, i8 0]
 @str5 = private constant [3 x i8] [i8 37, i8 120, i8 0]
 @str6 = private constant [3 x i8] [i8 37, i8 120, i8 0]

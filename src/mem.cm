@@ -32,12 +32,12 @@ func mem_violation(rw: Char8, adr: Nat32) {
 func vm_mem_read8(adr: Nat32) -> Nat8 {
 	var x = Nat8 0
 
-	if (adr >= ramStart) and (adr <= ramEnd) {
+	if adr >= ramStart and adr<= ramEnd {
         let p = *Nat8 Pointer &ram[adr - ramStart]
 		x = *p
-    } else if (adr >= mmioStart) and (adr <= mmioEnd) {
+    } else if adr >= mmioStart and adr<= mmioEnd {
         //
-	} else if (adr >= romStart) and (adr <= romEnd) {
+	} else if adr >= romStart and adr<= romEnd {
 		let p = *Nat8 Pointer &rom[adr - romStart]
 		x = *p
     } else {
@@ -54,12 +54,12 @@ func vm_mem_read8(adr: Nat32) -> Nat8 {
 func vm_mem_read16(adr: Nat32) -> Nat16 {
 	var x = Nat16 0
 
-    if (adr >= ramStart) and (adr <= ramEnd) {
+    if adr >= ramStart and adr<= ramEnd {
         let p = *Nat16 Pointer &ram[adr - ramStart]
         x = *p
-    } else if (adr >= mmioStart) and (adr <= mmioEnd) {
+    } else if adr >= mmioStart and adr<= mmioEnd {
         //
-	} else if (adr >= romStart) and (adr <= romEnd) {
+	} else if adr >= romStart and adr<= romEnd {
 		let p = *Nat16 Pointer &rom[adr - romStart]
 		x = *p
     } else {
@@ -76,13 +76,13 @@ func vm_mem_read16(adr: Nat32) -> Nat16 {
 func vm_mem_read32(adr: Nat32) -> Nat32 {
 	var x = Nat32 0
 
-	if (adr >= romStart) and (adr <= romEnd) {
+	if adr >= romStart and adr<= romEnd {
 		let p = *Nat32 Pointer &rom[adr - romStart]
 		x = *p
-	} else if (adr >= ramStart) and (adr <= ramEnd) {
+	} else if adr >= ramStart and adr<= ramEnd {
         let p = *Nat32 Pointer &ram[adr - ramStart]
         x = *p
-    } else if (adr >= mmioStart) and (adr <= mmioEnd) {
+    } else if adr >= mmioStart and adr<= mmioEnd {
         x = 0
     } else {
         mem_violation("r"[0], adr)
@@ -96,10 +96,10 @@ func vm_mem_read32(adr: Nat32) -> Nat32 {
 
 
 func vm_mem_write8(adr: Nat32, value: Nat8) {
-    if (adr >= ramStart) and (adr <= ramEnd) {
+    if adr >= ramStart and adr<= ramEnd {
         let p = *Nat8 Pointer &ram[adr - ramStart]
         *p = value
-    } else if (adr >= mmioStart) and (adr <= mmioEnd) {
+    } else if adr >= mmioStart and adr<= mmioEnd {
         if adr == consolePutAdr {
 			let v = Char8 value
 			printf("%c", v)
@@ -111,10 +111,10 @@ func vm_mem_write8(adr: Nat32, value: Nat8) {
 }
 
 func vm_mem_write16(adr: Nat32, value: Nat16) {
-    if (adr >= ramStart) and (adr <= ramEnd) {
+    if adr >= ramStart and adr<= ramEnd {
         let p = *Nat16 Pointer &ram[adr - ramStart]
         *p = value
-    } else if (adr >= mmioStart) and (adr <= mmioEnd) {
+    } else if adr >= mmioStart and adr<= mmioEnd {
         if adr == consolePutAdr {
             putchar(Int value)
             return
@@ -125,15 +125,15 @@ func vm_mem_write16(adr: Nat32, value: Nat16) {
 }
 
 func vm_mem_write32(adr: Nat32, value: Nat32) {
-    if (adr >= ramStart) and (adr <= ramEnd) {
+    if adr >= ramStart and adr<= ramEnd {
         let p = *Nat32 Pointer &ram[adr - ramStart]
         *p = value
-    } else if (adr >= mmioStart) and (adr <= mmioEnd) {
+    } else if adr >= mmioStart and adr<= mmioEnd {
         if adr == consolePutAdr {
             putchar(Int value)
             return
 		} else if adr == consolePrintInt32Adr {
-			printf("%d", value)
+			printf("%u", value)
             return
 		} else if adr == consolePrintUInt32Adr {
 			printf("%u", value)
