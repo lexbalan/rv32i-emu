@@ -116,7 +116,7 @@ func i_type_op(core: *Core, instr: Nat32) {
         if rd != 0 {
             core.reg[rd] = core.reg[rs1] + imm
         }
-    } else if (funct3 == 1) and (funct7 == 0) {
+    } else if funct3 == 1 and funct7 == 0 {
         /* SLLI is a logical left shift (zeros are shifted
         into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
         is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). */
@@ -143,12 +143,12 @@ func i_type_op(core: *Core, instr: Nat32) {
         if rd != 0 {
             core.reg[rd] = core.reg[rs1] xor imm
         }
-    } else if (funct3 == 5) and (funct7 == 0) {
+    } else if funct3 == 5 and funct7 == 0 {
         //printf("srli x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
             core.reg[rd] = Int32 (Nat32 core.reg[rs1] >> imm)
         }
-    } else if (funct3 == 5) and (funct7 == 0x20) {
+    } else if funct3 == 5 and funct7 == 0x20 {
         //printf("srai x%d, x%d, %d\n", rd, rs1, imm)
         if rd != 0 {
             core.reg[rd] = core.reg[rs1] >> imm
