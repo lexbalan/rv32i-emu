@@ -20,7 +20,7 @@ let textBufferSize = 4096
 var text: [textBufferSize]Nat32
 
 
-func loader(filename: *Str8, bufptr: *[]Nat8, buf_size: Nat32) -> Nat32 {
+func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
     printf("LOAD: %s\n", filename)
 
     let fp = fopen(filename, "rb")

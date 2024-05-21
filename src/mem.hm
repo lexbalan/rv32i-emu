@@ -28,8 +28,8 @@ let consolePrintInt64Adr = consoleMMIOAdr + 0x20
 let consolePrintUInt64Adr = consoleMMIOAdr + 0x28
 
 
-func get_ram_ptr() -> *[]Nat8
-func get_rom_ptr() -> *[]Nat8
+func get_ram_ptr() -> *[]Byte
+func get_rom_ptr() -> *[]Byte
 
 func vm_mem_read8(adr: Nat32) -> Nat8
 func vm_mem_read16(adr: Nat32) -> Nat16
