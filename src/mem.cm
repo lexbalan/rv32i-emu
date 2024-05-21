@@ -41,7 +41,7 @@ func vm_mem_read8(adr: Nat32) -> Nat8 {
 		let p = *Nat8 Pointer &rom[adr - romStart]
 		x = *p
     } else {
-        mem_violation("r"[0], adr)
+        mem_violation("r", adr)
 		x = 0
     }
 
@@ -63,7 +63,7 @@ func vm_mem_read16(adr: Nat32) -> Nat16 {
 		let p = *Nat16 Pointer &rom[adr - romStart]
 		x = *p
     } else {
-        mem_violation("r"[0], adr)
+        mem_violation("r", adr)
 		x = 0
     }
 
@@ -85,7 +85,7 @@ func vm_mem_read32(adr: Nat32) -> Nat32 {
     } else if adr >= mmioStart and adr<= mmioEnd {
         x = 0
     } else {
-        mem_violation("r"[0], adr)
+        mem_violation("r", adr)
     }
     
 	//printf("MEM_READ_32[%x] = 0x%x\n", adr, x)
@@ -106,7 +106,7 @@ func vm_mem_write8(adr: Nat32, value: Nat8) {
             return
         }
     } else {
-        mem_violation("w"[0], adr)
+        mem_violation("w", adr)
     }
 }
 
@@ -120,7 +120,7 @@ func vm_mem_write16(adr: Nat32, value: Nat16) {
             return
         }
     } else {
-        mem_violation("w"[0], adr)
+        mem_violation("w", adr)
     }
 }
 
@@ -147,7 +147,7 @@ func vm_mem_write32(adr: Nat32, value: Nat32) {
 		}
 
     } else {
-        mem_violation("w"[0], adr)
+        mem_violation("w", adr)
     }
 
 	//printf("MEM_WRITE_32[%x] = 0x%x\n", adr, value)

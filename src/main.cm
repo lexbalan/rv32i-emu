@@ -6,17 +6,17 @@ import "mem"
 import "core"
 
 
-const text_filename = *Str8 "./image.bin"
+let text_filename = *Str8 "./image.bin"
 
 
-const showText = false
+let showText = false
 
 
 var memctl: MemoryInterface
 var core: Core
 
 
-const textBufferSize = 4096
+let textBufferSize = 4096
 var text: [textBufferSize]Nat32
 
 

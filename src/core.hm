@@ -2,7 +2,7 @@
 //https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
 
 
-const nRegs = 32
+let nRegs = 32
 
 
 type MemoryInterface record {
@@ -28,35 +28,35 @@ type Core record {
 }
 
 
-const opLUI = 0x37
-const opAUI_PC = 0x17
-const opJAL = 0x6F
-const opJALR = 0x67
-const opL = 0x03  // load
-const opI = 0x13  // immediate
-const opS = 0x23  // store
-const opR = 0x33  // reg
-const opB = 0x63  // branch
-const opSYSTEM = 0x73
-const opFENCE = 0x0F
+let opLUI = 0x37
+let opAUI_PC = 0x17
+let opJAL = 0x6F
+let opJALR = 0x67
+let opL = 0x03  // load
+let opI = 0x13  // immediate
+let opS = 0x23  // store
+let opR = 0x33  // reg
+let opB = 0x63  // branch
+let opSYSTEM = 0x73
+let opFENCE = 0x0F
 
-const instrECALL = opSYSTEM or 0x00000000
-const instrEBREAK = opSYSTEM or 0x00100000
-const instrPAUSE = opFENCE or 0x01000000
+let instrECALL = opSYSTEM or 0x00000000
+let instrEBREAK = opSYSTEM or 0x00100000
+let instrPAUSE = opFENCE or 0x01000000
 
 
-const funct3_CSRRW = 1
-const funct3_CSRRS = 2
-const funct3_CSRRC = 3
-const funct3_CSRRWI = 4
-const funct3_CSRRSI = 5
-const funct3_CSRRCI = 6
+let funct3_CSRRW = 1
+let funct3_CSRRS = 2
+let funct3_CSRRC = 3
+let funct3_CSRRWI = 4
+let funct3_CSRRSI = 5
+let funct3_CSRRCI = 6
 
 func core_init(core: *Core, memctl: *MemoryInterface)
 func core_irq(core: *Core, irq: Nat32)
 func core_tick(core: *Core) -> Bool
 
 
-const intSysCall = 0x08
-const intMemViolation = 0x0B
+let intSysCall = 0x08
+let intMemViolation = 0x0B
 

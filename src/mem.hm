@@ -1,31 +1,31 @@
 //
 
 // see mem.ld
-const ramStart = 0x10000000
-const ramSize = 4096
-const ramEnd = ramStart + ramSize
+let ramStart = 0x10000000
+let ramSize = 4096
+let ramEnd = ramStart + ramSize
 
 
-const romStart = 0x00000000
-const romSize = 0x10000
-const romEnd = romStart + romSize
+let romStart = 0x00000000
+let romSize = 0x10000
+let romEnd = romStart + romSize
 
 
-const mmioStart = 0xF00C0000
-const mmioSize  = 0xFFFF
-const mmioEnd = mmioStart + mmioSize
+let mmioStart = 0xF00C0000
+let mmioSize  = 0xFFFF
+let mmioEnd = mmioStart + mmioSize
 
-const consoleMMIOAdr = mmioStart + 0x10
-const consolePutAdr  = consoleMMIOAdr + 0
-const consoleGetAdr  = consoleMMIOAdr + 1
+let consoleMMIOAdr = mmioStart + 0x10
+let consolePutAdr  = consoleMMIOAdr + 0
+let consoleGetAdr  = consoleMMIOAdr + 1
 
-const consolePrintInt32Adr = consoleMMIOAdr + 0x10
-const consolePrintUInt32Adr = consoleMMIOAdr + 0x14
-const consolePrintInt32HexAdr = consoleMMIOAdr + 0x18
-const consolePrintUInt32HexAdr = consoleMMIOAdr + 0x1C
+let consolePrintInt32Adr = consoleMMIOAdr + 0x10
+let consolePrintUInt32Adr = consoleMMIOAdr + 0x14
+let consolePrintInt32HexAdr = consoleMMIOAdr + 0x18
+let consolePrintUInt32HexAdr = consoleMMIOAdr + 0x1C
 
-const consolePrintInt64Adr = consoleMMIOAdr + 0x20
-const consolePrintUInt64Adr = consoleMMIOAdr + 0x28
+let consolePrintInt64Adr = consoleMMIOAdr + 0x20
+let consolePrintUInt64Adr = consoleMMIOAdr + 0x28
 
 
 func get_ram_ptr() -> *[]Nat8
