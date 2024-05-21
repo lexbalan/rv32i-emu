@@ -6,8 +6,7 @@ import "mem"
 import "core"
 
 
-let text_filename = *Str8 "./image.bin"
-
+let text_filename = "./image.bin"
 
 let showText = false
 
@@ -60,6 +59,7 @@ func show_regs() {
         i = i + 1
     }
 }
+
 
 func show_mem() {
 	var i = 0
