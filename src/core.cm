@@ -6,7 +6,6 @@ import "core"
 
 
 
-
 func core_init(core: *Core, memctl: *MemoryInterface) {
 //    memset(core, 0, sizeof(Core))
 //    core.memctl = memctl

@@ -12,12 +12,12 @@ let romEnd = romStart + romSize
 
 
 let mmioStart = 0xF00C0000
-let mmioSize  = 0xFFFF
+let mmioSize = 0xFFFF
 let mmioEnd = mmioStart + mmioSize
 
 let consoleMMIOAdr = mmioStart + 0x10
-let consolePutAdr  = consoleMMIOAdr + 0
-let consoleGetAdr  = consoleMMIOAdr + 1
+let consolePutAdr = consoleMMIOAdr + 0
+let consoleGetAdr = consoleMMIOAdr + 1
 
 let consolePrintInt32Adr = consoleMMIOAdr + 0x10
 let consolePrintUInt32Adr = consoleMMIOAdr + 0x14

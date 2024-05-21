@@ -15,7 +15,6 @@ type MemoryInterface record {
     write32: *(adr: Nat32, value: Nat32) -> Unit
 }
 
-
 type Core record {
     reg: [nRegs]Int32
     ip: Nat32
@@ -51,6 +50,7 @@ let funct3_CSRRC = 3
 let funct3_CSRRWI = 4
 let funct3_CSRRSI = 5
 let funct3_CSRRCI = 6
+
 
 func core_init(core: *Core, memctl: *MemoryInterface)
 func core_irq(core: *Core, irq: Nat32)

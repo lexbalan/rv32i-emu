@@ -17,10 +17,8 @@ func get_rom_ptr() -> *[]Byte {
     return &rom
 }
 
-func exit(code: Int32)
 
-
-func mem_violation_event(reason: Nat32)
+func mem_violation_event(reason: Nat32) -> Unit
 
 
 func mem_violation(rw: Char8, adr: Nat32) {
@@ -45,7 +43,7 @@ func vm_mem_read8(adr: Nat32) -> Nat8 {
 		x = 0
     }
 
-//	printf("MEM_READ_8[%x] = 0x%x\n", adr, x to Nat32)
+	//printf("MEM_READ_8[%x] = 0x%x\n", adr, x to Nat32)
     
     return x
 }
