@@ -1,18 +1,18 @@
 //
 
 // see mem.ld
-let ramStart = 0x10000000
 let ramSize = 4096
+let ramStart = 0x10000000
 let ramEnd = ramStart + ramSize
 
 
-let romStart = 0x00000000
 let romSize = 0x10000
+let romStart = 0x00000000
 let romEnd = romStart + romSize
 
 
-let mmioStart = 0xF00C0000
 let mmioSize = 0xFFFF
+let mmioStart = 0xF00C0000
 let mmioEnd = mmioStart + mmioSize
 
 let consoleMMIOAdr = mmioStart + 0x10
