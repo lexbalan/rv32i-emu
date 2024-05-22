@@ -9,18 +9,18 @@
 
 
 // see mem.ld
-#define ramStart  0x10000000
 #define ramSize  4096
+#define ramStart  0x10000000
 #define ramEnd  (ramStart + ramSize)
 
 
-#define romStart  0x00000000
 #define romSize  0x10000
+#define romStart  0x00000000
 #define romEnd  (romStart + romSize)
 
 
-#define mmioStart  0xF00C0000
 #define mmioSize  0xFFFF
+#define mmioStart  0xF00C0000
 #define mmioEnd  (mmioStart + mmioSize)
 
 #define consoleMMIOAdr  (mmioStart + 0x10)

@@ -324,6 +324,20 @@ declare void @perror(%ConstCharStr* %str)
 
 
 
+; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/csr.hm
+
+
+
+declare void @csr_rw(%Core* %core, i16 %csr, i8 %rd, i8 %rs1)
+declare void @csr_rs(%Core* %core, i16 %csr, i8 %rd, i8 %rs1)
+declare void @csr_rc(%Core* %core, i16 %csr, i8 %rd, i8 %rs1)
+
+
+declare void @csr_rwi(%Core* %core, i16 %csr, i8 %rd, i8 %imm)
+declare void @csr_rsi(%Core* %core, i16 %csr, i8 %rd, i8 %imm)
+declare void @csr_rci(%Core* %core, i16 %csr, i8 %rd, i8 %imm)
+
+
 ; -- SOURCE: src/core.cm
 
 @str1 = private constant [17 x i8] [i8 70, i8 65, i8 84, i8 65, i8 76, i8 58, i8 32, i8 120, i8 48, i8 32, i8 33, i8 61, i8 32, i8 48, i8 33, i8 10, i8 0]
@@ -468,6 +482,8 @@ define i8 @extract_funct7(i32 %instr) {
 	%3 = trunc i32 %2 to i8
 	ret i8 %3
 }
+
+
 
 define i32 @extract_imm12(i32 %instr) {
 	%1 = lshr i32 %instr, 20
@@ -865,59 +881,6 @@ endif_3:
 endif_2:
 	br label %endif_1
 endif_1:
-	ret void
-}
-
-define void @riscv_csr_rw(%Core* %core, i16 %csr, i8 %rd, i8 %rs1) {
-	%1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 0
-	%2 = getelementptr inbounds [32 x i32], [32 x i32]* %1, i32 0, i8 %rs1
-	%3 = load i32, i32* %2
-	%4 = icmp eq i16 %csr, 832
-	br i1 %4 , label %then_0, label %else_0
-then_0:
-	; mscratch
-	br label %endif_0
-else_0:
-	%5 = icmp eq i16 %csr, 833
-	br i1 %5 , label %then_1, label %else_1
-then_1:
-	; mepc
-	br label %endif_1
-else_1:
-	%6 = icmp eq i16 %csr, 834
-	br i1 %6 , label %then_2, label %else_2
-then_2:
-	; mcause
-	br label %endif_2
-else_2:
-	%7 = icmp eq i16 %csr, 835
-	br i1 %7 , label %then_3, label %else_3
-then_3:
-	; mbadaddr
-	br label %endif_3
-else_3:
-	%8 = icmp eq i16 %csr, 836
-	br i1 %8 , label %then_4, label %endif_4
-then_4:
-	; mip (machine interrupt pending)
-	br label %endif_4
-endif_4:
-	br label %endif_3
-endif_3:
-	br label %endif_2
-endif_2:
-	br label %endif_1
-endif_1:
-	br label %endif_0
-endif_0:
-	ret void
-}
-
-define void @riscv_csr_rs(%Core* %core, i8 %csr, i8 %rd, i8 %rs1) {
-	ret void
-}
-
-define void @riscv_csr_rc(%Core* %core, i8 %csr, i8 %rd, i8 %rs1) {
 	ret void
 }
 
@@ -1498,56 +1461,62 @@ else_36:
 	%303 = icmp eq i8 %25, 115
 	br i1 %303 , label %then_40, label %else_40
 then_40:
-	%304 = icmp eq i32 %15, 115
-	br i1 %304 , label %then_41, label %else_41
+	; CS register address (31 .. 20)
+	%304 = call i32 (i32) @extract_imm12(i32 %15)
+	%305 = trunc i32 %304 to i16
+	%306 = icmp eq i32 %15, 115
+	br i1 %306 , label %then_41, label %else_41
 then_41:
-	%305 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([7 x i8]* @str2 to [0 x i8]*))
+	%307 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([7 x i8]* @str2 to [0 x i8]*))
 	call void (%Core*, i32) @core_irq(%Core* %core, i32 8)
 	br label %endif_41
 else_41:
-	%306 = icmp eq i32 %15, 1048691
-	br i1 %306 , label %then_42, label %else_42
+	%308 = icmp eq i32 %15, 1048691
+	br i1 %308 , label %then_42, label %else_42
 then_42:
-	%307 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str3 to [0 x i8]*))
+	%309 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str3 to [0 x i8]*))
 	ret i1 0
 	; CSR instructions
 	br label %endif_42
 else_42:
-	%309 = icmp eq i8 %29, 1
-	br i1 %309 , label %then_43, label %else_43
+	%311 = icmp eq i8 %29, 1
+	br i1 %311 , label %then_43, label %else_43
 then_43:
-	;riscv_csr_rw(core, csr, rd, rs1)
+	call void (%Core*, i16, i8, i8) @csr_rw(%Core* %core, i16 %305, i8 %26, i8 %27)
 	br label %endif_43
 else_43:
-	%310 = icmp eq i8 %29, 2
-	br i1 %310 , label %then_44, label %else_44
+	%312 = icmp eq i8 %29, 2
+	br i1 %312 , label %then_44, label %else_44
 then_44:
-	;riscv_csr_rs(core, csr, rd, rs1)
+	call void (%Core*, i16, i8, i8) @csr_rs(%Core* %core, i16 %305, i8 %26, i8 %27)
 	br label %endif_44
 else_44:
-	%311 = icmp eq i8 %29, 3
-	br i1 %311 , label %then_45, label %else_45
+	%313 = icmp eq i8 %29, 3
+	br i1 %313 , label %then_45, label %else_45
 then_45:
-	;riscv_csr_rc(core, csr, rd, rs1)
+	call void (%Core*, i16, i8, i8) @csr_rc(%Core* %core, i16 %305, i8 %26, i8 %27)
 	br label %endif_45
 else_45:
-	%312 = icmp eq i8 %29, 4
-	br i1 %312 , label %then_46, label %else_46
+	%314 = icmp eq i8 %29, 4
+	br i1 %314 , label %then_46, label %else_46
 then_46:
+	call void (%Core*, i16, i8, i8) @csr_rwi(%Core* %core, i16 %305, i8 %26, i8 %27)
 	br label %endif_46
 else_46:
-	%313 = icmp eq i8 %29, 5
-	br i1 %313 , label %then_47, label %else_47
+	%315 = icmp eq i8 %29, 5
+	br i1 %315 , label %then_47, label %else_47
 then_47:
+	call void (%Core*, i16, i8, i8) @csr_rsi(%Core* %core, i16 %305, i8 %26, i8 %27)
 	br label %endif_47
 else_47:
-	%314 = icmp eq i8 %29, 6
-	br i1 %314 , label %then_48, label %else_48
+	%316 = icmp eq i8 %29, 6
+	br i1 %316 , label %then_48, label %else_48
 then_48:
+	call void (%Core*, i16, i8, i8) @csr_rci(%Core* %core, i16 %305, i8 %26, i8 %27)
 	br label %endif_48
 else_48:
-	%315 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([34 x i8]* @str4 to [0 x i8]*), i32 %15)
-	%316 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*), i8 %29)
+	%317 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([34 x i8]* @str4 to [0 x i8]*), i32 %15)
+	%318 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*), i8 %29)
 	ret i1 0
 	br label %endif_48
 endif_48:
@@ -1567,11 +1536,11 @@ endif_42:
 endif_41:
 	br label %endif_40
 else_40:
-	%318 = icmp eq i8 %25, 15
-	br i1 %318 , label %then_49, label %else_49
+	%320 = icmp eq i8 %25, 15
+	br i1 %320 , label %then_49, label %else_49
 then_49:
-	%319 = icmp eq i32 %15, 16777231
-	br i1 %319 , label %then_50, label %endif_50
+	%321 = icmp eq i32 %15, 16777231
+	br i1 %321 , label %then_50, label %endif_50
 then_50:
 	;printf("PAUSE\n")
 	br label %endif_50
@@ -1601,19 +1570,19 @@ endif_5:
 endif_4:
 	br label %endif_3
 endif_3:
-	%320 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-	%321 = load i1, i1* %320
-	br i1 %321 , label %then_51, label %else_51
+	%322 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+	%323 = load i1, i1* %322
+	br i1 %323 , label %then_51, label %else_51
 then_51:
-	%322 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-	%323 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-	%324 = load i32, i32* %323
-	%325 = add i32 %324, 4
-	store i32 %325, i32* %322
+	%324 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+	%325 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+	%326 = load i32, i32* %325
+	%327 = add i32 %326, 4
+	store i32 %327, i32* %324
 	br label %endif_51
 else_51:
-	%326 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-	store i1 1, i1* %326
+	%328 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+	store i1 1, i1* %328
 	br label %endif_51
 endif_51:
 	ret i1 1

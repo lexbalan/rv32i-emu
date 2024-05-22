@@ -14,25 +14,24 @@
 
 
 typedef struct {
-    void *read8;
-    void *read16;
-    void *read32;
+	void *read8;
+	void *read16;
+	void *read32;
 
-    void *write8;
-    void *write16;
-    void *write32;
+	void *write8;
+	void *write16;
+	void *write32;
 } MemoryInterface;
 
-
 typedef struct {
-    int32_t reg[nRegs];
-    uint32_t ip;
+	int32_t reg[nRegs];
+	uint32_t ip;
 
-    MemoryInterface *memctl;
+	MemoryInterface *memctl;
 
-    bool need_step;
-    uint32_t interrupt;
-    uint32_t cnt;
+	bool need_step;
+	uint32_t interrupt;
+	uint32_t cnt;
 } Core;
 
 
@@ -59,6 +58,7 @@ typedef struct {
 #define funct3_CSRRWI  4
 #define funct3_CSRRSI  5
 #define funct3_CSRRCI  6
+
 
 void core_init(Core *core, MemoryInterface *memctl);
 void core_irq(Core *core, uint32_t irq);

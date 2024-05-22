@@ -2,8 +2,8 @@
 import "libc/libc"
 import "libc/stdio"
 
+import "csr"
 import "core"
-
 
 
 func core_init(core: *Core, memctl: *MemoryInterface) {
@@ -76,6 +76,7 @@ func extract_funct7(instr: Nat32) -> Nat8 {
 }
 
 
+// bits: (31 .. 20)
 func extract_imm12(instr: Nat32) -> Nat32 {
     return (instr >> 20) and 0xFFF
 }
@@ -218,26 +219,6 @@ func r_type_op(core: *Core, instr: Nat32) {
         core.reg[rd] = v1 and v2
     }
 }
-
-
-
-func riscv_csr_rw(core: *Core, csr: Nat16, rd: Nat8, rs1: Nat8) {
-    let nv = core.reg[rs1]
-    if csr == 0x340 {
-        // mscratch
-    } else if csr == 0x341 {
-        // mepc
-    } else if csr == 0x342 {
-        // mcause
-    } else if csr == 0x343 {
-        // mbadaddr
-    } else if csr == 0x344 {
-        // mip (machine interrupt pending)
-    } 
-}
-
-func riscv_csr_rs(core: *Core, csr: Nat8, rd: Nat8, rs1: Nat8) {}
-func riscv_csr_rc(core: *Core, csr: Nat8, rd: Nat8, rs1: Nat8) {}
 
 
 
@@ -466,6 +447,9 @@ func core_tick(core: *Core) -> Bool {
         }
     
     } else if op == opSYSTEM {
+		// CS register address (31 .. 20)
+		let csr = Nat16 extract_imm12(instr)
+		
         if instr == instrECALL {
             printf("ECALL\n")
             core_irq(core, intSysCall)
@@ -476,16 +460,20 @@ func core_tick(core: *Core) -> Bool {
         
         // CSR instructions
         } else if funct3 == funct3_CSRRW {
-            //riscv_csr_rw(core, csr, rd, rs1)
+            csr_rw(core, csr, rd, rs1)
         } else if funct3 == funct3_CSRRS {
-            //riscv_csr_rs(core, csr, rd, rs1)
+            csr_rs(core, csr, rd, rs1)
         } else if funct3 == funct3_CSRRC {
-            //riscv_csr_rc(core, csr, rd, rs1)
-        
+            csr_rc(core, csr, rd, rs1)
         } else if funct3 == funct3_CSRRWI {
+			let imm = rs1
+			csr_rwi(core, csr, rd, imm)
         } else if funct3 == funct3_CSRRSI {
+			let imm = rs1
+			csr_rsi(core, csr, rd, imm)
         } else if funct3 == funct3_CSRRCI {
-        
+			let imm = rs1
+        	csr_rci(core, csr, rd, imm)
         } else {
             printf("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
             printf("funct3 = %x\n", funct3)

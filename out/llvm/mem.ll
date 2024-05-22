@@ -231,7 +231,6 @@ define [0 x i8]* @get_rom_ptr() {
 }
 
 
-declare void @exit(i32 %code)
 declare void @mem_violation_event(i32 %reason)
 
 define void @mem_violation(i8 %rw, i32 %adr) {
@@ -285,7 +284,7 @@ endif_2:
 endif_1:
 	br label %endif_0
 endif_0:
-	;	printf("MEM_READ_8[%x] = 0x%x\n", adr, x to Nat32)
+	;printf("MEM_READ_8[%x] = 0x%x\n", adr, x to Nat32)
 	%21 = load i8, i8* %1
 	ret i8 %21
 }
