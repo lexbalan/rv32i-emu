@@ -321,6 +321,7 @@ declare void @vm_mem_write32(i32 %adr, i32 %value)
 	i32, 
 	%MemoryInterface*, 
 	i1, 
+	i1, 
 	i32, 
 	i32
 }
@@ -339,7 +340,7 @@ declare void @vm_mem_write32(i32 %adr, i32 %value)
 
 declare void @core_init(%Core* %core, %MemoryInterface* %memctl)
 declare void @core_irq(%Core* %core, i32 %irq)
-declare i1 @core_tick(%Core* %core)
+declare void @core_tick(%Core* %core)
 
 
 
@@ -514,20 +515,15 @@ define %Int @main() {
 	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([7 x i8]* @str15 to [0 x i8]*))
 	br label %again_1
 again_1:
-	br i1 1 , label %body_1, label %break_1
+	%11 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 4
+	%12 = load i1, i1* %11
+	%13 = xor i1 %12, -1
+	br i1 %13 , label %body_1, label %break_1
 body_1:
-	;var cmd: [8]Char8
-	;scanf("%c", &cmd[0])
-	%11 = call i1 (%Core*) @core_tick(%Core* @core)
-	%12 = xor i1 %11, -1
-	br i1 %12 , label %then_0, label %endif_0
-then_0:
-	br label %break_1
-	br label %endif_0
-endif_0:
+	call void (%Core*) @core_tick(%Core* @core)
 	br label %again_1
 break_1:
-	%14 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 5
+	%14 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 6
 	%15 = load i32, i32* %14
 	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str16 to [0 x i8]*), i32 %15)
 	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str17 to [0 x i8]*))

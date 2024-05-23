@@ -20,30 +20,36 @@ type Core record {
     ip: Nat32
 
     memctl: *MemoryInterface
-    
+
     need_step: Bool
+	end: Bool
+
     interrupt: Nat32
     cnt: Nat32
 }
 
 
-let opLUI = 0x37
-let opAUI_PC = 0x17
-let opJAL = 0x6F
-let opJALR = 0x67
 let opL = 0x03  // load
 let opI = 0x13  // immediate
 let opS = 0x23  // store
 let opR = 0x33  // reg
 let opB = 0x63  // branch
+
+let opLUI = 0x37    // load upper immediate
+let opAUIPC = 0x17  // add upper immediate to PC
+let opJAL = 0x6F    // jump and link
+let opJALR = 0x67   // jump and link by register
+
 let opSYSTEM = 0x73
 let opFENCE = 0x0F
+
 
 let instrECALL = opSYSTEM or 0x00000000
 let instrEBREAK = opSYSTEM or 0x00100000
 let instrPAUSE = opFENCE or 0x01000000
 
 
+// funct3 for CSR
 let funct3_CSRRW = 1
 let funct3_CSRRS = 2
 let funct3_CSRRC = 3
@@ -54,7 +60,7 @@ let funct3_CSRRCI = 6
 
 func core_init(core: *Core, memctl: *MemoryInterface)
 func core_irq(core: *Core, irq: Nat32)
-func core_tick(core: *Core) -> Bool
+func core_tick(core: *Core)
 
 
 let intSysCall = 0x08

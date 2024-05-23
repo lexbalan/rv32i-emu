@@ -107,11 +107,11 @@ func do_jalr(core: *Core, instr: Nat32)
 func do_opb(core: *Core, instr: Nat32)
 func do_opl(core: *Core, instr: Nat32)
 func do_ops(core: *Core, instr: Nat32)
-func do_system(core: *Core, instr: Nat32) -> Bool
+func do_system(core: *Core, instr: Nat32)
 func do_fence(core: *Core, instr: Nat32)
 
 
-func core_tick(core: *Core) -> Bool {
+func core_tick(core: *Core) {
 
     if core.interrupt > 0 {
         //printf("\nINT #%02X\n", core.interrupt)
@@ -135,15 +135,13 @@ func core_tick(core: *Core) -> Bool {
 	let funct3 = extract_funct3(instr)
 
 
-	var rc: Bool = true
-
     if op == opI {
         do_opi(core, instr)
     } else if op == opR {
         do_opr(core, instr)
     } else if op == opLUI {
 		do_lui(core, instr)
-    } else if op == opAUI_PC {
+    } else if op == opAUIPC {
 		do_auipc(core, instr)
     } else if op == opJAL {
         do_jal(core, instr)
@@ -156,7 +154,7 @@ func core_tick(core: *Core) -> Bool {
     } else if op == opS {
 		do_ops(core, instr)
     } else if op == opSYSTEM {
-		rc = do_system(core, instr)
+		do_system(core, instr)
     } else if op == opFENCE {
 		do_fence(core, instr)
     } else {
@@ -168,12 +166,6 @@ func core_tick(core: *Core) -> Bool {
     } else {
         core.need_step = true
     }
-
-	if rc == false {
-		return false
-	}
-
-    return true
 }
 
 
@@ -517,7 +509,7 @@ func do_ops(core: *Core, instr: Nat32) {
 }
 
 
-func do_system(core: *Core, instr: Nat32) -> Bool {
+func do_system(core: *Core, instr: Nat32) {
 	let funct3 = extract_funct3(instr)
     let funct7 = extract_funct7(instr)
     let imm12 = extract_imm12(instr)
@@ -533,7 +525,7 @@ func do_system(core: *Core, instr: Nat32) -> Bool {
 
 	} else if instr == instrEBREAK {
 		printf("EBREAK\n")
-		return false
+		core.end = true
 
 	// CSR instructions
 	} else if funct3 == funct3_CSRRW {
@@ -554,10 +546,8 @@ func do_system(core: *Core, instr: Nat32) -> Bool {
 	} else {
 		printf("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
 		printf("funct3 = %x\n", funct3)
-		return false
+		core.end = true
 	}
-
-	return true
 }
 
 

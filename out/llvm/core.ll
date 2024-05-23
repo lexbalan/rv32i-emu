@@ -307,6 +307,7 @@ declare void @perror(%ConstCharStr* %str)
 	i32, 
 	%MemoryInterface*, 
 	i1, 
+	i1, 
 	i32, 
 	i32
 }
@@ -387,19 +388,20 @@ define void @core_init(%Core* %core, %MemoryInterface* %memctl) {
 	%34 = insertvalue %Core %33, i32 0, 1
 	%35 = insertvalue %Core %34, %MemoryInterface* %memctl, 2
 	%36 = insertvalue %Core %35, i1 1, 3
-	%37 = insertvalue %Core %36, i32 0, 4
+	%37 = insertvalue %Core %36, i1 0, 4
 	%38 = insertvalue %Core %37, i32 0, 5
-	store %Core %38, %Core* %core
+	%39 = insertvalue %Core %38, i32 0, 6
+	store %Core %39, %Core* %core
 	ret void
 }
 
 define void @core_irq(%Core* %core, i32 %irq) {
-	%1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+	%1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
 	%2 = load i32, i32* %1
 	%3 = icmp eq i32 %2, 0
 	br i1 %3 , label %then_0, label %endif_0
 then_0:
-	%4 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+	%4 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
 	store i32 %irq, i32* %4
 	br label %endif_0
 endif_0:
@@ -517,19 +519,19 @@ define i32 @extract_jal_imm(i32 %instr) {
 	ret i32 %16
 }
 
-define i1 @core_tick(%Core* %core) {
-	%1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+define void @core_tick(%Core* %core) {
+	%1 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
 	%2 = load i32, i32* %1
 	%3 = icmp ugt i32 %2, 0
 	br i1 %3 , label %then_0, label %endif_0
 then_0:
 	;printf("\nINT #%02X\n", core.interrupt)
-	%4 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+	%4 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
 	%5 = load i32, i32* %4
 	%6 = mul i32 %5, 4
 	%7 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
 	store i32 %6, i32* %7
-	%8 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+	%8 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
 	store i32 0, i32* %8
 	br label %endif_0
 endif_0:
@@ -541,8 +543,8 @@ endif_0:
 	%13 = getelementptr inbounds %MemoryInterface, %MemoryInterface* %12, i32 0, i32 2
 	%14 = load i32 (i32)*, i32 (i32)** %13
 	%15 = call i32 (i32) %14(i32 %10)
-	%16 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
-	%17 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 5
+	%16 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 6
+	%17 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 6
 	%18 = load i32, i32* %17
 	%19 = add i32 %18, 1
 	store i32 %19, i32* %16
@@ -559,73 +561,70 @@ then_1:
 endif_1:
 	%25 = call i8 (i32) @extract_op(i32 %15)
 	%26 = call i8 (i32) @extract_funct3(i32 %15)
-	%27 = alloca i1
-	store i1 1, i1* %27
-	%28 = icmp eq i8 %25, 19
-	br i1 %28 , label %then_2, label %else_2
+	%27 = icmp eq i8 %25, 19
+	br i1 %27 , label %then_2, label %else_2
 then_2:
 	call void (%Core*, i32) @do_opi(%Core* %core, i32 %15)
 	br label %endif_2
 else_2:
-	%29 = icmp eq i8 %25, 51
-	br i1 %29 , label %then_3, label %else_3
+	%28 = icmp eq i8 %25, 51
+	br i1 %28 , label %then_3, label %else_3
 then_3:
 	call void (%Core*, i32) @do_opr(%Core* %core, i32 %15)
 	br label %endif_3
 else_3:
-	%30 = icmp eq i8 %25, 55
-	br i1 %30 , label %then_4, label %else_4
+	%29 = icmp eq i8 %25, 55
+	br i1 %29 , label %then_4, label %else_4
 then_4:
 	call void (%Core*, i32) @do_lui(%Core* %core, i32 %15)
 	br label %endif_4
 else_4:
-	%31 = icmp eq i8 %25, 23
-	br i1 %31 , label %then_5, label %else_5
+	%30 = icmp eq i8 %25, 23
+	br i1 %30 , label %then_5, label %else_5
 then_5:
 	call void (%Core*, i32) @do_auipc(%Core* %core, i32 %15)
 	br label %endif_5
 else_5:
-	%32 = icmp eq i8 %25, 111
-	br i1 %32 , label %then_6, label %else_6
+	%31 = icmp eq i8 %25, 111
+	br i1 %31 , label %then_6, label %else_6
 then_6:
 	call void (%Core*, i32) @do_jal(%Core* %core, i32 %15)
 	br label %endif_6
 else_6:
-	%33 = icmp eq i8 %25, 103
-	%34 = icmp eq i8 %26, 0
-	%35 = and i1 %33, %34
-	br i1 %35 , label %then_7, label %else_7
+	%32 = icmp eq i8 %25, 103
+	%33 = icmp eq i8 %26, 0
+	%34 = and i1 %32, %33
+	br i1 %34 , label %then_7, label %else_7
 then_7:
 	call void (%Core*, i32) @do_jalr(%Core* %core, i32 %15)
 	br label %endif_7
 else_7:
-	%36 = icmp eq i8 %25, 99
-	br i1 %36 , label %then_8, label %else_8
+	%35 = icmp eq i8 %25, 99
+	br i1 %35 , label %then_8, label %else_8
 then_8:
 	call void (%Core*, i32) @do_opb(%Core* %core, i32 %15)
 	br label %endif_8
 else_8:
-	%37 = icmp eq i8 %25, 3
-	br i1 %37 , label %then_9, label %else_9
+	%36 = icmp eq i8 %25, 3
+	br i1 %36 , label %then_9, label %else_9
 then_9:
 	call void (%Core*, i32) @do_opl(%Core* %core, i32 %15)
 	br label %endif_9
 else_9:
-	%38 = icmp eq i8 %25, 35
-	br i1 %38 , label %then_10, label %else_10
+	%37 = icmp eq i8 %25, 35
+	br i1 %37 , label %then_10, label %else_10
 then_10:
 	call void (%Core*, i32) @do_ops(%Core* %core, i32 %15)
 	br label %endif_10
 else_10:
-	%39 = icmp eq i8 %25, 115
-	br i1 %39 , label %then_11, label %else_11
+	%38 = icmp eq i8 %25, 115
+	br i1 %38 , label %then_11, label %else_11
 then_11:
-	%40 = call i1 (%Core*, i32) @do_system(%Core* %core, i32 %15)
-	store i1 %40, i1* %27
+	call void (%Core*, i32) @do_system(%Core* %core, i32 %15)
 	br label %endif_11
 else_11:
-	%41 = icmp eq i8 %25, 15
-	br i1 %41 , label %then_12, label %else_12
+	%39 = icmp eq i8 %25, 15
+	br i1 %39 , label %then_12, label %else_12
 then_12:
 	call void (%Core*, i32) @do_fence(%Core* %core, i32 %15)
 	br label %endif_12
@@ -653,29 +652,22 @@ endif_4:
 endif_3:
 	br label %endif_2
 endif_2:
-	%42 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-	%43 = load i1, i1* %42
-	br i1 %43 , label %then_13, label %else_13
+	%40 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+	%41 = load i1, i1* %40
+	br i1 %41 , label %then_13, label %else_13
 then_13:
-	%44 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-	%45 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
-	%46 = load i32, i32* %45
-	%47 = add i32 %46, 4
-	store i32 %47, i32* %44
+	%42 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+	%43 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 1
+	%44 = load i32, i32* %43
+	%45 = add i32 %44, 4
+	store i32 %45, i32* %42
 	br label %endif_13
 else_13:
-	%48 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
-	store i1 1, i1* %48
+	%46 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 3
+	store i1 1, i1* %46
 	br label %endif_13
 endif_13:
-	%49 = load i1, i1* %27
-	%50 = icmp eq i1 %49, 0
-	br i1 %50 , label %then_14, label %endif_14
-then_14:
-	ret i1 0
-	br label %endif_14
-endif_14:
-	ret i1 1
+	ret void
 }
 
 define void @do_opi(%Core* %core, i32 %instr) {
@@ -1563,7 +1555,7 @@ endif_0:
 	ret void
 }
 
-define i1 @do_system(%Core* %core, i32 %instr) {
+define void @do_system(%Core* %core, i32 %instr) {
 	%1 = call i8 (i32) @extract_funct3(i32 %instr)
 	%2 = call i8 (i32) @extract_funct7(i32 %instr)
 	%3 = call i32 (i32) @extract_imm12(i32 %instr)
@@ -1582,7 +1574,8 @@ else_0:
 	br i1 %10 , label %then_1, label %else_1
 then_1:
 	%11 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str3 to [0 x i8]*))
-	ret i1 0
+	%12 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+	store i1 1, i1* %12
 	; CSR instructions
 	br label %endif_1
 else_1:
@@ -1624,7 +1617,8 @@ then_7:
 else_7:
 	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([34 x i8]* @str4 to [0 x i8]*), i32 %instr)
 	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*), i8 %1)
-	ret i1 0
+	%21 = getelementptr inbounds %Core, %Core* %core, i32 0, i32 4
+	store i1 1, i1* %21
 	br label %endif_7
 endif_7:
 	br label %endif_6
@@ -1641,7 +1635,7 @@ endif_2:
 endif_1:
 	br label %endif_0
 endif_0:
-	ret i1 1
+	ret void
 }
 
 define void @do_fence(%Core* %core, i32 %instr) {

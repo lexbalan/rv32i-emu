@@ -126,20 +126,8 @@ int main()
 
 	printf("START\n");
 
-	while (true) {
-		//var cmd: [8]Char8
-		//scanf("%c", &cmd[0])
-
-		/*if strcmp(&cmd, "regs") == 0 {
-			show_regs()
-		} else if strcmp(&cmd, "mem") == 0{
-			show_mem()
-		}*/
-
-		const bool cont = core_tick(&core);
-		if (!cont) {
-			break;
-		}
+	while (!core.end) {
+		core_tick(&core);
 	}
 
 	printf("core.cnt = %u\n", core.cnt);

@@ -98,36 +98,24 @@ func main() -> Int {
     memctl.write16 = &vm_mem_write16
     memctl.write32 = &vm_mem_write32
 
-    
+
 	let romptr = get_rom_ptr()
 	let loaded_bytes_text = loader(text_filename, romptr, romSize)
-    
+
     core_init(&core, &memctl)
-    
+
     printf("START\n")
-    
-    while true {
-		//var cmd: [8]Char8
-		//scanf("%c", &cmd[0])
 
-		/*if strcmp(&cmd, "regs") == 0 {
-			show_regs()
-		} else if strcmp(&cmd, "mem") == 0{
-			show_mem()
-		}*/
-
-        let cont = core_tick(&core)
-        if not cont {
-            break
-        }
+    while not core.end {
+        core_tick(&core)
     }
 
 	printf("core.cnt = %u\n", core.cnt)
-    
+
     printf("\nCore dump:\n")
-    
+
 	show_regs()
-    
+
 	show_mem()
 
     return 0
