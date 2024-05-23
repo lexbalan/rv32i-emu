@@ -306,7 +306,6 @@ func op_b(core: *Core, instr: Nat32) {
 		if Nat32 core.reg[rs1] >= Nat32 core.reg[rs2] {
 			core.pc = Nat32 (Int32 core.pc + Int32 imm)
 			core.need_step = false
-		} else {
 		}
 	}
 }
@@ -367,17 +366,14 @@ func op_l(core: *Core, instr: Nat32) {
 func op_s(core: *Core, instr: Nat32) {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	//let imm = expand12(imm12)
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 	let rs2 = extract_rs2(instr)
 
-	let imm4to0 = rd
-	let imm11to5 = extract_funct7(instr)
-
-	let i = (Nat32 imm11to5 << 5) or (Nat32 imm4to0)
-	let imm = expand12(i)
+	let imm4to0 = Nat32 rd
+	let imm11to5 = Nat32 funct7
+	let _imm = (imm11to5 << 5) or imm4to0
+	let imm = expand12(_imm)
 
 	let adr = Nat32 (core.reg[rs1] + imm)
 	let val = core.reg[rs2]
