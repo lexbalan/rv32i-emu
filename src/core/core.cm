@@ -8,10 +8,6 @@ import "core"
 
 
 func core_init(core: *Core, memctl: *MemoryInterface) {
-//    memset(core, 0, sizeof(Core))
-//    core.memctl = memctl
-//    core.need_step = true
-    
     *core = Core {
         memctl = memctl
         need_step = true
@@ -19,12 +15,7 @@ func core_init(core: *Core, memctl: *MemoryInterface) {
 }
 
 
-func core_irq(core: *Core, irq: Nat32) {
-    if core.interrupt == 0 {
-        core.interrupt = irq
-    }
-}
-
+func core_irq(core: *Core, irq: Nat32)
 
 func do_opi(core: *Core, instr: Nat32)
 func do_opr(core: *Core, instr: Nat32)
@@ -477,4 +468,10 @@ func do_fence(core: *Core, instr: Nat32) {
 	}
 }
 
+
+func core_irq(core: *Core, irq: Nat32) {
+    if core.interrupt == 0 {
+        core.interrupt = irq
+    }
+}
 
