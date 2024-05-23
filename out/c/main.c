@@ -14,7 +14,7 @@
 
 
 #include "mem.h"
-#include "core.h"
+#include "core/core.h"
 
 
 #define text_filename  "./image.bin"
@@ -124,7 +124,7 @@ int main()
 
 	core_init(&core, &memctl);
 
-	printf("START\n");
+	printf("~~~ START ~~~\n");
 
 	while (!core.end) {
 		core_tick(&core);
@@ -135,7 +135,6 @@ int main()
 	printf("\nCore dump:\n");
 
 	show_regs();
-
 	show_mem();
 
 	return 0;

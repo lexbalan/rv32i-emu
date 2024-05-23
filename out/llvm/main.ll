@@ -302,7 +302,7 @@ declare void @vm_mem_write16(i32 %adr, i16 %value)
 declare void @vm_mem_write32(i32 %adr, i32 %value)
 
 
-; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/core.hm
+; -- SOURCE: /Users/alexbalan/p/riscv-emu/src/core/core.hm
 
 
 
@@ -370,7 +370,7 @@ declare void @core_tick(%Core* %core)
 @str12 = private constant [2 x i8] [i8 10, i8 0]
 @str13 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
 @str14 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]
-@str15 = private constant [7 x i8] [i8 83, i8 84, i8 65, i8 82, i8 84, i8 10, i8 0]
+@str15 = private constant [15 x i8] [i8 126, i8 126, i8 126, i8 32, i8 83, i8 84, i8 65, i8 82, i8 84, i8 32, i8 126, i8 126, i8 126, i8 10, i8 0]
 @str16 = private constant [15 x i8] [i8 99, i8 111, i8 114, i8 101, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
 @str17 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 
@@ -522,7 +522,7 @@ define %Int @main() {
 	%8 = call [0 x i8]* () @get_rom_ptr()
 	%9 = call i32 (%Str8*, [0 x i8]*, i32) @loader(%Str8* bitcast ([12 x i8]* @str14 to [0 x i8]*), [0 x i8]* %8, i32 65536)
 	call void (%Core*, %MemoryInterface*) @core_init(%Core* @core, %MemoryInterface* @memctl)
-	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([7 x i8]* @str15 to [0 x i8]*))
+	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str15 to [0 x i8]*))
 	br label %again_1
 again_1:
 	%11 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 4

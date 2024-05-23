@@ -3,7 +3,7 @@ import "libc/libc"
 import "libc/stdio"
 
 import "mem"
-import "core"
+import "core/core"
 
 
 let text_filename = "./image.bin"
@@ -104,7 +104,7 @@ func main() -> Int {
 
     core_init(&core, &memctl)
 
-    printf("START\n")
+    printf("~~~ START ~~~\n")
 
     while not core.end {
         core_tick(&core)
@@ -115,7 +115,6 @@ func main() -> Int {
     printf("\nCore dump:\n")
 
 	show_regs()
-
 	show_mem()
 
     return 0
