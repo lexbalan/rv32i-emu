@@ -10,11 +10,11 @@ var rom: [romSize]Byte
 var ram: [ramSize]Byte
 
 func get_ram_ptr() -> *[]Byte {
-    return &ram
+	return &ram
 }
 
 func get_rom_ptr() -> *[]Byte {
-    return &rom
+	return &rom
 }
 
 
@@ -31,43 +31,43 @@ func vm_mem_read8(adr: Nat32) -> Nat8 {
 	var x = Nat8 0
 
 	if adr >= ramStart and adr<= ramEnd {
-        let p = *Nat8 Pointer &ram[adr - ramStart]
+		let p = *Nat8 Pointer &ram[adr - ramStart]
 		x = *p
-    } else if adr >= mmioStart and adr<= mmioEnd {
-        //
+	} else if adr >= mmioStart and adr<= mmioEnd {
+		//
 	} else if adr >= romStart and adr<= romEnd {
 		let p = *Nat8 Pointer &rom[adr - romStart]
 		x = *p
-    } else {
-        mem_violation("r", adr)
+	} else {
+		mem_violation("r", adr)
 		x = 0
-    }
+	}
 
 	//printf("MEM_READ_8[%x] = 0x%x\n", adr, x to Nat32)
-    
-    return x
+
+	return x
 }
 
 
 func vm_mem_read16(adr: Nat32) -> Nat16 {
 	var x = Nat16 0
 
-    if adr >= ramStart and adr<= ramEnd {
-        let p = *Nat16 Pointer &ram[adr - ramStart]
-        x = *p
-    } else if adr >= mmioStart and adr<= mmioEnd {
-        //
+	if adr >= ramStart and adr<= ramEnd {
+		let p = *Nat16 Pointer &ram[adr - ramStart]
+		x = *p
+	} else if adr >= mmioStart and adr<= mmioEnd {
+		//
 	} else if adr >= romStart and adr<= romEnd {
 		let p = *Nat16 Pointer &rom[adr - romStart]
 		x = *p
-    } else {
-        mem_violation("r", adr)
+	} else {
+		mem_violation("r", adr)
 		x = 0
-    }
+	}
 
 	//printf("MEM_READ_16[%x] = 0x%x\n", adr, x to Nat32)
-    
-    return x
+
+	return x
 }
 
 
@@ -78,77 +78,77 @@ func vm_mem_read32(adr: Nat32) -> Nat32 {
 		let p = *Nat32 Pointer &rom[adr - romStart]
 		x = *p
 	} else if adr >= ramStart and adr<= ramEnd {
-        let p = *Nat32 Pointer &ram[adr - ramStart]
-        x = *p
-    } else if adr >= mmioStart and adr<= mmioEnd {
-        x = 0
-    } else {
-        mem_violation("r", adr)
-    }
-    
+		let p = *Nat32 Pointer &ram[adr - ramStart]
+		x = *p
+	} else if adr >= mmioStart and adr<= mmioEnd {
+		x = 0
+	} else {
+		mem_violation("r", adr)
+	}
+
 	//printf("MEM_READ_32[%x] = 0x%x\n", adr, x)
 
-    return x
+	return x
 }
 
 
 
 func vm_mem_write8(adr: Nat32, value: Nat8) {
-    if adr >= ramStart and adr<= ramEnd {
-        let p = *Nat8 Pointer &ram[adr - ramStart]
-        *p = value
-    } else if adr >= mmioStart and adr<= mmioEnd {
-        if adr == consolePutAdr {
+	if adr >= ramStart and adr<= ramEnd {
+		let p = *Nat8 Pointer &ram[adr - ramStart]
+		*p = value
+	} else if adr >= mmioStart and adr<= mmioEnd {
+		if adr == consolePutAdr {
 			let v = Char8 value
 			printf("%c", v)
-            return
-        }
-    } else {
-        mem_violation("w", adr)
-    }
+			return
+		}
+	} else {
+		mem_violation("w", adr)
+	}
 }
 
 
 func vm_mem_write16(adr: Nat32, value: Nat16) {
-    if adr >= ramStart and adr<= ramEnd {
-        let p = *Nat16 Pointer &ram[adr - ramStart]
-        *p = value
-    } else if adr >= mmioStart and adr<= mmioEnd {
-        if adr == consolePutAdr {
-            putchar(Int value)
-            return
-        }
-    } else {
-        mem_violation("w", adr)
-    }
+	if adr >= ramStart and adr<= ramEnd {
+		let p = *Nat16 Pointer &ram[adr - ramStart]
+		*p = value
+	} else if adr >= mmioStart and adr<= mmioEnd {
+		if adr == consolePutAdr {
+			putchar(Int value)
+			return
+		}
+	} else {
+		mem_violation("w", adr)
+	}
 }
 
 
 func vm_mem_write32(adr: Nat32, value: Nat32) {
-    if adr >= ramStart and adr<= ramEnd {
-        let p = *Nat32 Pointer &ram[adr - ramStart]
-        *p = value
-    } else if adr >= mmioStart and adr<= mmioEnd {
-        if adr == consolePutAdr {
-            putchar(Int value)
-            return
+	if adr >= ramStart and adr<= ramEnd {
+		let p = *Nat32 Pointer &ram[adr - ramStart]
+		*p = value
+	} else if adr >= mmioStart and adr<= mmioEnd {
+		if adr == consolePutAdr {
+			putchar(Int value)
+			return
 		} else if adr == consolePrintInt32Adr {
 			printf("%u", value)
-            return
+			return
 		} else if adr == consolePrintUInt32Adr {
 			printf("%u", value)
-            return
+			return
 		} else if adr == consolePrintInt32HexAdr {
 			printf("%x", value)
-            return
+			return
 		} else if adr == consolePrintUInt32HexAdr {
 			printf("%x", value)
-            return
+			return
 		}
 
-    } else {
-        mem_violation("w", adr)
-    }
+	} else {
+		mem_violation("w", adr)
+	}
 
 	//printf("MEM_WRITE_32[%x] = 0x%x\n", adr, value)
 }

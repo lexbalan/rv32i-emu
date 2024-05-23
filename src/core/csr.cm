@@ -14,18 +14,18 @@ import "csr"
 The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
 */
 func csr_rw(core: *Core, csr: Nat16, rd: Nat8, rs1: Nat8) {
-    let nv = core.reg[rs1]
-    if csr == 0x340 {
-        // mscratch
-    } else if csr == 0x341 {
-        // mepc
-    } else if csr == 0x342 {
-        // mcause
-    } else if csr == 0x343 {
-        // mbadaddr
-    } else if csr == 0x344 {
-        // mip (machine interrupt pending)
-    } 
+	let nv = core.reg[rs1]
+	if csr == 0x340 {
+		// mscratch
+	} else if csr == 0x341 {
+		// mepc
+	} else if csr == 0x342 {
+		// mcause
+	} else if csr == 0x343 {
+		// mbadaddr
+	} else if csr == 0x344 {
+		// mip (machine interrupt pending)
+	}
 }
 
 

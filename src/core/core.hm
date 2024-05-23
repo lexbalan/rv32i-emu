@@ -6,26 +6,26 @@ let nRegs = 32
 
 
 type MemoryInterface record {
-    read8: *(adr: Nat32) -> Nat8
-    read16: *(adr: Nat32) -> Nat16
-    read32: *(adr: Nat32) -> Nat32
+	read8: *(adr: Nat32) -> Nat8
+	read16: *(adr: Nat32) -> Nat16
+	read32: *(adr: Nat32) -> Nat32
 
-    write8: *(adr: Nat32, value: Nat8) -> Unit
-    write16: *(adr: Nat32, value: Nat16) -> Unit
-    write32: *(adr: Nat32, value: Nat32) -> Unit
+	write8: *(adr: Nat32, value: Nat8) -> Unit
+	write16: *(adr: Nat32, value: Nat16) -> Unit
+	write32: *(adr: Nat32, value: Nat32) -> Unit
 }
 
 type Core record {
-    reg: [nRegs]Int32
-    pc: Nat32
+	reg: [nRegs]Int32
+	pc: Nat32
 
-    memctl: *MemoryInterface
+	memctl: *MemoryInterface
 
-    need_step: Bool
+	need_step: Bool
 	end: Bool
 
-    interrupt: Nat32
-    cnt: Nat32
+	interrupt: Nat32
+	cnt: Nat32
 }
 
 
@@ -35,9 +35,9 @@ let opS = 0x23  // store
 let opR = 0x33  // reg
 let opB = 0x63  // branch
 
-let opLUI = 0x37    // load upper immediate
+let opLUI = 0x37	// load upper immediate
 let opAUIPC = 0x17  // add upper immediate to PC
-let opJAL = 0x6F    // jump and link
+let opJAL = 0x6F	// jump and link
 let opJALR = 0x67   // jump and link by register
 
 let opSYSTEM = 0x73

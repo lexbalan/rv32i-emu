@@ -62,16 +62,16 @@ int main()
 	
 	
 
-    //asm("csrrw    %0, misa, %1");
+	//asm("csrrw	%0, misa, %1");
 	//asm("ebreak");
-    
-    uint32_t prev_value;
-    uint32_t new_value = 1;
-    
-    __asm__ volatile ("csrrw    %0, misa, %1"  
-                      : "=r" (prev_value) /* output: register %0 */
-                      : "r" (new_value)  /* input : register */
-                      : /* clobbers: none */);
+
+	uint32_t prev_value;
+	uint32_t new_value = 1;
+
+	__asm__ volatile ("csrrw	%0, misa, %1"
+					  : "=r" (prev_value) /* output: register %0 */
+					  : "r" (new_value)  /* input : register */
+					  : /* clobbers: none */);
 
 	//volatile uint32_t x = 0x80001200;
 
@@ -81,6 +81,6 @@ int main()
 		*p = 0;
 	}*/
 
-    return 0;
+	return 0;
 }
 

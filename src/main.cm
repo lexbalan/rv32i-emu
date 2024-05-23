@@ -20,19 +20,19 @@ var text: [textBufferSize]Nat32
 
 
 func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
-    printf("LOAD: %s\n", filename)
+	printf("LOAD: %s\n", filename)
 
-    let fp = fopen(filename, "rb")
+	let fp = fopen(filename, "rb")
 
-    if fp == nil {
-        printf("error: cannot open file '%s'", filename)
-        return 0
-    }
-    
-    let n = fread(bufptr, 1, SizeT buf_size, fp)
+	if fp == nil {
+		printf("error: cannot open file '%s'", filename)
+		return 0
+	}
 
-    printf("LOADED: %zu bytes\n", n)
-    
+	let n = fread(bufptr, 1, SizeT buf_size, fp)
+
+	printf("LOADED: %zu bytes\n", n)
+
 
 	if showText {
 		var i = SizeT 0
@@ -44,27 +44,27 @@ func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
 		printf("-----------\n")
 	}
 
-    fclose(fp)
-    
-    return Nat32 n
+	fclose(fp)
+
+	return Nat32 n
 }
 
 
 func show_regs() {
 	var i = 0
-    while i < 16 {
-        printf("x%02d = 0x%08x", i, core.reg[i])
+	while i < 16 {
+		printf("x%02d = 0x%08x", i, core.reg[i])
 		printf("    ")
 		printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
-        i = i + 1
-    }
+		i = i + 1
+	}
 }
 
 
 func show_mem() {
 	var i = 0
 	let ramptr = get_ram_ptr()
-    while i < 256 {
+	while i < 256 {
 		printf("%08X", i * 16)
 
 		var j = 0
@@ -87,36 +87,36 @@ func mem_violation_event(reason: Nat32) {
 
 
 func main() -> Int {
-    printf("RISC-V VM\n")
-    
-    // memory controller initialize
-    memctl.read8 = &vm_mem_read8
-    memctl.read16 = &vm_mem_read16
-    memctl.read32 = &vm_mem_read32
+	printf("RISC-V VM\n")
 
-    memctl.write8 = &vm_mem_write8
-    memctl.write16 = &vm_mem_write16
-    memctl.write32 = &vm_mem_write32
+	// memory controller initialize
+	memctl.read8 = &vm_mem_read8
+	memctl.read16 = &vm_mem_read16
+	memctl.read32 = &vm_mem_read32
+
+	memctl.write8 = &vm_mem_write8
+	memctl.write16 = &vm_mem_write16
+	memctl.write32 = &vm_mem_write32
 
 
 	let romptr = get_rom_ptr()
 	let loaded_bytes_text = loader(text_filename, romptr, romSize)
 
-    core_init(&core, &memctl)
+	core_init(&core, &memctl)
 
-    printf("~~~ START ~~~\n")
+	printf("~~~ START ~~~\n")
 
-    while not core.end {
-        core_tick(&core)
-    }
+	while not core.end {
+		core_tick(&core)
+	}
 
 	printf("core.cnt = %u\n", core.cnt)
 
-    printf("\nCore dump:\n")
+	printf("\nCore dump:\n")
 
 	show_regs()
 	show_mem()
 
-    return 0
+	return 0
 }
 

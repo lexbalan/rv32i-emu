@@ -6,15 +6,15 @@ void __rt0() {
 #if 1
   // Зануление BSS сегмента
   {
-    extern void _bss_start, _bss_end;
-    uint8_t *const p = &_bss_start;
-    const uint32_t bss_size = (uint32_t)&_bss_end - (uint32_t)&_bss_start;
+	extern void _bss_start, _bss_end;
+	uint8_t *const p = &_bss_start;
+	const uint32_t bss_size = (uint32_t)&_bss_end - (uint32_t)&_bss_start;
 
-    uint32_t i = 0;
-    while (i < bss_size) {
-      p[i] = 0;
-      ++i;
-    }
+	uint32_t i = 0;
+	while (i < bss_size) {
+	  p[i] = 0;
+	  ++i;
+	}
   }
 #endif
 
@@ -22,16 +22,16 @@ void __rt0() {
 #if 1
   // Копирование .data сегмента из FLASH в RAM
   {
-    extern void _data_start, _data_end, _data_flash_start;
-    uint8_t *const dst = &_data_start;
-    uint8_t *const src = &_data_flash_start;
-    const uint32_t data_size = (uint32_t)&_data_end - (uint32_t)&_data_start;
+	extern void _data_start, _data_end, _data_flash_start;
+	uint8_t *const dst = &_data_start;
+	uint8_t *const src = &_data_flash_start;
+	const uint32_t data_size = (uint32_t)&_data_end - (uint32_t)&_data_start;
 
-    uint32_t i = 0;
-    while (i < data_size) {
-      dst[i] = src[i];
-      ++i;
-    }
+	uint32_t i = 0;
+	while (i < data_size) {
+	  dst[i] = src[i];
+	  ++i;
+	}
   }
 #endif
 }
