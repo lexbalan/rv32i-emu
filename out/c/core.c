@@ -13,6 +13,7 @@
 
 
 
+#include "decode.h"
 #include "csr.h"
 #include "core.h"
 
@@ -36,92 +37,6 @@ void core_irq(Core *core, uint32_t irq)
 		core->interrupt = irq;
 	}
 }
-
-
-
-int32_t expand12(uint32_t val_12bit)
-{
-	uint32_t v;
-	v = val_12bit;
-	if ((v & 0x800) != 0) {
-		v = v | 0xFFFFF000;
-	}
-	return (int32_t)v;
-}
-
-
-int32_t expand20(uint32_t val_20bit)
-{
-	uint32_t v;
-	v = val_20bit;
-	if ((v & 0x80000) != 0) {
-		v = v | 0xFFF00000;
-	}
-	return (int32_t)v;
-}
-
-
-
-
-uint8_t extract_op(uint32_t instr)
-{
-	return (uint8_t)(instr & 0x7F);
-}
-
-
-uint8_t extract_funct3(uint32_t instr)
-{
-	return (uint8_t)(instr >> 12 & 0x07);
-}
-
-
-uint8_t extract_rd(uint32_t instr)
-{
-	return (uint8_t)(instr >> 7 & 0x1F);
-}
-
-
-uint8_t extract_rs1(uint32_t instr)
-{
-	return (uint8_t)(instr >> 15 & 0x1F);
-}
-
-
-uint8_t extract_rs2(uint32_t instr)
-{
-	return (uint8_t)(instr >> 20 & 0x1F);
-}
-
-
-uint8_t extract_funct7(uint32_t instr)
-{
-	return (uint8_t)(instr >> 25 & 0x7F);
-}
-
-
-// bits: (31 .. 20)
-uint32_t extract_imm12(uint32_t instr)
-{
-	return instr >> 20 & 0xFFF;
-}
-
-
-uint32_t extract_imm31_12(uint32_t instr)
-{
-	return instr >> 12 & 0xFFFFF;
-}
-
-
-uint32_t extract_jal_imm(uint32_t instr)
-{
-	const uint32_t imm = extract_imm31_12(instr);
-	const uint32_t bit19to12_msk = (imm >> 0 & 0xFF) << 12;
-	const uint32_t bit11_msk = (imm >> 8 & 0x1) << 11;
-	const uint32_t bit10to1 = (imm >> 9 & 0x3FF) << 1;
-	const uint32_t bit20_msk = (imm >> 20 & 0x1) << 20;
-	return bit20_msk | bit19to12_msk | bit11_msk | bit10to1;
-}
-
 
 
 void do_opi(Core *core, uint32_t instr);
@@ -206,9 +121,7 @@ void do_opi(Core *core, uint32_t instr)
 	const uint8_t rd = extract_rd(instr);
 	const uint8_t rs1 = extract_rs1(instr);
 
-
 	if (rd == 0) {return;}
-
 
 	if (funct3 == 0) {
 		//printf("addi x%d, x%d, %d\n", rd, rs1, imm)
@@ -223,20 +136,17 @@ void do_opi(Core *core, uint32_t instr)
 		if (rd != 0) {
 			core->reg[rd] = (int32_t)((uint32_t)core->reg[rs1] << imm);
 		}
-
 	} else if (funct3 == 2) {
 		// SLTI - set [1 to rd if rs1] less than immediate
 		//printf("slti x%d, x%d, %d\n", rd, rs1, imm)
 		if (rd != 0) {
 			core->reg[rd] = (int32_t)(core->reg[rs1] < imm);
 		}
-
 	} else if (funct3 == 3) {
 		//printf("sltiu x%d, x%d, %d\n", rd, rs1, imm)
 		if (rd != 0) {
 			core->reg[rd] = (int32_t)((uint32_t)core->reg[rs1] < (uint32_t)imm);
 		}
-
 	} else if (funct3 == 4) {
 		//printf("xori x%d, x%d, %d\n", rd, rs1, imm)
 		if (rd != 0) {
@@ -252,13 +162,11 @@ void do_opi(Core *core, uint32_t instr)
 		if (rd != 0) {
 			core->reg[rd] = core->reg[rs1] >> imm;
 		}
-
 	} else if (funct3 == 6) {
 		//printf("ori x%d, x%d, %d\n", rd, rs1, imm)
 		if (rd != 0) {
 			core->reg[rd] = core->reg[rs1] | imm;
 		}
-
 	} else if (funct3 == 7) {
 		//printf("andi x%d, x%d, %d\n", rd, rs1, imm)
 		if (rd != 0) {
@@ -462,11 +370,10 @@ void do_opl(Core *core, uint32_t instr)
 	const uint8_t funct3 = extract_funct3(instr);
 	const uint8_t funct7 = extract_funct7(instr);
 	const uint32_t imm12 = extract_imm12(instr);
-	//let imm = expand12(imm12)
+	const int32_t imm = expand12(imm12);
 	const uint8_t rd = extract_rd(instr);
 	const uint8_t rs1 = extract_rs1(instr);
 	const uint8_t rs2 = extract_rs2(instr);
-	const int32_t imm = expand12(extract_imm12(instr));
 
 	const uint32_t adr = (uint32_t)(core->reg[rs1] + imm);
 

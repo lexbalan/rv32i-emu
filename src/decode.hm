@@ -1,0 +1,15 @@
+
+
+func extract_op(instr: Nat32) -> Nat8
+func extract_funct3(instr: Nat32) -> Nat8
+func extract_rd(instr: Nat32) -> Nat8
+func extract_rs1(instr: Nat32) -> Nat8
+func extract_rs2(instr: Nat32) -> Nat8
+func extract_funct7(instr: Nat32) -> Nat8
+func extract_imm12(instr: Nat32) -> Nat32
+func extract_imm31_12(instr: Nat32) -> Nat32
+func extract_jal_imm(instr: Nat32) -> Nat32
+
+func expand12(val_12bit: Nat32) -> Int32
+func expand20(val_20bit: Nat32) -> Int32
+
