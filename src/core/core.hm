@@ -17,7 +17,7 @@ type MemoryInterface record {
 
 type Core record {
     reg: [nRegs]Int32
-    ip: Nat32
+    pc: Nat32
 
     memctl: *MemoryInterface
 
@@ -59,9 +59,9 @@ let funct3_CSRRCI = 6
 
 
 func core_init(core: *Core, memctl: *MemoryInterface)
-func core_irq(core: *Core, irq: Nat32)
 func core_tick(core: *Core)
 
+func core_irq(core: *Core, irq: Nat32)
 
 let intSysCall = 0x08
 let intMemViolation = 0x0B

@@ -349,8 +349,8 @@ declare void @vm_mem_write32(i32 %adr, i32 %value)
 
 
 declare void @core_init(%Core* %core, %MemoryInterface* %memctl)
-declare void @core_irq(%Core* %core, i32 %irq)
 declare void @core_tick(%Core* %core)
+declare void @core_irq(%Core* %core, i32 %irq)
 
 
 

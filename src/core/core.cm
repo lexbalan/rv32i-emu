@@ -15,19 +15,22 @@ func core_init(core: *Core, memctl: *MemoryInterface) {
 }
 
 
-func core_irq(core: *Core, irq: Nat32)
+func op_i(core: *Core, instr: Nat32)
+func op_r(core: *Core, instr: Nat32)
+func op_lui(core: *Core, instr: Nat32)
+func op_auipc(core: *Core, instr: Nat32)
+func op_jal(core: *Core, instr: Nat32)
+func op_jalr(core: *Core, instr: Nat32)
+func op_b(core: *Core, instr: Nat32)
+func op_l(core: *Core, instr: Nat32)
+func op_s(core: *Core, instr: Nat32)
+func op_system(core: *Core, instr: Nat32)
+func op_fence(core: *Core, instr: Nat32)
 
-func do_opi(core: *Core, instr: Nat32)
-func do_opr(core: *Core, instr: Nat32)
-func do_lui(core: *Core, instr: Nat32)
-func do_auipc(core: *Core, instr: Nat32)
-func do_jal(core: *Core, instr: Nat32)
-func do_jalr(core: *Core, instr: Nat32)
-func do_opb(core: *Core, instr: Nat32)
-func do_opl(core: *Core, instr: Nat32)
-func do_ops(core: *Core, instr: Nat32)
-func do_system(core: *Core, instr: Nat32)
-func do_fence(core: *Core, instr: Nat32)
+
+func fetch(core: *Core) -> Nat32 {
+	return core.memctl.read32(core.pc)
+}
 
 
 func core_tick(core: *Core) {
@@ -35,14 +38,9 @@ func core_tick(core: *Core) {
     if core.interrupt > 0 {
         //printf("\nINT #%02X\n", core.interrupt)
         let vect_offset = core.interrupt * 4
-        core.ip = vect_offset
+        core.pc = vect_offset
         core.interrupt = 0
     }
-
-    // instruction fetch
-    let instr = core.memctl.read32(core.ip)
-
-    core.cnt = core.cnt + 1
 
     // assert
     if core.reg[0] != 0 {
@@ -50,38 +48,41 @@ func core_tick(core: *Core) {
         exit(1)
     }
 
+
+	let instr = fetch(core)
     let op = extract_op(instr)
 	let funct3 = extract_funct3(instr)
 
-
     if op == opI {
-        do_opi(core, instr)
+        op_i(core, instr)
     } else if op == opR {
-        do_opr(core, instr)
+        op_r(core, instr)
     } else if op == opLUI {
-		do_lui(core, instr)
+		op_lui(core, instr)
     } else if op == opAUIPC {
-		do_auipc(core, instr)
+		op_auipc(core, instr)
     } else if op == opJAL {
-        do_jal(core, instr)
+        op_jal(core, instr)
     } else if op == opJALR and funct3 == 0 {
-        do_jalr(core, instr)
+        op_jalr(core, instr)
     } else if op == opB {
-        do_opb(core, instr)
+        op_b(core, instr)
     } else if op == opL {
-		do_opl(core, instr)
+		op_l(core, instr)
     } else if op == opS {
-		do_ops(core, instr)
+		op_s(core, instr)
     } else if op == opSYSTEM {
-		do_system(core, instr)
+		op_system(core, instr)
     } else if op == opFENCE {
-		do_fence(core, instr)
+		op_fence(core, instr)
     } else {
         //printf("UNKNOWN OPCODE: %08X\n", op)
     }
 
+	++core.cnt
+
     if core.need_step {
-        core.ip = core.ip + 4
+        core.pc = core.pc + 4
     } else {
         core.need_step = true
     }
@@ -89,7 +90,7 @@ func core_tick(core: *Core) {
 
 
 
-func do_opi(core: *Core, instr: Nat32) {
+func op_i(core: *Core, instr: Nat32) {
     let funct3 = extract_funct3(instr)
     let funct7 = extract_funct7(instr)
     let imm12 = extract_imm12(instr)
@@ -152,7 +153,7 @@ func do_opi(core: *Core, instr: Nat32) {
 }
 
 
-func do_opr(core: *Core, instr: Nat32) {
+func op_r(core: *Core, instr: Nat32) {
     let funct3 = extract_funct3(instr)
     let funct7 = extract_funct7(instr)
     let imm = expand12(extract_imm12(instr))
@@ -204,7 +205,7 @@ func do_opr(core: *Core, instr: Nat32) {
 }
 
 
-func do_lui(core: *Core, instr: Nat32) {
+func op_lui(core: *Core, instr: Nat32) {
 	// U-type
 	let imm = expand12(extract_imm31_12(instr))
 	//printf("lui x%d, 0x%X\n", rd, imm)
@@ -213,17 +214,17 @@ func do_lui(core: *Core, instr: Nat32) {
 }
 
 
-func do_auipc(core: *Core, instr: Nat32) {
+func op_auipc(core: *Core, instr: Nat32) {
 	// U-type
 	let imm = expand12(extract_imm31_12(instr))
-	let x = Int32 core.ip + (imm << 12)
+	let x = Int32 core.pc + (imm << 12)
 	let rd = extract_rd(instr)
 	core.reg[rd] = x
 	//printf("auipc x%d, 0x%X\n", rd, imm)
 }
 
 
-func do_jal(core: *Core, instr: Nat32) {
+func op_jal(core: *Core, instr: Nat32) {
 	// U-type
 	let rd = extract_rd(instr)
 	let raw_imm = extract_jal_imm(instr)
@@ -231,15 +232,15 @@ func do_jal(core: *Core, instr: Nat32) {
 
 	//printf("jal x%d, %d\n", rd, imm)
 	if rd != 0 {
-		core.reg[rd] = Int32 (core.ip + 4)
+		core.reg[rd] = Int32 (core.pc + 4)
 	}
 
-	core.ip = Nat32 (Int32 core.ip + imm)
+	core.pc = Nat32 (Int32 core.pc + imm)
 	core.need_step = false
 }
 
 
-func do_jalr(core: *Core, instr: Nat32) {
+func op_jalr(core: *Core, instr: Nat32) {
 	let rs1 = extract_rs1(instr)
 	let rd = extract_rd(instr)
 	let imm = expand12(extract_imm12(instr))
@@ -247,20 +248,20 @@ func do_jalr(core: *Core, instr: Nat32) {
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
 
-	let next_instr_ptr = Int32 (core.ip + 4)
+	let next_instr_ptr = Int32 (core.pc + 4)
 	let jump_to = Nat32 (core.reg[rs1] + imm) and 0xFFFFFFFE
 
 	if rd != 0 {
 		core.reg[rd] = next_instr_ptr
 	}
 
-	core.ip = jump_to
+	core.pc = jump_to
 
 	core.need_step = false
 }
 
 
-func do_opb(core: *Core, instr: Nat32) {
+func op_b(core: *Core, instr: Nat32) {
 	let funct3 = extract_funct3(instr)
 	let imm12_10to5 = extract_funct7(instr)
 	let imm4to1_11 = extract_rd(instr)
@@ -285,7 +286,7 @@ func do_opb(core: *Core, instr: Nat32) {
 		//beq
 		//printf("beq x%d, x%d, %d\n", rs1, rs2, imm to Int32)
 		if core.reg[rs1] == core.reg[rs2] {
-			core.ip = Nat32 (Int32 core.ip + Int32 imm)
+			core.pc = Nat32 (Int32 core.pc + Int32 imm)
 			core.need_step = false
 		}
 
@@ -293,7 +294,7 @@ func do_opb(core: *Core, instr: Nat32) {
 		//bne
 		//printf("bne x%d, x%d, %d\n", rs1, rs2, imm to Int32)
 		if core.reg[rs1] != core.reg[rs2] {
-			core.ip = Nat32 (Int32 core.ip + Int32 imm)
+			core.pc = Nat32 (Int32 core.pc + Int32 imm)
 			core.need_step = false
 		}
 
@@ -301,7 +302,7 @@ func do_opb(core: *Core, instr: Nat32) {
 		//blt
 		//printf("blt x%d, x%d, %d\n", rs1, rs2, imm to Int32)
 		if core.reg[rs1] < core.reg[rs2] {
-			core.ip = Nat32 (Int32 core.ip + Int32 imm)
+			core.pc = Nat32 (Int32 core.pc + Int32 imm)
 			core.need_step = false
 		}
 
@@ -309,7 +310,7 @@ func do_opb(core: *Core, instr: Nat32) {
 		//bge
 		//printf("bge x%d, x%d, %d\n", rs1, rs2, imm to Int32)
 		if core.reg[rs1] >= core.reg[rs2] {
-			core.ip = Nat32 (Int32 core.ip + Int32 imm)
+			core.pc = Nat32 (Int32 core.pc + Int32 imm)
 			core.need_step = false
 		}
 
@@ -317,7 +318,7 @@ func do_opb(core: *Core, instr: Nat32) {
 		//bltu
 		//printf("bltu x%d, x%d, %d\n", rs1, rs2, imm to Int32)
 		if Nat32 core.reg[rs1] < Nat32 core.reg[rs2] {
-			core.ip = Nat32 (Int32 core.ip + Int32 imm)
+			core.pc = Nat32 (Int32 core.pc + Int32 imm)
 			core.need_step = false
 		}
 
@@ -326,7 +327,7 @@ func do_opb(core: *Core, instr: Nat32) {
 		//printf("bgeu x%d, x%d, %d\n", rs1, rs2, imm to Int32)
 
 		if Nat32 core.reg[rs1] >= Nat32 core.reg[rs2] {
-			core.ip = Nat32 (Int32 core.ip + Int32 imm)
+			core.pc = Nat32 (Int32 core.pc + Int32 imm)
 			core.need_step = false
 		} else {
 		}
@@ -334,7 +335,7 @@ func do_opb(core: *Core, instr: Nat32) {
 }
 
 
-func do_opl(core: *Core, instr: Nat32) {
+func op_l(core: *Core, instr: Nat32) {
 	let funct3 = extract_funct3(instr)
     let funct7 = extract_funct7(instr)
     let imm12 = extract_imm12(instr)
@@ -386,7 +387,7 @@ func do_opl(core: *Core, instr: Nat32) {
 }
 
 
-func do_ops(core: *Core, instr: Nat32) {
+func op_s(core: *Core, instr: Nat32) {
 	let funct3 = extract_funct3(instr)
     let funct7 = extract_funct7(instr)
     let imm12 = extract_imm12(instr)
@@ -420,7 +421,7 @@ func do_ops(core: *Core, instr: Nat32) {
 }
 
 
-func do_system(core: *Core, instr: Nat32) {
+func op_system(core: *Core, instr: Nat32) {
 	let funct3 = extract_funct3(instr)
     let funct7 = extract_funct7(instr)
     let imm12 = extract_imm12(instr)
@@ -462,7 +463,7 @@ func do_system(core: *Core, instr: Nat32) {
 }
 
 
-func do_fence(core: *Core, instr: Nat32) {
+func op_fence(core: *Core, instr: Nat32) {
 	if instr == instrPAUSE {
 		//printf("PAUSE\n")
 	}
