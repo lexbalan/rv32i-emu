@@ -8,7 +8,7 @@ import "core"
 
 
 func core_init(core: *Core, memctl: *MemoryInterface) {
-	*core = Core {
+	*core = {
 		memctl = memctl
 		need_step = true
 	}
@@ -379,15 +379,15 @@ func op_s(core: *Core, instr: Nat32) {
 	let val = core.reg[rs2]
 
 	if funct3 == 0 {
-		// sb
+		// sb <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sb x%d, %d(x%d)\n", rs2, imm, rs1)
 		core.memctl.write8(adr, Nat8 val)
 	} else if funct3 == 1 {
-		// sh
+		// sh <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sh x%d, %d(x%d)\n", rs2, imm, rs1)
 		core.memctl.write16(adr, Nat16 val)
 	} else if funct3 == 2 {
-		// sw
+		// sw <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sw x%d, %d(x%d)\n", rs2, imm, rs1)
 		core.memctl.write32(adr, Nat32 val)
 	}
@@ -414,11 +414,16 @@ func op_system(core: *Core, instr: Nat32) {
 
 	// CSR instructions
 	} else if funct3 == funct3_CSRRW {
+		// CSR read & write
 		csr_rw(core, csr, rd, rs1)
 	} else if funct3 == funct3_CSRRS {
-		csr_rs(core, csr, rd, rs1)
+		// CSR read & set bit
+		let msk_reg = rs1
+		csr_rs(core, csr, rd, msk_reg)
 	} else if funct3 == funct3_CSRRC {
-		csr_rc(core, csr, rd, rs1)
+		// CSR read & clear bit
+		let msk_reg = rs1
+		csr_rc(core, csr, rd, msk_reg)
 	} else if funct3 == funct3_CSRRWI {
 		let imm = rs1
 		csr_rwi(core, csr, rd, imm)

@@ -143,6 +143,7 @@ break_2:
 
 
 %OffT = type i64
+%PointerToConst = type i8*
 
 
 ; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/stdio.hm
@@ -240,7 +241,7 @@ define void @mem_violation(i8 %rw, i32 %adr) {
 }
 
 define i8 @vm_mem_read8(i32 %adr) {
-	%1 = alloca i8
+	%1 = alloca i8, align 1
 	store i8 0, i8* %1
 	%2 = icmp uge i32 %adr, 268435456
 	%3 = icmp ule i32 %adr, 268439552
@@ -290,7 +291,7 @@ endif_0:
 }
 
 define i16 @vm_mem_read16(i32 %adr) {
-	%1 = alloca i16
+	%1 = alloca i16, align 2
 	store i16 0, i16* %1
 	%2 = icmp uge i32 %adr, 268435456
 	%3 = icmp ule i32 %adr, 268439552
@@ -340,7 +341,7 @@ endif_0:
 }
 
 define i32 @vm_mem_read32(i32 %adr) {
-	%1 = alloca i32
+	%1 = alloca i32, align 4
 	store i32 0, i32* %1
 	%2 = icmp uge i32 %adr, 0
 	%3 = icmp ule i32 %adr, 65536
@@ -410,7 +411,8 @@ then_1:
 	br i1 %11 , label %then_2, label %endif_2
 then_2:
 	%12 = bitcast i8 %value to i8
-	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str2 to [0 x i8]*), i8 %12)ret void
+	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str2 to [0 x i8]*), i8 %12)
+	ret void
 	br label %endif_2
 endif_2:
 	br label %endif_1
@@ -445,7 +447,8 @@ then_1:
 	br i1 %11 , label %then_2, label %endif_2
 then_2:
 	%12 = sext i16 %value to %Int
-	%13 = call %Int (%Int) @putchar(%Int %12)ret void
+	%13 = call %Int (%Int) @putchar(%Int %12)
+	ret void
 	br label %endif_2
 endif_2:
 	br label %endif_1
@@ -480,31 +483,36 @@ then_1:
 	br i1 %11 , label %then_2, label %else_2
 then_2:
 	%12 = bitcast i32 %value to %Int
-	%13 = call %Int (%Int) @putchar(%Int %12)ret void
+	%13 = call %Int (%Int) @putchar(%Int %12)
+	ret void
 	br label %endif_2
 else_2:
 	%15 = icmp eq i32 %adr, 4027318304
 	br i1 %15 , label %then_3, label %else_3
 then_3:
-	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str3 to [0 x i8]*), i32 %value)ret void
+	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str3 to [0 x i8]*), i32 %value)
+	ret void
 	br label %endif_3
 else_3:
 	%18 = icmp eq i32 %adr, 4027318308
 	br i1 %18 , label %then_4, label %else_4
 then_4:
-	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str4 to [0 x i8]*), i32 %value)ret void
+	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str4 to [0 x i8]*), i32 %value)
+	ret void
 	br label %endif_4
 else_4:
 	%21 = icmp eq i32 %adr, 4027318312
 	br i1 %21 , label %then_5, label %else_5
 then_5:
-	%22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str5 to [0 x i8]*), i32 %value)ret void
+	%22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str5 to [0 x i8]*), i32 %value)
+	ret void
 	br label %endif_5
 else_5:
 	%24 = icmp eq i32 %adr, 4027318316
 	br i1 %24 , label %then_6, label %endif_6
 then_6:
-	%25 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str6 to [0 x i8]*), i32 %value)ret void
+	%25 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str6 to [0 x i8]*), i32 %value)
+	ret void
 	br label %endif_6
 endif_6:
 	br label %endif_5

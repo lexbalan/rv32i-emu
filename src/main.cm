@@ -10,13 +10,51 @@ let text_filename = "./image.bin"
 
 let showText = false
 
-
-var memctl: MemoryInterface
 var core: Core
 
 
-let textBufferSize = 4096
-var text: [textBufferSize]Nat32
+func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32
+func show_regs(core: *Core)
+func show_mem() -> Unit
+
+
+func mem_violation_event(reason: Nat32) {
+	core_irq(&core, intMemViolation)
+}
+
+
+func main() -> Int {
+	printf("RISC-V VM\n")
+
+	var memctl = MemoryInterface {
+		read8 = &vm_mem_read8
+		read16 = &vm_mem_read16
+		read32 = &vm_mem_read32
+		write8 = &vm_mem_write8
+		write16 = &vm_mem_write16
+		write32 = &vm_mem_write32
+	}
+
+	let romptr = get_rom_ptr()
+	let nbytes = loader(text_filename, romptr, romSize)
+
+	
+	core_init(&core, &memctl)
+
+	printf("~~~ START ~~~\n")
+
+	while not core.end {
+		core_tick(&core)
+	}
+
+	printf("core.cnt = %u\n", core.cnt)
+
+	printf("\nCore dump:\n")
+	show_regs(&core)
+	show_mem()
+
+	return 0
+}
 
 
 func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
@@ -32,7 +70,6 @@ func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
 	let n = fread(bufptr, 1, SizeT buf_size, fp)
 
 	printf("LOADED: %zu bytes\n", n)
-
 
 	if showText {
 		var i = SizeT 0
@@ -50,7 +87,7 @@ func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
 }
 
 
-func show_regs() {
+func show_regs(core: *Core) {
 	var i = 0
 	while i < 16 {
 		printf("x%02d = 0x%08x", i, core.reg[i])
@@ -79,44 +116,4 @@ func show_mem() {
 	}
 }
 
-
-
-func mem_violation_event(reason: Nat32) {
-	core_irq(&core, intMemViolation)
-}
-
-
-func main() -> Int {
-	printf("RISC-V VM\n")
-
-	// memory controller initialize
-	memctl.read8 = &vm_mem_read8
-	memctl.read16 = &vm_mem_read16
-	memctl.read32 = &vm_mem_read32
-
-	memctl.write8 = &vm_mem_write8
-	memctl.write16 = &vm_mem_write16
-	memctl.write32 = &vm_mem_write32
-
-
-	let romptr = get_rom_ptr()
-	let loaded_bytes_text = loader(text_filename, romptr, romSize)
-
-	core_init(&core, &memctl)
-
-	printf("~~~ START ~~~\n")
-
-	while not core.end {
-		core_tick(&core)
-	}
-
-	printf("core.cnt = %u\n", core.cnt)
-
-	printf("\nCore dump:\n")
-
-	show_regs()
-	show_mem()
-
-	return 0
-}
 
