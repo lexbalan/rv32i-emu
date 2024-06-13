@@ -8,7 +8,7 @@ import "core"
 
 
 func core_init(core: *Core, memctl: *MemoryInterface) {
-	*core = {
+	*core = Core {
 		memctl = memctl
 		need_step = true
 	}
