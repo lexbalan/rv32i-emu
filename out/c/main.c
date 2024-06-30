@@ -34,8 +34,8 @@ int main()
 {
 	printf("RISC-V VM\n");
 
-	SystemInterface memctl;
-	memctl = (SystemInterface){
+	BusInterface memctl;
+	memctl = (BusInterface){
 		.read8 = &vm_mem_read8,
 		.read16 = &vm_mem_read16,
 		.read32 = &vm_mem_read32,
@@ -48,7 +48,7 @@ int main()
 	const uint32_t nbytes = loader(text_filename, romptr, romSize);
 
 
-	core_init((Core *)&core, (SystemInterface *)&memctl);
+	core_init((Core *)&core, (BusInterface *)&memctl);
 
 	printf("~~~ START ~~~\n");
 

@@ -220,7 +220,7 @@ declare void @vm_mem_write32(i32 %adr, i32 %value)
 
 
 
-%SystemInterface = type {
+%BusInterface = type {
 	i8 (i32)*, 
 	i16 (i32)*, 
 	i32 (i32)*, 
@@ -232,7 +232,7 @@ declare void @vm_mem_write32(i32 %adr, i32 %value)
 %Core = type {
 	[32 x i32], 
 	i32, 
-	%SystemInterface*, 
+	%BusInterface*, 
 	i1, 
 	i1, 
 	i32, 
@@ -261,7 +261,7 @@ declare void @vm_mem_write32(i32 %adr, i32 %value)
 
 
 
-declare void @core_init(%Core* %core, %SystemInterface* %sys)
+declare void @core_init(%Core* %core, %BusInterface* %bus)
 declare void @core_tick(%Core* %core)
 declare void @core_irq(%Core* %core, i32 %irq)
 
@@ -298,19 +298,19 @@ define void @mem_violation_event(i32 %reason) {
 
 define i32 @main() {
 	%1 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
-	%2 = alloca %SystemInterface, align 8
-	%3 = insertvalue %SystemInterface zeroinitializer, i8 (i32)* @vm_mem_read8, 0
-	%4 = insertvalue %SystemInterface %3, i16 (i32)* @vm_mem_read16, 1
-	%5 = insertvalue %SystemInterface %4, i32 (i32)* @vm_mem_read32, 2
-	%6 = insertvalue %SystemInterface %5, void (i32, i8)* @vm_mem_write8, 3
-	%7 = insertvalue %SystemInterface %6, void (i32, i16)* @vm_mem_write16, 4
-	%8 = insertvalue %SystemInterface %7, void (i32, i32)* @vm_mem_write32, 5
-	store %SystemInterface %8, %SystemInterface* %2
+	%2 = alloca %BusInterface, align 8
+	%3 = insertvalue %BusInterface zeroinitializer, i8 (i32)* @vm_mem_read8, 0
+	%4 = insertvalue %BusInterface %3, i16 (i32)* @vm_mem_read16, 1
+	%5 = insertvalue %BusInterface %4, i32 (i32)* @vm_mem_read32, 2
+	%6 = insertvalue %BusInterface %5, void (i32, i8)* @vm_mem_write8, 3
+	%7 = insertvalue %BusInterface %6, void (i32, i16)* @vm_mem_write16, 4
+	%8 = insertvalue %BusInterface %7, void (i32, i32)* @vm_mem_write32, 5
+	store %BusInterface %8, %BusInterface* %2
 	%9 = call [0 x i8]* @get_rom_ptr()
 	%10 = call i32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x i8]* %9, i32 65536)
 	%11 = bitcast %Core* @core to %Core*
-	%12 = bitcast %SystemInterface* %2 to %SystemInterface*
-	call void @core_init(%Core* %11, %SystemInterface* %12)
+	%12 = bitcast %BusInterface* %2 to %BusInterface*
+	call void @core_init(%Core* %11, %BusInterface* %12)
 	%13 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 	br label %again_1
 again_1:
