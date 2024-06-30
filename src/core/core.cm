@@ -1,5 +1,4 @@
 
-import "libc/libc"
 import "libc/stdio"
 
 import "decode"
@@ -7,9 +6,9 @@ import "csr"
 import "core"
 
 
-func core_init(core: *Core, memctl: *MemoryInterface) {
+func core_init(core: *Core, sys: *SystemInterface) {
 	*core = Core {
-		memctl = memctl
+		sys = sys
 		need_step = true
 	}
 }
@@ -29,12 +28,11 @@ func op_fence(core: *Core, instr: Nat32)
 
 
 func fetch(core: *Core) -> Nat32 {
-	return core.memctl.read32(core.pc)
+	return core.sys.read32(core.pc)
 }
 
 
 func core_tick(core: *Core) {
-
 	if core.interrupt > 0 {
 		//printf("\nINT #%02X\n", core.interrupt)
 		let vect_offset = core.interrupt * 4
@@ -325,21 +323,21 @@ func op_l(core: *Core, instr: Nat32) {
 	if funct3 == 0 {
 		// lb
 		//printf("lb x%d, %d(x%d)\n", rd, imm, rs1)
-		let val = core.memctl.read8(adr)
+		let val = core.sys.read8(adr)
 		if rd != 0 {
 			core.reg[rd] = Int32 val
 		}
 	} else if funct3 == 1 {
 		// lh
 		//printf("lh x%d, %d(x%d)\n", rd, imm, rs1)
-		let val = core.memctl.read16(adr)
+		let val = core.sys.read16(adr)
 		if rd != 0 {
 			core.reg[rd] = Int32 val
 		}
 	} else if funct3 == 2 {
 		// lw
 		//printf("lw x%d, %d(x%d)\n", rd, imm, rs1)
-		let val = core.memctl.read32(adr)
+		let val = core.sys.read32(adr)
 		//printf("LW [0x%x] (0x%x)\n", adr, val)
 		if rd != 0 {
 			core.reg[rd] = Int32 val
@@ -347,7 +345,7 @@ func op_l(core: *Core, instr: Nat32) {
 	} else if funct3 == 4 {
 		// lbu
 		//printf("lbu x%d, %d(x%d)\n", rd, imm, rs1)
-		let val = Nat32 core.memctl.read8(adr)
+		let val = Nat32 core.sys.read8(adr)
 		//printf("LBU[0x%x] (0x%x)\n", adr, val)
 		if rd != 0 {
 			core.reg[rd] = Int32 val
@@ -355,7 +353,7 @@ func op_l(core: *Core, instr: Nat32) {
 	} else if funct3 == 5 {
 		// lhu
 		//printf("lhu x%d, %d(x%d)\n", rd, imm, rs1)
-		let val = Nat32 core.memctl.read16(adr)
+		let val = Nat32 core.sys.read16(adr)
 		if rd != 0 {
 			core.reg[rd] = Int32 val
 		}
@@ -381,15 +379,15 @@ func op_s(core: *Core, instr: Nat32) {
 	if funct3 == 0 {
 		// sb <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sb x%d, %d(x%d)\n", rs2, imm, rs1)
-		core.memctl.write8(adr, Nat8 val)
+		core.sys.write8(adr, Nat8 val)
 	} else if funct3 == 1 {
 		// sh <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sh x%d, %d(x%d)\n", rs2, imm, rs1)
-		core.memctl.write16(adr, Nat16 val)
+		core.sys.write16(adr, Nat16 val)
 	} else if funct3 == 2 {
 		// sw <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sw x%d, %d(x%d)\n", rs2, imm, rs1)
-		core.memctl.write32(adr, Nat32 val)
+		core.sys.write32(adr, Nat32 val)
 	}
 }
 

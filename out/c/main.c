@@ -4,11 +4,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <time.h>
 #include <stdio.h>
 
 
@@ -31,7 +26,7 @@ void show_mem();
 
 void mem_violation_event(uint32_t reason)
 {
-	core_irq(&core, intMemViolation);
+	core_irq((Core *)&core, intMemViolation);
 }
 
 
@@ -39,8 +34,8 @@ int main()
 {
 	printf("RISC-V VM\n");
 
-	MemoryInterface memctl;
-	memctl = (MemoryInterface){
+	SystemInterface memctl;
+	memctl = (SystemInterface){
 		.read8 = &vm_mem_read8,
 		.read16 = &vm_mem_read16,
 		.read32 = &vm_mem_read32,
@@ -53,18 +48,18 @@ int main()
 	const uint32_t nbytes = loader(text_filename, romptr, romSize);
 
 
-	core_init(&core, &memctl);
+	core_init((Core *)&core, (SystemInterface *)&memctl);
 
 	printf("~~~ START ~~~\n");
 
 	while (!core.end) {
-		core_tick(&core);
+		core_tick((Core *)&core);
 	}
 
 	printf("core.cnt = %u\n", core.cnt);
 
 	printf("\nCore dump:\n");
-	show_regs(&core);
+	show_regs((Core *)&core);
 	show_mem();
 
 	return 0;

@@ -5,7 +5,7 @@
 let nRegs = 32
 
 
-type MemoryInterface record {
+type SystemInterface record {
 	read8: *(adr: Nat32) -> Nat8
 	read16: *(adr: Nat32) -> Nat16
 	read32: *(adr: Nat32) -> Nat32
@@ -19,7 +19,7 @@ type Core record {
 	reg: [nRegs]Int32
 	pc: Nat32
 
-	memctl: *MemoryInterface
+	sys: *SystemInterface
 
 	need_step: Bool
 	end: Bool
@@ -62,7 +62,7 @@ let intSysCall = 0x08
 let intMemViolation = 0x0B
 
 
-func core_init(core: *Core, memctl: *MemoryInterface)
+func core_init(core: *Core, sys: *SystemInterface)
 func core_tick(core: *Core)
 
 func core_irq(core: *Core, irq: Nat32)

@@ -8,6 +8,7 @@
 #include <string.h>
 
 
+
 // see mem.ld
 #define ramSize  4096
 #define ramStart  0x10000000

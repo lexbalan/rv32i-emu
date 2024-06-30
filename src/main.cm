@@ -1,5 +1,4 @@
 
-import "libc/libc"
 import "libc/stdio"
 
 import "mem"
@@ -26,7 +25,7 @@ func mem_violation_event(reason: Nat32) {
 func main() -> Int {
 	printf("RISC-V VM\n")
 
-	var memctl = MemoryInterface {
+	var memctl = SystemInterface {
 		read8 = &vm_mem_read8
 		read16 = &vm_mem_read16
 		read32 = &vm_mem_read32
