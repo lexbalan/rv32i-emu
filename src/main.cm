@@ -73,7 +73,7 @@ func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
 	if showText {
 		var i = SizeT 0
 		while i < (n / 4) {
-			printf("%08zx: 0x%08x\n", i, (*[]Nat32 bufptr)[i])
+			printf("%08zx: 0x%08x\n", i, (unsafe *[]Nat32 bufptr)[i])
 			i = i + 4
 		}
 
@@ -82,7 +82,7 @@ func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
 
 	fclose(fp)
 
-	return Nat32 n
+	return unsafe Nat32 n
 }
 
 

@@ -379,11 +379,11 @@ func op_s(core: *Core, instr: Nat32) {
 	if funct3 == 0 {
 		// sb <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sb x%d, %d(x%d)\n", rs2, imm, rs1)
-		core.bus.write8(adr, Nat8 val)
+		core.bus.write8(adr, unsafe Nat8 val)
 	} else if funct3 == 1 {
 		// sh <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sh x%d, %d(x%d)\n", rs2, imm, rs1)
-		core.bus.write16(adr, Nat16 val)
+		core.bus.write16(adr, unsafe Nat16 val)
 	} else if funct3 == 2 {
 		// sw <source:reg>, <offset:12bit_imm>(<address:reg>)
 		//printf("sw x%d, %d(x%d)\n", rs2, imm, rs1)
@@ -400,7 +400,7 @@ func op_bustem(core: *Core, instr: Nat32) {
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 
-	let csr = Nat16 imm12
+	let csr = unsafe Nat16 imm12
 
 	if instr == instrECALL {
 		printf("ECALL\n")

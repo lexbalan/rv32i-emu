@@ -3,32 +3,32 @@ import "decode"
 
 
 func extract_op(instr: Nat32) -> Nat8 {
-	return Nat8 (instr and 0x7F)
+	return unsafe Nat8 (instr and 0x7F)
 }
 
 
 func extract_funct3(instr: Nat32) -> Nat8 {
-	return Nat8 ((instr >> 12) and 0x07)
+	return unsafe Nat8 ((instr >> 12) and 0x07)
 }
 
 
 func extract_rd(instr: Nat32) -> Nat8 {
-	return Nat8 ((instr >> 7) and 0x1F)
+	return unsafe Nat8 ((instr >> 7) and 0x1F)
 }
 
 
 func extract_rs1(instr: Nat32) -> Nat8 {
-	return Nat8 ((instr >> 15) and 0x1F)
+	return unsafe Nat8 ((instr >> 15) and 0x1F)
 }
 
 
 func extract_rs2(instr: Nat32) -> Nat8 {
-	return Nat8 ((instr >> 20) and 0x1F)
+	return unsafe Nat8 ((instr >> 20) and 0x1F)
 }
 
 
 func extract_funct7(instr: Nat32) -> Nat8 {
-	return Nat8 ((instr >> 25) and 0x7F)
+	return unsafe Nat8 ((instr >> 25) and 0x7F)
 }
 
 
