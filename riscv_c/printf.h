@@ -1,4 +1,4 @@
 
 
-int printf(char *str, ...);
+int printf(const char *str, ...);
 

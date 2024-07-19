@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#include "system.h"
+
 
 uint64_t sum64(uint32_t a, uint32_t b) {
 	return (uint64_t)a + (uint64_t)b;
@@ -29,7 +31,7 @@ char *sprintf_hex32(char *buf, int d);
 char *sprintf_dec32(char *buf, int d);
 
 
-int printf(char *str, ...)
+int printf(const char *str, ...)
 {
 	va_list a_list;
 	va_start(a_list, str);
@@ -63,7 +65,7 @@ int printf(char *str, ...)
 				char *s = va_arg(a_list, char*);
 				sptr = s;
 			} else if (c == 'c') {
-				char cc = va_arg(a_list, char);
+				char cc = va_arg(a_list, int); // int!
 				sptr[0] = cc;
 				sptr[1] = 0;
 			} else if (c == '%') {
