@@ -6,7 +6,7 @@
 
 
 void console_put(uint32_t x) {
-	*((int8_t *)consolePrintCHAR8_ADR) = (int8_t)x;
+	*((int8_t *)consolePrintChar8Adr) = (int8_t)x;
 }
 
 uint32_t console_get() {

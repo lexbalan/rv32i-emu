@@ -8,7 +8,7 @@
 #define mmioEnd	(mmioStart + mmioSize)
 
 #define consoleMMIOAdr			   (mmioStart + 0x10)
-#define consolePrintCHAR8_ADR		(consoleMMIOAdr + 0x00)
+#define consolePrintChar8Adr		(consoleMMIOAdr + 0x00)
 #define consoleScanChar8Adr		  (consoleMMIOAdr + 0x01)
 #define consolePrintInt32Adr		 (consoleMMIOAdr + 0x10)
 #define consolePrintUInt32Adr		(consoleMMIOAdr + 0x14)
