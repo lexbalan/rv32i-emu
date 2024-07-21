@@ -13,7 +13,6 @@ zset_loop:
 
 
 
-
 # t0 - temp reg
 # t1 - mcpy_4 lim adr
 # t2 - mcpy_1 lim adr
@@ -35,8 +34,8 @@ mcpy_4:
 mcpy_loop4:
 	lw t0, 0(a1)			# t1 = *((uint32_t *)src)
 	sw t0, 0(a0)			# *((uint32_t *)dst) = t1
-	addi a0, a0, 4		  # src = src + 4
-	addi a1, a1, 4		  # dst = dst + 4
+	addi a0, a0, 4		    # src = src + 4
+	addi a1, a1, 4		    # dst = dst + 4
 	blt a0, t1, mcpy_loop4  # if (dst < t1) goto mcpy_loop4
 
 mcpy_1:

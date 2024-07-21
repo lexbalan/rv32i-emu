@@ -68,7 +68,7 @@ int main()
 	uint32_t prev_value;
 	uint32_t new_value = 1;
 
-	__asm__ volatile ("csrrw	%0, misa, %1"
+	__asm__ volatile ("csrrw  %0, misa, %1"
 					  : "=r" (prev_value) /* output: register %0 */
 					  : "r" (new_value)  /* input : register */
 					  : /* clobbers: none */);

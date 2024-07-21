@@ -11,34 +11,37 @@
 .global system
 
 
+
 vectors:
-	j _start
+	#j _start - делает короткий прыжок
 	
-	j trap_empty
+	jr zero, %lo(_start)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
 	
-	j system
+	jr zero, %lo(trap_empty)
 	
-	j trap_empty
+	jr zero, %lo(system)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
 	
-	j __mem_violation
+	jr zero, %lo(trap_empty)
 	
-	j trap_empty
+	jr zero, %lo(__mem_violation)
 	
-	j trap_empty
+	jr zero, %lo(trap_empty)
+	
+	jr zero, %lo(trap_empty)
 
 
 
@@ -50,7 +53,7 @@ _start:
 	lui sp, %hi(_sstack)
 	addi sp, sp, %lo(_sstack)
 	
-	j __boot
+	jr zero, %lo(__boot)
 
 
 trap_empty:
