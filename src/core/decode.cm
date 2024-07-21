@@ -63,6 +63,7 @@ func expand12(val_12bit: Nat32) -> Int32 {
 	return Int32 v
 }
 
+
 // sign expand (20bit -> 32bit)
 func expand20(val_20bit: Nat32) -> Int32 {
 	var v = val_20bit

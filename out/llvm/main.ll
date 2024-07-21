@@ -148,6 +148,26 @@ break_2:
 %GidT = type i32;
 
 
+; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/stdlib.hm
+
+
+
+declare void @abort()
+declare i32 @abs(i32 %x)
+declare i32 @atexit(void ()* %x)
+declare double @atof([0 x i8]* %nptr)
+declare i32 @atoi([0 x i8]* %nptr)
+declare i64 @atol([0 x i8]* %nptr)
+declare i8* @calloc(i64 %num, i64 %size)
+declare void @exit(i32 %x)
+declare void @free(i8* %ptr)
+declare %Str* @getenv(%Str* %name)
+declare i64 @labs(i64 %x)
+declare %Str* @secure_getenv(%Str* %name)
+declare i8* @malloc(i64 %size)
+declare i32 @system([0 x i8]* %string)
+
+
 ; -- SOURCE: /Users/alexbalan/p/Modest/lib/libc/stdio.hm
 
 
@@ -275,7 +295,7 @@ declare void @core_irq(%Core* %core, i32 %irq)
 ; -- SOURCE: src/main.cm
 
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
-@str2 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]
+@str2 = private constant [11 x i8] [i8 46, i8 47, i8 109, i8 97, i8 105, i8 110, i8 46, i8 98, i8 105, i8 110, i8 0]
 @str3 = private constant [15 x i8] [i8 126, i8 126, i8 126, i8 32, i8 83, i8 84, i8 65, i8 82, i8 84, i8 32, i8 126, i8 126, i8 126, i8 10, i8 0]
 @str4 = private constant [15 x i8] [i8 99, i8 111, i8 114, i8 101, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
 @str5 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
@@ -313,28 +333,34 @@ define i32 @main() {
 	%8 = insertvalue %BusInterface %7, void (i32, i32)* @vm_mem_write32, 5
 	store %BusInterface %8, %BusInterface* %2
 	%9 = call [0 x i8]* @get_rom_ptr()
-	%10 = call i32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x i8]* %9, i32 65536)
-	%11 = bitcast %Core* @core to %Core*
-	%12 = bitcast %BusInterface* %2 to %BusInterface*
-	call void @core_init(%Core* %11, %BusInterface* %12)
-	%13 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+	%10 = call i32 @loader(%Str8* bitcast ([11 x i8]* @str2 to [0 x i8]*), [0 x i8]* %9, i32 65536)
+	%11 = icmp ule i32 %10, 0
+	br i1 %11 , label %then_0, label %endif_0
+then_0:
+	call void @exit(i32 1)
+	br label %endif_0
+endif_0:
+	%12 = bitcast %Core* @core to %Core*
+	%13 = bitcast %BusInterface* %2 to %BusInterface*
+	call void @core_init(%Core* %12, %BusInterface* %13)
+	%14 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 	br label %again_1
 again_1:
-	%14 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 4
-	%15 = load i1, i1* %14
-	%16 = xor i1 %15, -1
-	br i1 %16 , label %body_1, label %break_1
+	%15 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 4
+	%16 = load i1, i1* %15
+	%17 = xor i1 %16, -1
+	br i1 %17 , label %body_1, label %break_1
 body_1:
-	%17 = bitcast %Core* @core to %Core*
-	call void @core_tick(%Core* %17)
+	%18 = bitcast %Core* @core to %Core*
+	call void @core_tick(%Core* %18)
 	br label %again_1
 break_1:
-	%18 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 6
-	%19 = load i32, i32* %18
-	%20 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), i32 %19)
-	%21 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
-	%22 = bitcast %Core* @core to %Core*
-	call void @show_regs(%Core* %22)
+	%19 = getelementptr inbounds %Core, %Core* @core, i32 0, i32 6
+	%20 = load i32, i32* %19
+	%21 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), i32 %20)
+	%22 = call i32 (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
+	%23 = bitcast %Core* @core to %Core*
+	call void @show_regs(%Core* %23)
 	call void @show_mem()
 	ret i32 0
 }

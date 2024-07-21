@@ -1,11 +1,12 @@
 
+import "libc/stdlib"
 import "libc/stdio"
 
 import "mem"
 import "core/core"
 
 
-let text_filename = "./image.bin"
+let text_filename = "./main.bin"
 
 let showText = false
 
@@ -37,6 +38,9 @@ func main() -> Int {
 	let romptr = get_rom_ptr()
 	let nbytes = loader(text_filename, romptr, romSize)
 
+	if nbytes <= 0 {
+		exit(1)
+	}
 	
 	core_init(&core, &memctl)
 

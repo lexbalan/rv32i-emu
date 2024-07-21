@@ -1,15 +1,23 @@
+#
+# C > O > ELF > BIN
+#
 
+
+TARGET=main
+
+OBJECTS = vect.o startup.o main.o system.o console.o printf.o muldivmod.o base.o
 
 CFLAGS = --target=riscv32 -march=rv32i
+LINKERSCRIPT = mem.ld
 
-# compile C to BIN
-all:
-	# translate C to ASM
-	#clang $(CFLAGS) -S main.c
-	#clang $(CFLAGS) -S printf.c
-	# translate ASM to OBJ
-	#clang $(CFLAGS) main.s -c -o main.o
-	
+
+.PHONY: objects
+
+
+all: $(TARGET).bin
+
+
+objects:
 	clang $(CFLAGS) vect.S -c -o vect.o
 	clang $(CFLAGS) main.c -c -o main.o
 	clang $(CFLAGS) startup.c -c -o startup.o
@@ -19,32 +27,45 @@ all:
 	clang $(CFLAGS) muldivmod.c -c -o muldivmod.o
 	clang $(CFLAGS) base.S -c -o base.o
 
-	
-	# link OBJects to ELF
-	ld.lld -T mem.ld -o main.elf vect.o startup.o main.o system.o console.o printf.o muldivmod.o base.o
-	
-	# extract sections from ELF to BIN file
-	llvm-objcopy -Iriscv32 main.elf --only-section=.boot --only-section=.text --only-section=.data -Obinary ../image.bin
 
-	# make ELF dump
-	llvm-objdump -d ./main.elf > ./dump.txt
+# link OBJects to ELF
+$(TARGET).elf: objects
+	ld.lld -T $(LINKERSCRIPT) -o $(TARGET).elf $(OBJECTS)
+	
+
+# extract sections from ELF to BIN file
+$(TARGET).bin: $(TARGET).elf
+	llvm-objcopy -Iriscv32 $(TARGET).elf --only-section=.boot --only-section=.text --only-section=.data -Obinary ../$(TARGET).bin
 
 
 clean:
 	rm *.o
 
 
+objdump: $(TARGET).elf
+	# make ELF dump
+	llvm-objdump -d ./$(TARGET).elf > ./$(TARGET)_dump.txt
+
+
 # show ELF content
-dump:
-	objdump --full-contents main.elf
+dump: $(TARGET).elf
+	objdump --full-contents $(TARGET).elf
 
 
 # show ELF sections
-sect:
-	objdump -h main.elf
+sections: $(TARGET).elf
+	objdump -h $(TARGET).elf
 
 
 # show ELF symbols
-symb:
-	objdump -t main.elf
+symbols: $(TARGET).elf
+	objdump -t $(TARGET).elf
+
+
+
+# translate C to ASM
+#clang $(CFLAGS) -S main.c
+#clang $(CFLAGS) -S printf.c
+# translate ASM to OBJ
+#clang $(CFLAGS) main.s -c -o main.o
 
