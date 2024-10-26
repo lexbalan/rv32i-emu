@@ -143,6 +143,8 @@ func doOpI(core: *Core, instr: Word32) {
 		if debug {
 			printf("addi x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = Word32 (Int32 core.reg[rs1] + imm)
 
 	} else if funct3 == 1 and funct7 == 0 {
@@ -152,42 +154,65 @@ func doOpI(core: *Core, instr: Word32) {
 		if debug {
 			printf("slli x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = core.reg[rs1] << imm
+
 	} else if funct3 == 2 {
 		// SLTI - set [1 to rd if rs1] less than immediate
 		if debug {
 			printf("slti x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = Word32 (Int32 core.reg[rs1] < imm)
+
 	} else if funct3 == 3 {
 		if debug {
 			printf("sltiu x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = Word32 (Nat32 core.reg[rs1] < Nat32 imm)
+
 	} else if funct3 == 4 {
 		if debug {
 			printf("xori x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = core.reg[rs1] xor Word32 imm
+
 	} else if funct3 == 5 and funct7 == 0 {
 		if debug {
 			printf("srli x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = (core.reg[rs1] >> imm)
+
 	} else if funct3 == 5 and funct7 == 0x20 {
 		if debug {
 			printf("srai x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = core.reg[rs1] >> imm
+
 	} else if funct3 == 6 {
 		if debug {
 			printf("ori x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = core.reg[rs1] or Word32 imm
+
 	} else if funct3 == 7 {
 		if debug {
 			printf("andi x%d, x%d, %d\n", rd, rs1, imm)
 		}
+
+		//
 		core.reg[rd] = core.reg[rs1] and Word32 imm
 	}
 }
@@ -210,93 +235,129 @@ func doOpR(core: *Core, instr: Word32) {
 		if debug {
 			printf("add x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = Word32 (Int32 v1 + Int32 v2)
+
 	} else if funct3 == 0 and funct7 == 0x20 {
 		if debug {
 			printf("sub x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = Word32 (Int32 v1 - Int32 v2)
+
 	} else if funct3 == 1 {
 		// shift left logical
 		if debug {
 			printf("sll x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = v1 << Int32 v2
+
 	} else if funct3 == 2 {
 		// set less than
 		if debug {
 			printf("slt x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = Word32 (Int32 v1 < Int32 v2)
+
 	} else if funct3 == 3 {
 		// set less than unsigned
 		if debug {
 			printf("sltu x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = Word32 (Nat32 v1 < Nat32 v2)
+
 	} else if funct3 == 4 {
 		if debug {
 			printf("xor x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = v1 xor v2
+
 	} else if funct3 == 5 and funct7 == 0 {
 		// shift right logical
 		if debug {
 			printf("srl x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
 		core.reg[rd] = v1 >> Int32 v2
+
 	} else if funct3 == 5 and funct7 == 0x20 {
 		// shift right arithmetical
 		if debug {
 			printf("sra x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
-		// ERROR: не реализовано арифм сдвиг
+
+		// ERROR: не реализован арифм сдвиг!
 		//core.reg[rd] = v1 >> Int32 v2
+
 	} else if funct3 == 6 {
 		if debug {
 			printf("or x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = v1 or v2
+
 	} else if funct3 == 7 {
 		if debug {
 			printf("and x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
+
+		//
 		core.reg[rd] = v1 and v2
 	}
 }
 
 
 func doOpLUI(core: *Core, instr: Word32) {
-	// U-type
+	// load upper immediate
+
 	let imm = expand12(extract_imm31_12(instr))
 	let rd = extract_rd(instr)
+
 	if debug {
 		printf("lui x%d, 0x%X\n", rd, imm)
 	}
-	if rd == 0 {return}
-	// CHECKIT
-	core.reg[rd] = Word32 imm << 12
+
+	if rd != 0 {
+		core.reg[rd] = Word32 imm << 12
+	}
 }
 
 
 func doOpAUIPC(core: *Core, instr: Word32) {
-	// U-type
+	// Add upper immediate to PC
+
 	let imm = expand12(extract_imm31_12(instr))
 	let x = core.pc + Nat32 (Word32 imm << 12)
 	let rd = extract_rd(instr)
+
 	if debug {
 		printf("auipc x%d, 0x%X\n", rd, imm)
 	}
-	if rd == 0 {return}
-	core.reg[rd] = Word32 x
+
+	if rd != 0 {
+		core.reg[rd] = Word32 x
+	}
 }
 
 
 func doOpJAL(core: *Core, instr: Word32) {
-	// U-type
+	// Jump and link
+
 	let rd = extract_rd(instr)
 	let raw_imm = extract_jal_imm(instr)
 	let imm = expand20(raw_imm)
+
 	if debug {
 		printf("jal x%d, %d\n", rd, imm)
 	}
@@ -310,15 +371,18 @@ func doOpJAL(core: *Core, instr: Word32) {
 
 
 func doOpJALR(core: *Core, instr: Word32) {
+	// Jump and link (by register)
+
 	let rs1 = extract_rs1(instr)
 	let rd = extract_rd(instr)
 	let imm = expand12(extract_imm12(instr))
+
 	if debug {
 		printf("jalr %d(x%d)\n", imm, rs1)
 	}
+
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
-
 	let next_instr_ptr = Int32 (core.pc + 4)
 	let jump_to = Word32 (Int32 core.reg[rs1] + imm) and 0xFFFFFFFE
 
@@ -352,56 +416,73 @@ func doOpB(core: *Core, instr: Word32) {
 	let imm = Int16 bits
 
 	if funct3 == 0 {
-		//beq
+		// BEQ - Branch if equal
+
 		if debug {
 			printf("beq x%d, x%d, %d\n", rs1, rs2, imm)
 		}
+
+		// Branch if two registers are equal
 		if core.reg[rs1] == core.reg[rs2] {
 			core.nexpc = Nat32 (Int32 core.pc + Int32 imm)
 		}
 
 	} else if funct3 == 1 {
-		//bne
+		// BNE - Branch if not equal
+
 		if debug {
 			printf("bne x%d, x%d, %d\n", rs1, rs2, imm)
 		}
+
+		//
 		if core.reg[rs1] != core.reg[rs2] {
 			core.nexpc = Nat32 (Int32 core.pc + Int32 imm)
 		}
 
 	} else if funct3 == 4 {
-		//blt
+		// BLT - Branch if less than (signed)
+
 		if debug {
 			printf("blt x%d, x%d, %d\n", rs1, rs2, imm)
 		}
+
+		//
 		if Int32 core.reg[rs1] < Int32 core.reg[rs2] {
 			core.nexpc = Nat32 (Int32 core.pc + Int32 imm)
 		}
 
 	} else if funct3 == 5 {
-		//bge
+		// BGE - Branch if greater or equal (signed)
+
 		if debug {
 			printf("bge x%d, x%d, %d\n", rs1, rs2, imm)
 		}
+
+		//
 		if Int32 core.reg[rs1] >= Int32 core.reg[rs2] {
 			core.nexpc = Nat32 (Int32 core.pc + Int32 imm)
 		}
 
 	} else if funct3 == 6 {
-		//bltu
+		// BLTU - Branch if less than (unsigned)
+
 		if debug {
 			printf("bltu x%d, x%d, %d\n", rs1, rs2, imm)
 		}
+
+		//
 		if Nat32 core.reg[rs1] < Nat32 core.reg[rs2] {
 			core.nexpc = Nat32 (Int32 core.pc + Int32 imm)
 		}
 
 	} else if funct3 == 7 {
-		//bgeu
+		// BGEU - Branch if greater or equal (unsigned)
+
 		if debug {
 			printf("bgeu x%d, x%d, %d\n", rs1, rs2, imm)
 		}
 
+		//
 		if Nat32 core.reg[rs1] >= Nat32 core.reg[rs2] {
 			core.nexpc = Nat32 (Int32 core.pc + Int32 imm)
 		}
@@ -421,52 +502,60 @@ func doOpL(core: *Core, instr: Word32) {
 	let adr = Nat32 (Int32 core.reg[rs1] + imm)
 
 	if funct3 == 0 {
-		// lb
+		// LB (Load 8-bit signed integer value)
+
 		if debug {
 			printf("lb x%d, %d(x%d)\n", rd, imm, rs1)
 		}
-		let val = core.bus.read8(adr)
+
+		let val = Int32 core.bus.read8(adr)
 		if rd != 0 {
 			core.reg[rd] = Word32 val
 		}
+
 	} else if funct3 == 1 {
-		// lh
+		// LH (Load 16-bit signed integer value)
+
 		if debug {
 			printf("lh x%d, %d(x%d)\n", rd, imm, rs1)
 		}
-		let val = core.bus.read16(adr)
+
+		let val = Int32 core.bus.read16(adr)
 		if rd != 0 {
 			core.reg[rd] = Word32 val
 		}
+
 	} else if funct3 == 2 {
-		// lw
+		// LW (Load 32-bit signed integer value)
+
 		if debug {
 			printf("lw x%d, %d(x%d)\n", rd, imm, rs1)
 		}
+
 		let val = core.bus.read32(adr)
-		if debug {
-			printf("LW [0x%x] (0x%x)\n", adr, val)
-		}
 		if rd != 0 {
 			core.reg[rd] = val
 		}
+
 	} else if funct3 == 4 {
-		// lbu
+		// LBU (Load 8-bit unsigned integer value)
+
 		if debug {
 			printf("lbu x%d, %d(x%d)\n", rd, imm, rs1)
 		}
+
 		let val = Nat32 core.bus.read8(adr)
-		if debug {
-			printf("LBU[0x%x] (0x%x)\n", adr, val)
-		}
 		if rd != 0 {
 			core.reg[rd] = Word32 val
 		}
+
 	} else if funct3 == 5 {
-		// lhu
+		// LHU (Load 16-bit unsigned integer value)
+
 		if debug {
 			printf("lhu x%d, %d(x%d)\n", rd, imm, rs1)
 		}
+
 		let val = Nat32 core.bus.read16(adr)
 		if rd != 0 {
 			core.reg[rd] = Word32 val
@@ -491,22 +580,36 @@ func doOpS(core: *Core, instr: Word32) {
 	let val = core.reg[rs2]
 
 	if funct3 == 0 {
-		// sb <source:reg>, <offset:12bit_imm>(<address:reg>)
+		// SB (save 8-bit value)
+		// <source:reg>, <offset:12bit_imm>(<address:reg>)
+		
 		if debug {
 			printf("sb x%d, %d(x%d)\n", rs2, imm, rs1)
 		}
+
+		//
 		core.bus.write8(adr, unsafe Word8 val)
+
 	} else if funct3 == 1 {
-		// sh <source:reg>, <offset:12bit_imm>(<address:reg>)
+		// SH (save 16-bit value)
+		// <source:reg>, <offset:12bit_imm>(<address:reg>)
+
 		if debug {
 			printf("sh x%d, %d(x%d)\n", rs2, imm, rs1)
 		}
+
+		//
 		core.bus.write16(adr, unsafe Word16 val)
+
 	} else if funct3 == 2 {
-		// sw <source:reg>, <offset:12bit_imm>(<address:reg>)
+		// SW (save 32-bit value)
+		// <source:reg>, <offset:12bit_imm>(<address:reg>)
+
 		if debug {
 			printf("sw x%d, %d(x%d)\n", rs2, imm, rs1)
 		}
+
+		//
 		core.bus.write32(adr, val)
 	}
 }
@@ -523,15 +626,21 @@ func doOpSystem(core: *Core, instr: Word32) {
 	let csr = unsafe Nat16 imm12
 
 	if instr == instrECALL {
+
 		if debug {
 			printf("ECALL\n")
 		}
+
+		//
 		irq(core, intSysCall)
 
 	} else if instr == instrEBREAK {
+
 		if debug {
 			printf("EBREAK\n")
 		}
+
+		//
 		core.end = true
 
 	// CSR instructions
@@ -559,9 +668,9 @@ func doOpSystem(core: *Core, instr: Word32) {
 		if debug {
 			printf("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
 		}
-		if debug {
+		/*if debug {
 			printf("funct3 = %x\n", funct3)
-		}
+		}*/
 		core.end = true
 	}
 }

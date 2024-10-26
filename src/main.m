@@ -43,6 +43,7 @@ public func main() -> Int {
 
 	printf("~~~ START ~~~\n")
 
+	//while core.pc != 0xFFFFFFFF {
 	while not core.end {
 		riscvCore.tick(&core)
 	}
