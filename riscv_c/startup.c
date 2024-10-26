@@ -39,12 +39,39 @@ void __rt0() {
 
 extern int main();
 
+
+extern void* _stack_start; // Объявляем внешний символ, который должен быть определен в линкерном скрипте
+
+void set_stack_pointer() {
+    __asm__ volatile (
+        "ldr sp, =_stack_start\n"  // Загружаем адрес _stack_start в sp
+    );
+}
+
+
 // if not defined boot section, will be defined firstly (!)
 __attribute__ ((section ("boot"))) void __boot() {
+
+#if 0
+	extern void _stack_start;
+	__asm__ volatile (
+		"add sp, zero, %0"
+		:
+		: "r" (&_stack_start)  /* input : register */
+		: /* clobbers: none */);
+
+#endif
+	/*__asm__ volatile (
+		"lui   sp, %hi(_stack_start)\n"
+		"addi  sp, %lo(_stack_start)\n"
+	);*/
+
+	set_stack_pointer();
+
 	__rt0();
 	main();
 
-	asm("ebreak");
+	__asm__ volatile ("ebreak");
 }
 
 

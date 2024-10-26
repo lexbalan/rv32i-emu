@@ -4,18 +4,19 @@
 
 
 .global vectors
+.global _stack_start
 .global _start
 .global __mem_violation
 .global trap_empty
-.global _sstack
 .global system
+.global __boot
 
 
 
 vectors:
 	#j _start - делает короткий прыжок
 	
-	jr zero, %lo(_start)
+	jr zero, %lo(__boot)
 	
 	jr zero, %lo(trap_empty)
 	
@@ -50,8 +51,8 @@ _start:
 	#lui sp, 0x10000
 	#addi sp, sp, 2047
 	
-	lui sp, %hi(_sstack)
-	addi sp, sp, %lo(_sstack)
+	lui sp, %hi(_stack_start)
+	addi sp, sp, %lo(_stack_start)
 	
 	jr zero, %lo(__boot)
 

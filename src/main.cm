@@ -54,6 +54,7 @@ func main() -> Int {
 
 	printf("\nCore dump:\n")
 	show_regs(&core)
+	printf("\n")
 	show_mem()
 
 	return 0

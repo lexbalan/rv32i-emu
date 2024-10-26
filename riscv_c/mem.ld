@@ -51,10 +51,10 @@ SECTIONS
 	.stack :
 	{
 		. = ALIGN(4);
-		_estack = .;
+		_stack_end = .;
 		. = . + __stack_size;
 		. = ALIGN(4);
-		_sstack = .;
+		_stack_start = .;
 	} > RAM
 }
 
