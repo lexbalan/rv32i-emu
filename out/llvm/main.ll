@@ -199,12 +199,12 @@ declare void @perror(%ConstCharStr* %str)
 ; -- print imports --
 declare [0 x i8]* @mem_get_ram_ptr()
 declare [0 x i8]* @mem_get_rom_ptr()
-declare i8 @mem_vm_mem_read8(i32 %adr)
-declare i16 @mem_vm_mem_read16(i32 %adr)
-declare i32 @mem_vm_mem_read32(i32 %adr)
-declare void @mem_vm_mem_write8(i32 %adr, i8 %value)
-declare void @mem_vm_mem_write16(i32 %adr, i16 %value)
-declare void @mem_vm_mem_write32(i32 %adr, i32 %value)
+declare i8 @mem_read8(i32 %adr)
+declare i16 @mem_read16(i32 %adr)
+declare i32 @mem_read32(i32 %adr)
+declare void @mem_write8(i32 %adr, i8 %value)
+declare void @mem_write16(i32 %adr, i16 %value)
+declare void @mem_write32(i32 %adr, i32 %value)
 ; from included decode
 declare i8 @decode_extract_op(i32 %instr)
 declare i8 @decode_extract_funct3(i32 %instr)
@@ -229,16 +229,16 @@ declare i32 @decode_expand20(i32 %val_20bit)
 %core_Core = type {
 	[32 x i32], 
 	i32, 
+	i32, 
 	%core_BusInterface*, 
-	i1, 
 	i1, 
 	i32, 
 	i32
 };
 
-declare void @core_core_init(%core_Core* %core, %core_BusInterface* %bus)
-declare void @core_core_tick(%core_Core* %core)
-declare void @core_core_irq(%core_Core* %core, i32 %irq)
+declare void @core_init(%core_Core* %core, %core_BusInterface* %bus)
+declare void @core_tick(%core_Core* %core)
+declare void @core_irq(%core_Core* %core, i32 %irq)
 ; -- end print imports --
 ; -- strings --
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
@@ -385,12 +385,12 @@ break_1:
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
 	%2 = alloca %core_BusInterface, align 8
-	%3 = insertvalue %core_BusInterface zeroinitializer, i8 (i32)* @mem_vm_mem_read8, 0
-	%4 = insertvalue %core_BusInterface %3, i16 (i32)* @mem_vm_mem_read16, 1
-	%5 = insertvalue %core_BusInterface %4, i32 (i32)* @mem_vm_mem_read32, 2
-	%6 = insertvalue %core_BusInterface %5, void (i32, i8)* @mem_vm_mem_write8, 3
-	%7 = insertvalue %core_BusInterface %6, void (i32, i16)* @mem_vm_mem_write16, 4
-	%8 = insertvalue %core_BusInterface %7, void (i32, i32)* @mem_vm_mem_write32, 5
+	%3 = insertvalue %core_BusInterface zeroinitializer, i8 (i32)* @mem_read8, 0
+	%4 = insertvalue %core_BusInterface %3, i16 (i32)* @mem_read16, 1
+	%5 = insertvalue %core_BusInterface %4, i32 (i32)* @mem_read32, 2
+	%6 = insertvalue %core_BusInterface %5, void (i32, i8)* @mem_write8, 3
+	%7 = insertvalue %core_BusInterface %6, void (i32, i16)* @mem_write16, 4
+	%8 = insertvalue %core_BusInterface %7, void (i32, i32)* @mem_write32, 5
 	store %core_BusInterface %8, %core_BusInterface* %2
 	%9 = call [0 x i8]* @mem_get_rom_ptr()
 	%10 = bitcast i17 65536 to i32
@@ -403,7 +403,7 @@ then_0:
 endif_0:
 	%13 = bitcast %core_Core* @core to %core_Core*
 	%14 = bitcast %core_BusInterface* %2 to %core_BusInterface*
-	call void @core_core_init(%core_Core* %13, %core_BusInterface* %14)
+	call void @core_init(%core_Core* %13, %core_BusInterface* %14)
 	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 	br label %again_1
 again_1:
@@ -413,7 +413,7 @@ again_1:
 	br i1 %18 , label %body_1, label %break_1
 body_1:
 	%19 = bitcast %core_Core* @core to %core_Core*
-	call void @core_core_tick(%core_Core* %19)
+	call void @core_tick(%core_Core* %19)
 	br label %again_1
 break_1:
 	%20 = getelementptr inbounds %core_Core, %core_Core* @core, i32 0, i32 6

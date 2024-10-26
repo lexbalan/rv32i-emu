@@ -7,21 +7,10 @@ include "libc/stdio"
 include "decode"
 
 
+const debugMode = false
+
+
 public const nRegs = 32
-
-const debug = false
-
-
-public type BusInterface record {
-	read8: *(adr: Nat32) -> Word8
-	read16: *(adr: Nat32) -> Word16
-	read32: *(adr: Nat32) -> Word32
-
-	write8: *(adr: Nat32, value: Word8) -> Unit
-	write16: *(adr: Nat32, value: Word16) -> Unit
-	write32: *(adr: Nat32, value: Word32) -> Unit
-}
-
 
 public type Core record {
 	reg: [nRegs]Word32
@@ -38,19 +27,30 @@ public type Core record {
 }
 
 
-const opL = 0x03  // load
-const opI = 0x13  // immediate
-const opS = 0x23  // store
-const opR = 0x33  // reg
-const opB = 0x63  // branch
+public type BusInterface record {
+	read8: *(adr: Nat32) -> Word8
+	read16: *(adr: Nat32) -> Word16
+	read32: *(adr: Nat32) -> Word32
+
+	write8: *(adr: Nat32, value: Word8) -> Unit
+	write16: *(adr: Nat32, value: Word16) -> Unit
+	write32: *(adr: Nat32, value: Word32) -> Unit
+}
+
+
+const opL = 0x03      // load
+const opI = 0x13      // immediate
+const opS = 0x23      // store
+const opR = 0x33      // reg
+const opB = 0x63      // branch
 
 const opLUI = 0x37	  // load upper immediate
 const opAUIPC = 0x17  // add upper immediate to PC
 const opJAL = 0x6F	  // jump and link
 const opJALR = 0x67   // jump and link by register
 
-const opSYSTEM = 0x73
-const opFENCE = 0x0F
+const opSYSTEM = 0x73 //
+const opFENCE = 0x0F  //
 
 
 const instrECALL = opSYSTEM or 0x00000000
@@ -85,7 +85,7 @@ func fetch(core: *Core) -> Word32 {
 
 public func tick(core: *Core) {
 	if core.interrupt > 0 {
-		if debug {
+		if debugMode {
 			printf("\nINT #%02X\n", core.interrupt)
 		}
 		let vect_offset = core.interrupt * 4
@@ -120,7 +120,7 @@ public func tick(core: *Core) {
 	} else if op == opFENCE {
 		doOpFence(core, instr)
 	} else {
-		if debug {
+		if debugMode {
 			printf("UNKNOWN OPCODE: %08X\n", op)
 		}
 	}
@@ -142,7 +142,7 @@ func doOpI(core: *Core, instr: Word32) {
 	if rd == 0 {return}
 
 	if funct3 == 0 {
-		if debug {
+		if debugMode {
 			printf("addi x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -153,7 +153,7 @@ func doOpI(core: *Core, instr: Word32) {
 		/* SLLI is a logical left shift (zeros are shifted
 		into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
 		is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). */
-		if debug {
+		if debugMode {
 			printf("slli x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -162,7 +162,7 @@ func doOpI(core: *Core, instr: Word32) {
 
 	} else if funct3 == 2 {
 		// SLTI - set [1 to rd if rs1] less than immediate
-		if debug {
+		if debugMode {
 			printf("slti x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -170,7 +170,7 @@ func doOpI(core: *Core, instr: Word32) {
 		core.reg[rd] = Word32 (Int32 core.reg[rs1] < imm)
 
 	} else if funct3 == 3 {
-		if debug {
+		if debugMode {
 			printf("sltiu x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -178,7 +178,7 @@ func doOpI(core: *Core, instr: Word32) {
 		core.reg[rd] = Word32 (Nat32 core.reg[rs1] < Nat32 imm)
 
 	} else if funct3 == 4 {
-		if debug {
+		if debugMode {
 			printf("xori x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -186,7 +186,7 @@ func doOpI(core: *Core, instr: Word32) {
 		core.reg[rd] = core.reg[rs1] xor Word32 imm
 
 	} else if funct3 == 5 and funct7 == 0 {
-		if debug {
+		if debugMode {
 			printf("srli x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -194,7 +194,7 @@ func doOpI(core: *Core, instr: Word32) {
 		core.reg[rd] = (core.reg[rs1] >> imm)
 
 	} else if funct3 == 5 and funct7 == 0x20 {
-		if debug {
+		if debugMode {
 			printf("srai x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -202,7 +202,7 @@ func doOpI(core: *Core, instr: Word32) {
 		core.reg[rd] = core.reg[rs1] >> imm
 
 	} else if funct3 == 6 {
-		if debug {
+		if debugMode {
 			printf("ori x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -210,7 +210,7 @@ func doOpI(core: *Core, instr: Word32) {
 		core.reg[rd] = core.reg[rs1] or Word32 imm
 
 	} else if funct3 == 7 {
-		if debug {
+		if debugMode {
 			printf("andi x%d, x%d, %d\n", rd, rs1, imm)
 		}
 
@@ -234,7 +234,7 @@ func doOpR(core: *Core, instr: Word32) {
 	let v2 = core.reg[rs2]
 
 	if funct3 == 0 and funct7 == 0x00 {
-		if debug {
+		if debugMode {
 			printf("add x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -242,7 +242,7 @@ func doOpR(core: *Core, instr: Word32) {
 		core.reg[rd] = Word32 (Int32 v1 + Int32 v2)
 
 	} else if funct3 == 0 and funct7 == 0x20 {
-		if debug {
+		if debugMode {
 			printf("sub x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -251,7 +251,7 @@ func doOpR(core: *Core, instr: Word32) {
 
 	} else if funct3 == 1 {
 		// shift left logical
-		if debug {
+		if debugMode {
 			printf("sll x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -260,7 +260,7 @@ func doOpR(core: *Core, instr: Word32) {
 
 	} else if funct3 == 2 {
 		// set less than
-		if debug {
+		if debugMode {
 			printf("slt x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -269,7 +269,7 @@ func doOpR(core: *Core, instr: Word32) {
 
 	} else if funct3 == 3 {
 		// set less than unsigned
-		if debug {
+		if debugMode {
 			printf("sltu x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -277,7 +277,7 @@ func doOpR(core: *Core, instr: Word32) {
 		core.reg[rd] = Word32 (Nat32 v1 < Nat32 v2)
 
 	} else if funct3 == 4 {
-		if debug {
+		if debugMode {
 			printf("xor x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -286,7 +286,7 @@ func doOpR(core: *Core, instr: Word32) {
 
 	} else if funct3 == 5 and funct7 == 0 {
 		// shift right logical
-		if debug {
+		if debugMode {
 			printf("srl x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -294,7 +294,7 @@ func doOpR(core: *Core, instr: Word32) {
 
 	} else if funct3 == 5 and funct7 == 0x20 {
 		// shift right arithmetical
-		if debug {
+		if debugMode {
 			printf("sra x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -302,7 +302,7 @@ func doOpR(core: *Core, instr: Word32) {
 		//core.reg[rd] = v1 >> Int32 v2
 
 	} else if funct3 == 6 {
-		if debug {
+		if debugMode {
 			printf("or x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -310,7 +310,7 @@ func doOpR(core: *Core, instr: Word32) {
 		core.reg[rd] = v1 or v2
 
 	} else if funct3 == 7 {
-		if debug {
+		if debugMode {
 			printf("and x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
@@ -326,7 +326,7 @@ func doOpLUI(core: *Core, instr: Word32) {
 	let imm = expand12(extract_imm31_12(instr))
 	let rd = extract_rd(instr)
 
-	if debug {
+	if debugMode {
 		printf("lui x%d, 0x%X\n", rd, imm)
 	}
 
@@ -343,7 +343,7 @@ func doOpAUIPC(core: *Core, instr: Word32) {
 	let x = core.pc + Nat32 (Word32 imm << 12)
 	let rd = extract_rd(instr)
 
-	if debug {
+	if debugMode {
 		printf("auipc x%d, 0x%X\n", rd, imm)
 	}
 
@@ -360,7 +360,7 @@ func doOpJAL(core: *Core, instr: Word32) {
 	let raw_imm = extract_jal_imm(instr)
 	let imm = expand20(raw_imm)
 
-	if debug {
+	if debugMode {
 		printf("jal x%d, %d\n", rd, imm)
 	}
 
@@ -379,7 +379,7 @@ func doOpJALR(core: *Core, instr: Word32) {
 	let rd = extract_rd(instr)
 	let imm = expand12(extract_imm12(instr))
 
-	if debug {
+	if debugMode {
 		printf("jalr %d(x%d)\n", imm, rs1)
 	}
 
@@ -420,7 +420,7 @@ func doOpB(core: *Core, instr: Word32) {
 	if funct3 == 0 {
 		// BEQ - Branch if equal
 
-		if debug {
+		if debugMode {
 			printf("beq x%d, x%d, %d\n", rs1, rs2, imm)
 		}
 
@@ -432,7 +432,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 1 {
 		// BNE - Branch if not equal
 
-		if debug {
+		if debugMode {
 			printf("bne x%d, x%d, %d\n", rs1, rs2, imm)
 		}
 
@@ -444,7 +444,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 4 {
 		// BLT - Branch if less than (signed)
 
-		if debug {
+		if debugMode {
 			printf("blt x%d, x%d, %d\n", rs1, rs2, imm)
 		}
 
@@ -456,7 +456,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 5 {
 		// BGE - Branch if greater or equal (signed)
 
-		if debug {
+		if debugMode {
 			printf("bge x%d, x%d, %d\n", rs1, rs2, imm)
 		}
 
@@ -468,7 +468,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 6 {
 		// BLTU - Branch if less than (unsigned)
 
-		if debug {
+		if debugMode {
 			printf("bltu x%d, x%d, %d\n", rs1, rs2, imm)
 		}
 
@@ -480,7 +480,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 7 {
 		// BGEU - Branch if greater or equal (unsigned)
 
-		if debug {
+		if debugMode {
 			printf("bgeu x%d, x%d, %d\n", rs1, rs2, imm)
 		}
 
@@ -506,7 +506,7 @@ func doOpL(core: *Core, instr: Word32) {
 	if funct3 == 0 {
 		// LB (Load 8-bit signed integer value)
 
-		if debug {
+		if debugMode {
 			printf("lb x%d, %d(x%d)\n", rd, imm, rs1)
 		}
 
@@ -518,7 +518,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 1 {
 		// LH (Load 16-bit signed integer value)
 
-		if debug {
+		if debugMode {
 			printf("lh x%d, %d(x%d)\n", rd, imm, rs1)
 		}
 
@@ -530,7 +530,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 2 {
 		// LW (Load 32-bit signed integer value)
 
-		if debug {
+		if debugMode {
 			printf("lw x%d, %d(x%d)\n", rd, imm, rs1)
 		}
 
@@ -542,7 +542,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 4 {
 		// LBU (Load 8-bit unsigned integer value)
 
-		if debug {
+		if debugMode {
 			printf("lbu x%d, %d(x%d)\n", rd, imm, rs1)
 		}
 
@@ -554,7 +554,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 5 {
 		// LHU (Load 16-bit unsigned integer value)
 
-		if debug {
+		if debugMode {
 			printf("lhu x%d, %d(x%d)\n", rd, imm, rs1)
 		}
 
@@ -585,7 +585,7 @@ func doOpS(core: *Core, instr: Word32) {
 		// SB (save 8-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 		
-		if debug {
+		if debugMode {
 			printf("sb x%d, %d(x%d)\n", rs2, imm, rs1)
 		}
 
@@ -596,7 +596,7 @@ func doOpS(core: *Core, instr: Word32) {
 		// SH (save 16-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 
-		if debug {
+		if debugMode {
 			printf("sh x%d, %d(x%d)\n", rs2, imm, rs1)
 		}
 
@@ -607,7 +607,7 @@ func doOpS(core: *Core, instr: Word32) {
 		// SW (save 32-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 
-		if debug {
+		if debugMode {
 			printf("sw x%d, %d(x%d)\n", rs2, imm, rs1)
 		}
 
@@ -629,7 +629,7 @@ func doOpSystem(core: *Core, instr: Word32) {
 
 	if instr == instrECALL {
 
-		if debug {
+		if debugMode {
 			printf("ECALL\n")
 		}
 
@@ -638,7 +638,7 @@ func doOpSystem(core: *Core, instr: Word32) {
 
 	} else if instr == instrEBREAK {
 
-		if debug {
+		if debugMode {
 			printf("EBREAK\n")
 		}
 
@@ -667,10 +667,10 @@ func doOpSystem(core: *Core, instr: Word32) {
 		let imm = rs1
 		csr_rci(core, csr, rd, imm)
 	} else {
-		if debug {
+		if debugMode {
 			printf("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
 		}
-		/*if debug {
+		/*if debugMode {
 			printf("funct3 = %x\n", funct3)
 		}*/
 		core.end = true
@@ -680,7 +680,7 @@ func doOpSystem(core: *Core, instr: Word32) {
 
 func doOpFence(core: *Core, instr: Word32) {
 	if instr == instrPAUSE {
-		if debug {
+		if debugMode {
 			printf("PAUSE\n")
 		}
 	}
