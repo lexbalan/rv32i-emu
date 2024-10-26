@@ -139,7 +139,9 @@ func doOpI(core: *Core, instr: Word32) {
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 
-	if rd == 0 {return}
+	if rd == 0 {
+		return
+	}
 
 	if funct3 == 0 {
 		if debugMode {
@@ -228,10 +230,12 @@ func doOpR(core: *Core, instr: Word32) {
 	let rs1 = extract_rs1(instr)
 	let rs2 = extract_rs2(instr)
 
-	if rd == 0 {return}
+	if rd == 0 {
+		return
+	}
 
-	let v1 = core.reg[rs1]
-	let v2 = core.reg[rs2]
+	let v0 = core.reg[rs1]
+	let v1 = core.reg[rs2]
 
 	if funct3 == 0 and funct7 == 0x00 {
 		if debugMode {
@@ -239,7 +243,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = Word32 (Int32 v1 + Int32 v2)
+		core.reg[rd] = Word32 (Int32 v0 + Int32 v1)
 
 	} else if funct3 == 0 and funct7 == 0x20 {
 		if debugMode {
@@ -247,7 +251,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = Word32 (Int32 v1 - Int32 v2)
+		core.reg[rd] = Word32 (Int32 v0 - Int32 v1)
 
 	} else if funct3 == 1 {
 		// shift left logical
@@ -256,7 +260,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = v1 << Int32 v2
+		core.reg[rd] = v0 << Int32 v1
 
 	} else if funct3 == 2 {
 		// set less than
@@ -265,7 +269,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = Word32 (Int32 v1 < Int32 v2)
+		core.reg[rd] = Word32 (Int32 v0 < Int32 v1)
 
 	} else if funct3 == 3 {
 		// set less than unsigned
@@ -274,7 +278,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = Word32 (Nat32 v1 < Nat32 v2)
+		core.reg[rd] = Word32 (Nat32 v0 < Nat32 v1)
 
 	} else if funct3 == 4 {
 		if debugMode {
@@ -282,7 +286,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = v1 xor v2
+		core.reg[rd] = v0 xor v1
 
 	} else if funct3 == 5 and funct7 == 0 {
 		// shift right logical
@@ -290,7 +294,7 @@ func doOpR(core: *Core, instr: Word32) {
 			printf("srl x%d, x%d, x%d\n", rd, rs1, rs2)
 		}
 
-		core.reg[rd] = v1 >> Int32 v2
+		core.reg[rd] = v0 >> Int32 v1
 
 	} else if funct3 == 5 and funct7 == 0x20 {
 		// shift right arithmetical
@@ -299,7 +303,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		// ERROR: не реализован арифм сдвиг!
-		//core.reg[rd] = v1 >> Int32 v2
+		//core.reg[rd] = v0 >> Int32 v1
 
 	} else if funct3 == 6 {
 		if debugMode {
@@ -307,7 +311,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = v1 or v2
+		core.reg[rd] = v0 or v1
 
 	} else if funct3 == 7 {
 		if debugMode {
@@ -315,7 +319,7 @@ func doOpR(core: *Core, instr: Word32) {
 		}
 
 		//
-		core.reg[rd] = v1 and v2
+		core.reg[rd] = v0 and v1
 	}
 }
 
