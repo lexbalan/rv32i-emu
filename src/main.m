@@ -1,53 +1,50 @@
 
-import "libc/stdlib"
-import "libc/stdio"
+include "libc/ctypes"
+include "libc/stdlib"
+include "libc/stdio"
 
 import "mem"
-import "core/core"
+import "core/core" as riscvCore
 
 
-let text_filename = "./main.bin"
+const text_filename = "./main.bin"
 
-let showText = false
-
-var core: Core
+const showText = false
 
 
-func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32
-func show_regs(core: *Core)
-func show_mem() -> Unit
+var core: riscvCore.Core
 
 
-func mem_violation_event(reason: Nat32) {
-	core_irq(&core, intMemViolation)
-}
+//public func mem_violation_event(reason: Nat32) {
+//	core.irq(&core, riscvCore.intMemViolation)
+//}
 
 
-func main() -> Int {
+public func main() -> Int {
 	printf("RISC-V VM\n")
 
-	var memctl = BusInterface {
-		read8 = &vm_mem_read8
-		read16 = &vm_mem_read16
-		read32 = &vm_mem_read32
-		write8 = &vm_mem_write8
-		write16 = &vm_mem_write16
-		write32 = &vm_mem_write32
+	var memctl = riscvCore.BusInterface {
+		read8 = &mem.read8
+		read16 = &mem.read16
+		read32 = &mem.read32
+		write8 = &mem.write8
+		write16 = &mem.write16
+		write32 = &mem.write32
 	}
 
-	let romptr = get_rom_ptr()
-	let nbytes = loader(text_filename, romptr, romSize)
+	let romptr = mem.get_rom_ptr()
+	let nbytes = loader(text_filename, romptr, mem.romSize)
 
 	if nbytes <= 0 {
 		exit(1)
 	}
 	
-	core_init(&core, &memctl)
+	riscvCore.init(&core, &memctl)
 
 	printf("~~~ START ~~~\n")
 
 	while not core.end {
-		core_tick(&core)
+		riscvCore.tick(&core)
 	}
 
 	printf("core.cnt = %u\n", core.cnt)
@@ -91,7 +88,7 @@ func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
 }
 
 
-func show_regs(core: *Core) {
+func show_regs(core: *riscvCore.Core) {
 	var i = 0
 	while i < 16 {
 		printf("x%02d = 0x%08x", i, core.reg[i])
@@ -104,7 +101,7 @@ func show_regs(core: *Core) {
 
 func show_mem() {
 	var i = 0
-	let ramptr = get_ram_ptr()
+	let ramptr = mem.get_ram_ptr()
 	while i < 256 {
 		printf("%08X", i * 16)
 

@@ -1,57 +1,63 @@
-//
+// ./out/c//mem.c
 
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
-#include <stdio.h>
-
-
-
-
-
 #include "mem.h"
 
 
-static uint8_t rom[romSize];
-static uint8_t ram[ramSize];
 
-uint8_t *get_ram_ptr()
+#define mem_mmioSize  0xFFFF
+#define mem_mmioStart  0xF00C0000
+#define mem_mmioEnd  (mem_mmioStart + mem_mmioSize)
+#define mem_consoleMMIOAdr  (mem_mmioStart + 0x10)
+#define mem_consolePutAdr  (mem_consoleMMIOAdr + 0)
+#define mem_consoleGetAdr  (mem_consoleMMIOAdr + 1)
+#define mem_consolePrintInt32Adr  (mem_consoleMMIOAdr + 0x10)
+#define mem_consolePrintUInt32Adr  (mem_consoleMMIOAdr + 0x14)
+#define mem_consolePrintInt32HexAdr  (mem_consoleMMIOAdr + 0x18)
+#define mem_consolePrintUInt32HexAdr  (mem_consoleMMIOAdr + 0x1C)
+#define mem_consolePrintInt64Adr  (mem_consoleMMIOAdr + 0x20)
+#define mem_consolePrintUInt64Adr  (mem_consoleMMIOAdr + 0x28)
+void memoryViolation(char rw, uint32_t adr);
+
+
+
+static uint8_t rom[mem_romSize];
+static uint8_t ram[mem_ramSize];
+
+void memoryViolation(char rw, uint32_t adr)
+{
+	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
+	//	memoryViolation_event(0x55) // !
+}
+
+uint8_t *mem_get_ram_ptr()
 {
 	return (uint8_t *)&ram;
 }
 
-uint8_t *get_rom_ptr()
+uint8_t *mem_get_rom_ptr()
 {
 	return (uint8_t *)&rom;
 }
 
-
-void mem_violation_event(uint32_t reason);
-
-
-void mem_violation(char rw, uint32_t adr)
-{
-	printf("MEMORY VIOLATION '%c' 0x%08x\n", rw, adr);
-	mem_violation_event(0x55);
-}
-
-
-uint8_t vm_mem_read8(uint32_t adr)
+uint8_t mem_read8(uint32_t adr)
 {
 	uint8_t x;
 	x = 0;
 
-	if ((adr >= ramStart) && (adr <= ramEnd)) {
-		uint8_t *const p = (uint8_t *)(void *)&ram[adr - ramStart];
-		x = *p;
-	} else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
+	if ((adr >= mem_ramStart) && (adr <= mem_ramEnd)) {
+		uint8_t *const ptr = (uint8_t *)(void *)&ram[adr - mem_ramStart];
+		x = *ptr;
+	} else if ((adr >= mem_mmioStart) && (adr <= mem_mmioEnd)) {
 		//
-	} else if ((adr >= romStart) && (adr <= romEnd)) {
-		uint8_t *const p = (uint8_t *)(void *)&rom[adr - romStart];
-		x = *p;
+	} else if ((adr >= mem_romStart) && (adr <= mem_romEnd)) {
+		uint8_t *const ptr = (uint8_t *)(void *)&rom[adr - mem_romStart];
+		x = *ptr;
 	} else {
-		mem_violation('r', adr);
+		memoryViolation('r', adr);
 		x = 0;
 	}
 
@@ -60,22 +66,21 @@ uint8_t vm_mem_read8(uint32_t adr)
 	return x;
 }
 
-
-uint16_t vm_mem_read16(uint32_t adr)
+uint16_t mem_read16(uint32_t adr)
 {
 	uint16_t x;
 	x = 0;
 
-	if ((adr >= ramStart) && (adr <= ramEnd)) {
-		uint16_t *const p = (uint16_t *)(void *)&ram[adr - ramStart];
-		x = *p;
-	} else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
+	if ((adr >= mem_ramStart) && (adr <= mem_ramEnd)) {
+		uint16_t *const ptr = (uint16_t *)(void *)&ram[adr - mem_ramStart];
+		x = *ptr;
+	} else if ((adr >= mem_mmioStart) && (adr <= mem_mmioEnd)) {
 		//
-	} else if ((adr >= romStart) && (adr <= romEnd)) {
-		uint16_t *const p = (uint16_t *)(void *)&rom[adr - romStart];
-		x = *p;
+	} else if ((adr >= mem_romStart) && (adr <= mem_romEnd)) {
+		uint16_t *const ptr = (uint16_t *)(void *)&rom[adr - mem_romStart];
+		x = *ptr;
 	} else {
-		mem_violation('r', adr);
+		memoryViolation('r', adr);
 		x = 0;
 	}
 
@@ -84,22 +89,21 @@ uint16_t vm_mem_read16(uint32_t adr)
 	return x;
 }
 
-
-uint32_t vm_mem_read32(uint32_t adr)
+uint32_t mem_read32(uint32_t adr)
 {
 	uint32_t x;
 	x = 0;
 
-	if ((adr >= romStart) && (adr <= romEnd)) {
-		uint32_t *const p = (uint32_t *)(void *)&rom[adr - romStart];
-		x = *p;
-	} else if ((adr >= ramStart) && (adr <= ramEnd)) {
-		uint32_t *const p = (uint32_t *)(void *)&ram[adr - ramStart];
-		x = *p;
-	} else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
+	if ((adr >= mem_romStart) && (adr <= mem_romEnd)) {
+		uint32_t *const ptr = (uint32_t *)(void *)&rom[adr - mem_romStart];
+		x = *ptr;
+	} else if ((adr >= mem_ramStart) && (adr <= mem_ramEnd)) {
+		uint32_t *const ptr = (uint32_t *)(void *)&ram[adr - mem_ramStart];
+		x = *ptr;
+	} else if ((adr >= mem_mmioStart) && (adr <= mem_mmioEnd)) {
 		x = 0;
 	} else {
-		mem_violation('r', adr);
+		memoryViolation('r', adr);
 	}
 
 	//printf("MEM_READ_32[%x] = 0x%x\n", adr, x)
@@ -107,66 +111,62 @@ uint32_t vm_mem_read32(uint32_t adr)
 	return x;
 }
 
-
-
-void vm_mem_write8(uint32_t adr, uint8_t value)
+void mem_write8(uint32_t adr, uint8_t value)
 {
-	if ((adr >= ramStart) && (adr <= ramEnd)) {
-		uint8_t *const p = (uint8_t *)(void *)&ram[adr - ramStart];
-		*p = value;
-	} else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
-		if (adr == consolePutAdr) {
+	if ((adr >= mem_ramStart) && (adr <= mem_ramEnd)) {
+		uint8_t *const ptr = (uint8_t *)(void *)&ram[adr - mem_ramStart];
+		*ptr = value;
+	} else if ((adr >= mem_mmioStart) && (adr <= mem_mmioEnd)) {
+		if (adr == mem_consolePutAdr) {
 			const char v = (char)value;
 			printf("%c", v);
 			return;
 		}
 	} else {
-		mem_violation('w', adr);
+		memoryViolation('w', adr);
 	}
 }
 
-
-void vm_mem_write16(uint32_t adr, uint16_t value)
+void mem_write16(uint32_t adr, uint16_t value)
 {
-	if ((adr >= ramStart) && (adr <= ramEnd)) {
-		uint16_t *const p = (uint16_t *)(void *)&ram[adr - ramStart];
-		*p = value;
-	} else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
-		if (adr == consolePutAdr) {
+	if ((adr >= mem_ramStart) && (adr <= mem_ramEnd)) {
+		uint16_t *const ptr = (uint16_t *)(void *)&ram[adr - mem_ramStart];
+		*ptr = value;
+	} else if ((adr >= mem_mmioStart) && (adr <= mem_mmioEnd)) {
+		if (adr == mem_consolePutAdr) {
 			putchar((int)value);
 			return;
 		}
 	} else {
-		mem_violation('w', adr);
+		memoryViolation('w', adr);
 	}
 }
 
-
-void vm_mem_write32(uint32_t adr, uint32_t value)
+void mem_write32(uint32_t adr, uint32_t value)
 {
-	if ((adr >= ramStart) && (adr <= ramEnd)) {
-		uint32_t *const p = (uint32_t *)(void *)&ram[adr - ramStart];
-		*p = value;
-	} else if ((adr >= mmioStart) && (adr <= mmioEnd)) {
-		if (adr == consolePutAdr) {
+	if ((adr >= mem_ramStart) && (adr <= mem_ramEnd)) {
+		uint32_t *const ptr = (uint32_t *)(void *)&ram[adr - mem_ramStart];
+		*ptr = value;
+	} else if ((adr >= mem_mmioStart) && (adr <= mem_mmioEnd)) {
+		if (adr == mem_consolePutAdr) {
 			putchar((int)value);
 			return;
-		} else if (adr == consolePrintInt32Adr) {
+		} else if (adr == mem_consolePrintInt32Adr) {
 			printf("%u", value);
 			return;
-		} else if (adr == consolePrintUInt32Adr) {
+		} else if (adr == mem_consolePrintUInt32Adr) {
 			printf("%u", value);
 			return;
-		} else if (adr == consolePrintInt32HexAdr) {
+		} else if (adr == mem_consolePrintInt32HexAdr) {
 			printf("%x", value);
 			return;
-		} else if (adr == consolePrintUInt32HexAdr) {
+		} else if (adr == mem_consolePrintUInt32HexAdr) {
 			printf("%x", value);
 			return;
 		}
 
 	} else {
-		mem_violation('w', adr);
+		memoryViolation('w', adr);
 	}
 
 	//printf("MEM_WRITE_32[%x] = 0x%x\n", adr, value)

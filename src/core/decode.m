@@ -1,49 +1,47 @@
 
-import "decode"
 
-
-func extract_op(instr: Nat32) -> Nat8 {
-	return unsafe Nat8 (instr and 0x7F)
+public func extract_op(instr: Word32) -> Word8 {
+	return unsafe Word8 (instr and 0x7F)
 }
 
 
-func extract_funct3(instr: Nat32) -> Nat8 {
-	return unsafe Nat8 ((instr >> 12) and 0x07)
+public func extract_funct3(instr: Word32) -> Word8 {
+	return unsafe Word8 ((instr >> 12) and 0x07)
 }
 
 
-func extract_rd(instr: Nat32) -> Nat8 {
+public func extract_rd(instr: Word32) -> Nat8 {
 	return unsafe Nat8 ((instr >> 7) and 0x1F)
 }
 
 
-func extract_rs1(instr: Nat32) -> Nat8 {
+public func extract_rs1(instr: Word32) -> Nat8 {
 	return unsafe Nat8 ((instr >> 15) and 0x1F)
 }
 
 
-func extract_rs2(instr: Nat32) -> Nat8 {
+public func extract_rs2(instr: Word32) -> Nat8 {
 	return unsafe Nat8 ((instr >> 20) and 0x1F)
 }
 
 
-func extract_funct7(instr: Nat32) -> Nat8 {
-	return unsafe Nat8 ((instr >> 25) and 0x7F)
+public func extract_funct7(instr: Word32) -> Word8 {
+	return unsafe Word8 ((instr >> 25) and 0x7F)
 }
 
 
 // bits: (31 .. 20)
-func extract_imm12(instr: Nat32) -> Nat32 {
+public func extract_imm12(instr: Word32) -> Word32 {
 	return (instr >> 20) and 0xFFF
 }
 
 
-func extract_imm31_12(instr: Nat32) -> Nat32 {
+public func extract_imm31_12(instr: Word32) -> Word32 {
 	return (instr >> 12) and 0xFFFFF
 }
 
 
-func extract_jal_imm(instr: Nat32) -> Nat32 {
+public func extract_jal_imm(instr: Word32) -> Word32 {
 	let imm = extract_imm31_12(instr)
 	let bit19to12_msk = ((imm >> 0) and 0xFF) << 12
 	let bit11_msk = ((imm >> 8) and 0x1) << 11
@@ -55,7 +53,7 @@ func extract_jal_imm(instr: Nat32) -> Nat32 {
 
 
 // sign expand (12bit -> 32bit)
-func expand12(val_12bit: Nat32) -> Int32 {
+public func expand12(val_12bit: Word32) -> Int32 {
 	var v = val_12bit
 	if (v and 0x800) != 0 {
 		v = v or 0xFFFFF000
@@ -65,7 +63,7 @@ func expand12(val_12bit: Nat32) -> Int32 {
 
 
 // sign expand (20bit -> 32bit)
-func expand20(val_20bit: Nat32) -> Int32 {
+public func expand20(val_20bit: Word32) -> Int32 {
 	var v = val_20bit
 	if (v and 0x80000) != 0 {
 		v = v or 0xFFF00000

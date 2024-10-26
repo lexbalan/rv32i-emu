@@ -4,67 +4,23 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include <stdio.h>
+#include "main.h"
 
 
 
-#include "mem.h"
-#include "core/core.h"
-
-
-#define text_filename  "./image.bin"
-
-#define showText  false
-
-static Core core;
-
-
+#define main_text_filename  "./main.bin"
+#define main_showText  false
 uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
-void show_regs(Core *core);
+void show_regs(core_Core *core);
 void show_mem();
 
 
-void mem_violation_event(uint32_t reason)
-{
-	core_irq((Core *)&core, intMemViolation);
-}
 
 
-int main()
-{
-	printf("RISC-V VM\n");
-
-	BusInterface memctl;
-	memctl = (BusInterface){
-		.read8 = &vm_mem_read8,
-		.read16 = &vm_mem_read16,
-		.read32 = &vm_mem_read32,
-		.write8 = &vm_mem_write8,
-		.write16 = &vm_mem_write16,
-		.write32 = &vm_mem_write32
-	};
-
-	uint8_t *const romptr = get_rom_ptr();
-	const uint32_t nbytes = loader(text_filename, romptr, romSize);
 
 
-	core_init((Core *)&core, (BusInterface *)&memctl);
 
-	printf("~~~ START ~~~\n");
-
-	while (!core.end) {
-		core_tick((Core *)&core);
-	}
-
-	printf("core.cnt = %u\n", core.cnt);
-
-	printf("\nCore dump:\n");
-	show_regs((Core *)&core);
-	show_mem();
-
-	return 0;
-}
-
+static core_Core core;
 
 uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 {
@@ -81,7 +37,7 @@ uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 
 	printf("LOADED: %zu bytes\n", n);
 
-	if (showText) {
+	if (main_showText) {
 		size_t i;
 		i = 0;
 		while (i < n / 4) {
@@ -97,8 +53,7 @@ uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 	return (uint32_t)n;
 }
 
-
-void show_regs(Core *core)
+void show_regs(core_Core *core)
 {
 	int32_t i;
 	i = 0;
@@ -110,12 +65,11 @@ void show_regs(Core *core)
 	}
 }
 
-
 void show_mem()
 {
 	int32_t i;
 	i = 0;
-	uint8_t *const ramptr = get_ram_ptr();
+	uint8_t *const ramptr = mem_get_ram_ptr();
 	while (i < 256) {
 		printf("%08X", i * 16);
 
@@ -130,5 +84,44 @@ void show_mem()
 
 		i = i + 16;
 	}
+}
+
+int main()
+{
+	printf("RISC-V VM\n");
+
+	core_BusInterface memctl;
+	memctl = (core_BusInterface){
+		.read8 = &mem_read8,
+		.read16 = &mem_read16,
+		.read32 = &mem_read32,
+		.write8 = &mem_write8,
+		.write16 = &mem_write16,
+		.write32 = &mem_write32
+	};
+
+	uint8_t *const romptr = mem_get_rom_ptr();
+	const uint32_t nbytes = loader(main_text_filename, romptr, mem_romSize);
+
+	if (nbytes <= 0) {
+		exit(1);
+	}
+
+	core_init((core_Core *)&core, (core_BusInterface *)&memctl);
+
+	printf("~~~ START ~~~\n");
+
+	while (!core.end) {
+		core_tick((core_Core *)&core);
+	}
+
+	printf("core.cnt = %u\n", core.cnt);
+
+	printf("\nCore dump:\n");
+	show_regs((core_Core *)&core);
+	printf("\n");
+	show_mem();
+
+	return 0;
 }
 
