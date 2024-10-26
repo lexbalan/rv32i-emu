@@ -1,4 +1,5 @@
 //
+//
 
 include "libc/ctypes"
 include "libc/stdio"
@@ -40,6 +41,7 @@ public func get_ram_ptr() -> *[]Word8 {
 	return &ram
 }
 
+
 public func get_rom_ptr() -> *[]Word8 {
 	return &rom
 }
@@ -52,15 +54,21 @@ func memoryViolation(rw: Char8, adr: Nat32) {
 }
 
 
+@inlinehint
+func adressInRange(x: Nat32, a: Nat32, b: Nat32) -> Bool {
+	return x >= a and x < b
+}
+
+
 public func read8(adr: Nat32) -> Word8 {
 	var x = Word8 0
 
-	if adr >= ramStart and adr <= ramEnd {
+	if adressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word8 Ptr &ram[adr - ramStart]
 		x = *ptr
-	} else if adr >= mmioStart and adr <= mmioEnd {
+	} else if adressInRange(adr, mmioStart, mmioEnd) {
 		//
-	} else if adr >= romStart and adr <= romEnd {
+	} else if adressInRange(adr, romStart, romEnd) {
 		let ptr = *Word8 Ptr &rom[adr - romStart]
 		x = *ptr
 	} else {
@@ -77,21 +85,19 @@ public func read8(adr: Nat32) -> Word8 {
 public func read16(adr: Nat32) -> Word16 {
 	var x = Word16 0
 
-	if adr >= ramStart and adr <= ramEnd {
+	if adressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word16 Ptr &ram[adr - ramStart]
 		x = *ptr
-	} else if adr >= mmioStart and adr <= mmioEnd {
+	} else if adressInRange(adr, mmioStart, mmioEnd) {
 		//
-	} else if adr >= romStart and adr <= romEnd {
+	} else if adressInRange(adr, romStart, romEnd) {
 		let ptr = *Word16 Ptr &rom[adr - romStart]
 		x = *ptr
 	} else {
 		memoryViolation("r", adr)
-		x = 0
 	}
 
 	//printf("MEM_READ_16[%x] = 0x%x\n", adr, x to Nat32)
-
 	return x
 }
 
@@ -99,14 +105,14 @@ public func read16(adr: Nat32) -> Word16 {
 public func read32(adr: Nat32) -> Word32 {
 	var x = Word32 0
 
-	if adr >= romStart and adr <= romEnd {
+	if adressInRange(adr, romStart, romEnd) {
 		let ptr = *Word32 Ptr &rom[adr - romStart]
 		x = *ptr
-	} else if adr >= ramStart and adr <= ramEnd {
+	} else if adressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word32 Ptr &ram[adr - ramStart]
 		x = *ptr
-	} else if adr >= mmioStart and adr <= mmioEnd {
-		x = 0
+	} else if adressInRange(adr, mmioStart, mmioEnd) {
+		//TODO
 	} else {
 		memoryViolation("r", adr)
 	}
@@ -119,10 +125,10 @@ public func read32(adr: Nat32) -> Word32 {
 
 
 public func write8(adr: Nat32, value: Word8) {
-	if adr >= ramStart and adr <= ramEnd {
+	if adressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word8 Ptr &ram[adr - ramStart]
 		*ptr = value
-	} else if adr >= mmioStart and adr <= mmioEnd {
+	} else if adressInRange(adr, mmioStart, mmioEnd) {
 		if adr == consolePutAdr {
 			let v = Char8 value
 			printf("%c", v)
@@ -135,10 +141,10 @@ public func write8(adr: Nat32, value: Word8) {
 
 
 public func write16(adr: Nat32, value: Word16) {
-	if adr >= ramStart and adr <= ramEnd {
+	if adressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word16 Ptr &ram[adr - ramStart]
 		*ptr = value
-	} else if adr >= mmioStart and adr <= mmioEnd {
+	} else if adressInRange(adr, mmioStart, mmioEnd) {
 		if adr == consolePutAdr {
 			putchar(Int value)
 			return
@@ -150,10 +156,10 @@ public func write16(adr: Nat32, value: Word16) {
 
 
 public func write32(adr: Nat32, value: Word32) {
-	if adr >= ramStart and adr <= ramEnd {
+	if adressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word32 Ptr &ram[adr - ramStart]
 		*ptr = value
-	} else if adr >= mmioStart and adr <= mmioEnd {
+	} else if adressInRange(adr, mmioStart, mmioEnd) {
 		if adr == consolePutAdr {
 			putchar(Int value)
 			return

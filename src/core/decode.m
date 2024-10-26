@@ -1,3 +1,5 @@
+//
+//
 
 
 public func extract_op(instr: Word32) -> Word8 {
@@ -49,7 +51,6 @@ public func extract_jal_imm(instr: Word32) -> Word32 {
 	let bit20_msk = ((imm >> 20) and 0x1) << 20
 	return bit20_msk or bit19to12_msk or bit11_msk or bit10to1
 }
-
 
 
 // sign expand (12bit -> 32bit)

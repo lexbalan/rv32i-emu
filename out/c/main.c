@@ -111,7 +111,6 @@ int main()
 
 	printf("~~~ START ~~~\n");
 
-	//while core.pc != 0xFFFFFFFF {
 	while (!core.end) {
 		core_tick((core_Core *)&core);
 	}
