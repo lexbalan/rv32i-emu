@@ -58,7 +58,7 @@ public func main() -> Int {
 }
 
 
-func loader(filename: *Str8, bufptr: *[]Byte, buf_size: Nat32) -> Nat32 {
+func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	printf("LOAD: %s\n", filename)
 
 	let fp = fopen(filename, "rb")
