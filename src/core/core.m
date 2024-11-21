@@ -15,15 +15,15 @@ public const nRegs = 32
 public type Core record {
 	reg: [nRegs]Word32
 	pc: Nat32
-	
+
 	nexpc: Nat32
 
 	bus: *BusInterface
 
-	end: Bool
-
 	interrupt: Nat32
-	cnt: Nat32
+
+	public cnt: Nat32
+	public end: Bool
 }
 
 
@@ -760,4 +760,16 @@ func csr_rci(core: *Core, csr: Nat16, rd: Nat8, imm: Nat8) {
 	//TODO
 }
 
+
+
+
+public func show_regs(core: *Core) {
+	var i = 0
+	while i < 16 {
+		printf("x%02d = 0x%08x", i, core.reg[i])
+		printf("    ")
+		printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
+		i = i + 1
+	}
+}
 

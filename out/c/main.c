@@ -11,7 +11,6 @@
 #define main_text_filename  "./main.bin"
 #define main_showText  false
 uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
-void show_regs(core_Core *core);
 void show_mem();
 
 
@@ -51,18 +50,6 @@ uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 	fclose(fp);
 
 	return (uint32_t)n;
-}
-
-void show_regs(core_Core *core)
-{
-	int32_t i;
-	i = 0;
-	while (i < 16) {
-		printf("x%02d = 0x%08x", i, core->reg[i]);
-		printf("    ");
-		printf("x%02d = 0x%08x\n", i + 16, core->reg[i + 16]);
-		i = i + 1;
-	}
 }
 
 void show_mem()
@@ -118,7 +105,7 @@ int main()
 	printf("core.cnt = %u\n", core.cnt);
 
 	printf("\nCore dump:\n");
-	show_regs((core_Core *)&core);
+	core_show_regs((core_Core *)&core);
 	printf("\n");
 	show_mem();
 

@@ -50,7 +50,7 @@ public func main() -> Int {
 	printf("core.cnt = %u\n", core.cnt)
 
 	printf("\nCore dump:\n")
-	show_regs(&core)
+	riscvCore.show_regs(&core)
 	printf("\n")
 	show_mem()
 
@@ -85,17 +85,6 @@ func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	fclose(fp)
 
 	return unsafe Nat32 n
-}
-
-
-func show_regs(core: *riscvCore.Core) {
-	var i = 0
-	while i < 16 {
-		printf("x%02d = 0x%08x", i, core.reg[i])
-		printf("    ")
-		printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
-		i = i + 1
-	}
 }
 
 
