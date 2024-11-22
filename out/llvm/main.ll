@@ -201,6 +201,12 @@ declare %Int @ungetc(%Int %char, %File* %f)
 declare void @perror(%ConstCharStr* %str)
 ; -- end print includes --
 ; -- print imports --
+declare void @mmio_write8(%Int32 %adr, %Word8 %value)
+declare void @mmio_write16(%Int32 %adr, %Word16 %value)
+declare void @mmio_write32(%Int32 %adr, %Word32 %value)
+declare %Word8 @mmio_read8(%Int32 %adr)
+declare %Word16 @mmio_read16(%Int32 %adr)
+declare %Word32 @mmio_read32(%Int32 %adr)
 declare [0 x %Word8]* @mem_get_ram_ptr()
 declare [0 x %Word8]* @mem_get_rom_ptr()
 declare %Word8 @mem_read8(%Int32 %adr)
