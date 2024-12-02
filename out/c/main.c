@@ -8,77 +8,29 @@
 
 
 
-#define main_text_filename  "./main.bin"
-#define main_showText  false
-uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
-void show_mem();
 
 
 
 
 
-
-
+#define text_filename  "./main.bin"
+#define showText  false
 static core_Core core;
+//public func mem_violation_event(reason: Nat32) {
+//	core.irq(&core, riscvCore.intMemViolation)
+//}
 
-uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
-{
-	printf("LOAD: %s\n", filename);
 
-	FILE *const fp = fopen(filename, "rb");
+static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
 
-	if (fp == NULL) {
-		printf("error: cannot open file '%s'", filename);
-		return 0;
-	}
 
-	const size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
-
-	printf("LOADED: %zu bytes\n", n);
-
-	if (main_showText) {
-		size_t i;
-		i = 0;
-		while (i < n / 4) {
-			printf("%08zx: 0x%08x\n", i, ((uint32_t *)bufptr)[i]);
-			i = i + 4;
-		}
-
-		printf("-----------\n");
-	}
-
-	fclose(fp);
-
-	return (uint32_t)n;
-}
-
-void show_mem()
-{
-	int32_t i;
-	i = 0;
-	uint8_t *const ramptr = mem_get_ram_ptr();
-	while (i < 256) {
-		printf("%08X", i * 16);
-
-		int32_t j;
-		j = 0;
-		while (j < 16) {
-			printf(" %02X", ramptr[i + j]);
-			j = j + 1;
-		}
-
-		printf("\n");
-
-		i = i + 16;
-	}
-}
+static void show_mem();
 
 int main()
 {
 	printf("RISC-V VM\n");
 
-	core_BusInterface memctl;
-	memctl = (core_BusInterface){
+	core_BusInterface memctl = (core_BusInterface){
 		.read8 = &mem_read8,
 		.read16 = &mem_read16,
 		.read32 = &mem_read32,
@@ -88,7 +40,7 @@ int main()
 	};
 
 	uint8_t *const romptr = mem_get_rom_ptr();
-	const uint32_t nbytes = loader(main_text_filename, romptr, mem_romSize);
+	const uint32_t nbytes = loader(text_filename, romptr, mem_romSize);
 
 	if (nbytes <= 0) {
 		exit(1);
@@ -110,5 +62,54 @@ int main()
 	show_mem();
 
 	return 0;
+}
+
+static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
+{
+	printf("LOAD: %s\n", filename);
+
+	FILE *const fp = fopen(filename, "rb");
+
+	if (fp == NULL) {
+		printf("error: cannot open file '%s'", filename);
+		return 0;
+	}
+
+	const size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
+
+	printf("LOADED: %zu bytes\n", n);
+
+	if (showText) {
+		size_t i = 0;
+		while (i < n / 4) {
+			printf("%08zx: 0x%08x\n", i, ((uint32_t *)bufptr)[i]);
+			i = i + 4;
+		}
+
+		printf("-----------\n");
+	}
+
+	fclose(fp);
+
+	return (uint32_t)n;
+}
+
+static void show_mem()
+{
+	int32_t i = 0;
+	uint8_t *const ramptr = mem_get_ram_ptr();
+	while (i < 256) {
+		printf("%08X", i * 16);
+
+		int32_t j = 0;
+		while (j < 16) {
+			printf(" %02X", ramptr[i + j]);
+			j = j + 1;
+		}
+
+		printf("\n");
+
+		i = i + 16;
+	}
 }
 

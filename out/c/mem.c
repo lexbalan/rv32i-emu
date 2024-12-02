@@ -8,27 +8,13 @@
 
 
 
-#define mem_mmioSize  0xFFFF
-#define mem_mmioStart  0xF00C0000
-#define mem_mmioEnd  (mem_mmioStart + mem_mmioSize)
-void memoryViolation(char rw, uint32_t adr);
-bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b);
 
-
-
+// see mem.ld
+#define mmioSize  0xFFFF
+#define mmioStart  0xF00C0000
+#define mmioEnd  (mmioStart + mmioSize)
 static uint8_t rom[mem_romSize];
 static uint8_t ram[mem_ramSize];
-
-void memoryViolation(char rw, uint32_t adr)
-{
-	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
-	//	memoryViolation_event(0x55) // !
-}
-
-bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b)
-{
-	return (x >= a) && (x < b);
-}
 
 uint8_t *mem_get_ram_ptr()
 {
@@ -40,15 +26,25 @@ uint8_t *mem_get_rom_ptr()
 	return (uint8_t *)&rom;
 }
 
+static void memoryViolation(char rw, uint32_t adr)
+{
+	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
+	//	memoryViolation_event(0x55) // !
+}
+
+static bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b)
+{
+	return (x >= a) && (x < b);
+}
+
 uint8_t mem_read8(uint32_t adr)
 {
-	uint8_t x;
-	x = 0;
+	uint8_t x = 0;
 
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint8_t *const ptr = (uint8_t *)(void *)&ram[adr - mem_ramStart];
 		x = *ptr;
-	} else if (isAdressInRange(adr, mem_mmioStart, mem_mmioEnd)) {
+	} else if (isAdressInRange(adr, mmioStart, mmioEnd)) {
 		//
 	} else if (isAdressInRange(adr, mem_romStart, mem_romEnd)) {
 		uint8_t *const ptr = (uint8_t *)(void *)&rom[adr - mem_romStart];
@@ -65,13 +61,12 @@ uint8_t mem_read8(uint32_t adr)
 
 uint16_t mem_read16(uint32_t adr)
 {
-	uint16_t x;
-	x = 0;
+	uint16_t x = 0;
 
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint16_t *const ptr = (uint16_t *)(void *)&ram[adr - mem_ramStart];
 		x = *ptr;
-	} else if (isAdressInRange(adr, mem_mmioStart, mem_mmioEnd)) {
+	} else if (isAdressInRange(adr, mmioStart, mmioEnd)) {
 		//
 	} else if (isAdressInRange(adr, mem_romStart, mem_romEnd)) {
 		uint16_t *const ptr = (uint16_t *)(void *)&rom[adr - mem_romStart];
@@ -86,8 +81,7 @@ uint16_t mem_read16(uint32_t adr)
 
 uint32_t mem_read32(uint32_t adr)
 {
-	uint32_t x;
-	x = 0;
+	uint32_t x = 0;
 
 	if (isAdressInRange(adr, mem_romStart, mem_romEnd)) {
 		uint32_t *const ptr = (uint32_t *)(void *)&rom[adr - mem_romStart];
@@ -95,7 +89,7 @@ uint32_t mem_read32(uint32_t adr)
 	} else if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint32_t *const ptr = (uint32_t *)(void *)&ram[adr - mem_ramStart];
 		x = *ptr;
-	} else if (isAdressInRange(adr, mem_mmioStart, mem_mmioEnd)) {
+	} else if (isAdressInRange(adr, mmioStart, mmioEnd)) {
 		//TODO
 	} else {
 		memoryViolation('r', adr);
@@ -111,8 +105,8 @@ void mem_write8(uint32_t adr, uint8_t value)
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint8_t *const ptr = (uint8_t *)(void *)&ram[adr - mem_ramStart];
 		*ptr = value;
-	} else if (isAdressInRange(adr, mem_mmioStart, mem_mmioEnd)) {
-		mmio_write8(adr - mem_mmioStart, value);
+	} else if (isAdressInRange(adr, mmioStart, mmioEnd)) {
+		mmio_write8(adr - mmioStart, value);
 	} else {
 		memoryViolation('w', adr);
 	}
@@ -123,8 +117,8 @@ void mem_write16(uint32_t adr, uint16_t value)
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint16_t *const ptr = (uint16_t *)(void *)&ram[adr - mem_ramStart];
 		*ptr = value;
-	} else if (isAdressInRange(adr, mem_mmioStart, mem_mmioEnd)) {
-		mmio_write16(adr - mem_mmioStart, value);
+	} else if (isAdressInRange(adr, mmioStart, mmioEnd)) {
+		mmio_write16(adr - mmioStart, value);
 	} else {
 		memoryViolation('w', adr);
 	}
@@ -135,8 +129,8 @@ void mem_write32(uint32_t adr, uint32_t value)
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint32_t *const ptr = (uint32_t *)(void *)&ram[adr - mem_ramStart];
 		*ptr = value;
-	} else if (isAdressInRange(adr, mem_mmioStart, mem_mmioEnd)) {
-		mmio_write32(adr - mem_mmioStart, value);
+	} else if (isAdressInRange(adr, mmioStart, mmioEnd)) {
+		mmio_write32(adr - mmioStart, value);
 	} else {
 		memoryViolation('w', adr);
 	}

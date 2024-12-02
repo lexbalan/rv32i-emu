@@ -198,8 +198,18 @@ declare %Word32 @mmio_read32(%Int32 %adr)
 ; -- endstrings --
 
 
-@rom = global [65536 x %Word8] zeroinitializer
-@ram = global [4096 x %Word8] zeroinitializer
+@rom = internal global [65536 x %Word8] zeroinitializer
+@ram = internal global [4096 x %Word8] zeroinitializer
+
+define [0 x %Word8]* @mem_get_ram_ptr() {
+	%1 = bitcast [4096 x %Word8]* @ram to [0 x %Word8]*
+	ret [0 x %Word8]* %1
+}
+
+define [0 x %Word8]* @mem_get_rom_ptr() {
+	%1 = bitcast [65536 x %Word8]* @rom to [0 x %Word8]*
+	ret [0 x %Word8]* %1
+}
 
 define internal void @memoryViolation(%Char8 %rw, %Int32 %adr) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str1 to [0 x i8]*), %Char8 %rw, %Int32 %adr)
@@ -212,18 +222,6 @@ define internal %Bool @isAdressInRange(%Int32 %x, %Int32 %a, %Int32 %b) {
 	%2 = icmp ult %Int32 %x, %b
 	%3 = and %Bool %1, %2
 	ret %Bool %3
-}
-
-
-
-define [0 x %Word8]* @mem_get_ram_ptr() {
-	%1 = bitcast [4096 x %Word8]* @ram to [0 x %Word8]*
-	ret [0 x %Word8]* %1
-}
-
-define [0 x %Word8]* @mem_get_rom_ptr() {
-	%1 = bitcast [65536 x %Word8]* @rom to [0 x %Word8]*
-	ret [0 x %Word8]* %1
 }
 
 define %Word8 @mem_read8(%Int32 %adr) {

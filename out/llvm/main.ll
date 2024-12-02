@@ -227,15 +227,6 @@ declare %Word32 @decode_extract_imm31_12(%Word32 %instr)
 declare %Word32 @decode_extract_jal_imm(%Word32 %instr)
 declare %Int32 @decode_expand12(%Word32 %val_12bit)
 declare %Int32 @decode_expand20(%Word32 %val_20bit)
-%core_BusInterface = type {
-	%Word8 (%Int32)*,
-	%Word16 (%Int32)*,
-	%Word32 (%Int32)*,
-	void (%Int32, %Word8)*,
-	void (%Int32, %Word16)*,
-	void (%Int32, %Word32)*
-};
-
 %core_Core = type {
 	[32 x %Word32],
 	%Int32,
@@ -244,6 +235,15 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 	%Int32,
 	%Int32,
 	%Bool
+};
+
+%core_BusInterface = type {
+	%Word8 (%Int32)*,
+	%Word16 (%Int32)*,
+	%Word32 (%Int32)*,
+	void (%Int32, %Word8)*,
+	void (%Int32, %Word16)*,
+	void (%Int32, %Word32)*
 };
 
 declare void @core_init(%core_Core* %core, %core_BusInterface* %bus)
@@ -270,7 +270,51 @@ declare void @core_show_regs(%core_Core* %core)
 ; -- endstrings --
 
 
-@core = global %core_Core zeroinitializer
+@core = internal global %core_Core zeroinitializer
+
+define %Int @main() {
+	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
+	%2 = alloca %core_BusInterface, align 8
+	%3 = insertvalue %core_BusInterface zeroinitializer, %Word8 (%Int32)* @mem_read8, 0
+	%4 = insertvalue %core_BusInterface %3, %Word16 (%Int32)* @mem_read16, 1
+	%5 = insertvalue %core_BusInterface %4, %Word32 (%Int32)* @mem_read32, 2
+	%6 = insertvalue %core_BusInterface %5, void (%Int32, %Word8)* @mem_write8, 3
+	%7 = insertvalue %core_BusInterface %6, void (%Int32, %Word16)* @mem_write16, 4
+	%8 = insertvalue %core_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
+	store %core_BusInterface %8, %core_BusInterface* %2
+	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
+	%10 = call %Int32 @loader(%Str8* bitcast ([11 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 65536)
+	%11 = icmp ule %Int32 %10, 0
+	br %Bool %11 , label %then_0, label %endif_0
+then_0:
+	call void @exit(%Int 1)
+	br label %endif_0
+endif_0:
+	%12 = bitcast %core_Core* @core to %core_Core*
+	%13 = bitcast %core_BusInterface* %2 to %core_BusInterface*
+	call void @core_init(%core_Core* %12, %core_BusInterface* %13)
+	%14 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+	br label %again_1
+again_1:
+	%15 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 6
+	%16 = load %Bool, %Bool* %15
+	%17 = xor %Bool %16, -1
+	br %Bool %17 , label %body_1, label %break_1
+body_1:
+	%18 = bitcast %core_Core* @core to %core_Core*
+	call void @core_tick(%core_Core* %18)
+	br label %again_1
+break_1:
+	%19 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 5
+	%20 = load %Int32, %Int32* %19
+	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %20)
+	%22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
+	%23 = bitcast %core_Core* @core to %core_Core*
+	call void @core_show_regs(%core_Core* %23)
+	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
+	call void @show_mem()
+	ret %Int 0
+}
 
 define internal %Int32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str7 to [0 x i8]*), %Str8* %filename)
@@ -356,51 +400,6 @@ break_2:
 	br label %again_1
 break_1:
 	ret void
-}
-
-
-define %Int @main() {
-	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
-	%2 = alloca %core_BusInterface, align 8
-	%3 = insertvalue %core_BusInterface zeroinitializer, %Word8 (%Int32)* @mem_read8, 0
-	%4 = insertvalue %core_BusInterface %3, %Word16 (%Int32)* @mem_read16, 1
-	%5 = insertvalue %core_BusInterface %4, %Word32 (%Int32)* @mem_read32, 2
-	%6 = insertvalue %core_BusInterface %5, void (%Int32, %Word8)* @mem_write8, 3
-	%7 = insertvalue %core_BusInterface %6, void (%Int32, %Word16)* @mem_write16, 4
-	%8 = insertvalue %core_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
-	store %core_BusInterface %8, %core_BusInterface* %2
-	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
-	%10 = call %Int32 @loader(%Str8* bitcast ([11 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 65536)
-	%11 = icmp ule %Int32 %10, 0
-	br %Bool %11 , label %then_0, label %endif_0
-then_0:
-	call void @exit(%Int 1)
-	br label %endif_0
-endif_0:
-	%12 = bitcast %core_Core* @core to %core_Core*
-	%13 = bitcast %core_BusInterface* %2 to %core_BusInterface*
-	call void @core_init(%core_Core* %12, %core_BusInterface* %13)
-	%14 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
-	br label %again_1
-again_1:
-	%15 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 6
-	%16 = load %Bool, %Bool* %15
-	%17 = xor %Bool %16, -1
-	br %Bool %17 , label %body_1, label %break_1
-body_1:
-	%18 = bitcast %core_Core* @core to %core_Core*
-	call void @core_tick(%core_Core* %18)
-	br label %again_1
-break_1:
-	%19 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 5
-	%20 = load %Int32, %Int32* %19
-	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %20)
-	%22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
-	%23 = bitcast %core_Core* @core to %core_Core*
-	call void @core_show_regs(%core_Core* %23)
-	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
-	call void @show_mem()
-	ret %Int 0
 }
 
 

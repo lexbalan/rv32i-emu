@@ -655,12 +655,12 @@ func doOpSystem(core: *Core, instr: Word32) {
 		csr_rw(core, csr, rd, rs1)
 	} else if funct3 == funct3_CSRRS {
 		// CSR read & set bit
-		let msk_reg = rs1
-		csr_rs(core, csr, rd, msk_reg)
+		let mask_reg = rs1
+		csr_rs(core, csr, rd, mask_reg)
 	} else if funct3 == funct3_CSRRC {
 		// CSR read & clear bit
-		let msk_reg = rs1
-		csr_rc(core, csr, rd, msk_reg)
+		let mask_reg = rs1
+		csr_rc(core, csr, rd, mask_reg)
 	} else if funct3 == funct3_CSRRWI {
 		let imm = rs1
 		csr_rwi(core, csr, rd, imm)
