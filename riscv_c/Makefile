@@ -1,71 +1,53 @@
-#
-# C > O > ELF > BIN
-#
 
+COMPILER_PATH=/opt/homebrew/opt/llvm@14/bin
 
-TARGET=main
+CC=$(COMPILER_PATH)/clang
+MACHINE=--target=riscv32 -march=rv32i
 
-OBJECTS = vect.o startup.o main.o system.o console.o printf.o muldivmod.o base.o
-
-CFLAGS = --target=riscv32 -march=rv32i
-LINKERSCRIPT = mem.ld
-
-
-.PHONY: objects
-
-
-all: $(TARGET).bin
-
-
-objects:
-	clang $(CFLAGS) vect.S -c -o vect.o
-	clang $(CFLAGS) main.c -c -o main.o
-	clang $(CFLAGS) startup.c -c -o startup.o
-	clang $(CFLAGS) system.c -c -o system.o
-	clang $(CFLAGS) console.c -c -o console.o
-	clang $(CFLAGS) printf.c -c -o printf.o
-	clang $(CFLAGS) muldivmod.c -c -o muldivmod.o
-	clang $(CFLAGS) base.S -c -o base.o
-
-
-# link OBJects to ELF
-$(TARGET).elf: objects
-	ld.lld -T $(LINKERSCRIPT) -o $(TARGET).elf $(OBJECTS)
+# compile C to BIN
+all:
+	# translate C to ASM
+	#$(CC) $(MACHINE) -S main.c
 	
+	# translate ASM to OBJ
+	#$(CC) $(MACHINE) main.s -c -o main.o
+	
+	$(CC) $(MACHINE) vect.S -c -o vect.o
+	$(CC) $(MACHINE) base.S -c -o base.o
+	$(CC) $(MACHINE) main.c -c -o main.o
+	$(CC) $(MACHINE) startup.c -c -o startup.o
+	$(CC) $(MACHINE) system.c -c -o system.o
+	$(CC) $(MACHINE) console.c -c -o console.o
+	$(CC) $(MACHINE) printf.c -c -o printf.o
+	$(CC) $(MACHINE) muldivmod.c -c -o muldivmod.o
 
-# extract sections from ELF to BIN file
-$(TARGET).bin: $(TARGET).elf
-	llvm-objcopy -Iriscv32 $(TARGET).elf --only-section=.boot --only-section=.text --only-section=.data -Obinary ../$(TARGET).bin
-
-
-clean:
+	
+	# link OBJects to ELF
+	$(CC) $(MACHINE) -nostdlib -o main.elf -T mem.ld vect.o startup.o main.o system.o console.o printf.o muldivmod.o base.o
+	
 	rm *.o
+	
+	# extract sections from ELF to BIN file
+	
+	llvm-objcopy -Iriscv32 main.elf --only-section=.boot --only-section=.text --only-section=.data -Obinary ../image.bin
 
-
-objdump: $(TARGET).elf
 	# make ELF dump
-	llvm-objdump -d ./$(TARGET).elf > ./$(TARGET)_dump.txt
+	llvm-objdump -d ./main.elf > ./dump.txt
+
 
 
 # show ELF content
-dump: $(TARGET).elf
-	objdump --full-contents $(TARGET).elf
+dump:
+	objdump --full-contents main.elf
 
 
 # show ELF sections
-sections: $(TARGET).elf
-	objdump -h $(TARGET).elf
+sect:
+	objdump -h main.elf
 
 
 # show ELF symbols
-symbols: $(TARGET).elf
-	objdump -t $(TARGET).elf
+symb:
+	objdump -t main.elf
 
-
-
-# translate C to ASM
-#clang $(CFLAGS) -S main.c
-#clang $(CFLAGS) -S printf.c
-# translate ASM to OBJ
-#clang $(CFLAGS) main.s -c -o main.o
 

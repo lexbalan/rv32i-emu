@@ -13,7 +13,7 @@
 
 
 
-#define text_filename  "./main.bin"
+#define text_filename  "./image.bin"
 #define showText  false
 static core_Core core;
 //public func mem_violation_event(reason: Nat32) {

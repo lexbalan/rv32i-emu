@@ -38,7 +38,7 @@ int main()
 	printf("c = '%c'\n", '$');
 	printf("s = \"%s\"\n", "Hi!");
 	printf("d = %d\n", 123);
-	printf("-d = %d\n", -103);
+	printf("-d = %d\n", -123);
 	printf("x = 0x%x\n", 0x1234567F);
 	
 	
@@ -63,7 +63,7 @@ int main()
 	
 
 	//asm("csrrw	%0, misa, %1");
-	//asm("ebreak");
+	asm("ebreak");
 
 	uint32_t prev_value;
 	uint32_t new_value = 1;

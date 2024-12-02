@@ -7,7 +7,7 @@ import "mem"
 import "core/core" as riscvCore
 
 
-const text_filename = "./main.bin"
+const text_filename = "./image.bin"
 
 const showText = false
 

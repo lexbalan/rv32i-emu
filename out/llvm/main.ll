@@ -253,7 +253,7 @@ declare void @core_show_regs(%core_Core* %core)
 ; -- end print imports --
 ; -- strings --
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
-@str2 = private constant [11 x i8] [i8 46, i8 47, i8 109, i8 97, i8 105, i8 110, i8 46, i8 98, i8 105, i8 110, i8 0]
+@str2 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]
 @str3 = private constant [15 x i8] [i8 126, i8 126, i8 126, i8 32, i8 83, i8 84, i8 65, i8 82, i8 84, i8 32, i8 126, i8 126, i8 126, i8 10, i8 0]
 @str4 = private constant [15 x i8] [i8 99, i8 111, i8 114, i8 101, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
 @str5 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
@@ -283,7 +283,7 @@ define %Int @main() {
 	%8 = insertvalue %core_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
 	store %core_BusInterface %8, %core_BusInterface* %2
 	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
-	%10 = call %Int32 @loader(%Str8* bitcast ([11 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 65536)
+	%10 = call %Int32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 65536)
 	%11 = icmp ule %Int32 %10, 0
 	br %Bool %11 , label %then_0, label %endif_0
 then_0:
