@@ -572,9 +572,8 @@ func doOpSystem(core: *Core, instr: Word32) {
 	} else if instr == instrEBREAK {
 		debug("EBREAK\n")
 
-		printf("EBREAK\n")
-
 		//
+		printf("END.\n")
 		core.end = true
 
 	// CSR instructions
