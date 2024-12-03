@@ -38,43 +38,22 @@ void __rt0() {
 
 
 extern int main();
+// Объявляем внешний символ начала стека
+// (который должен быть определен в линкер-скрипте)
+extern void* _stack_start;
+extern void _bss_start, _bss_end;
+extern void _data_start, _data_end, _data_flash_start;
 
 
-extern void* _stack_start; // Объявляем внешний символ, который должен быть определен в линкерном скрипте
+__attribute__ ((section (".startup")))
+void startup()
+{
+	const uint32_t bss_size = (uint32_t)&_bss_end - (uint32_t)&_bss_start;
+	zset(&_bss_start, bss_size);
 
+	const uint32_t data_size = (uint32_t)&_data_end - (uint32_t)&_data_start;
+	mcpy(&_data_start, &_data_flash_start, data_size);
 
-// not worked ..
-void set_stack_pointer() {
-    __asm__ volatile (
-        "la sp, _stack_start\n"  // Загружаем адрес _stack_start в sp
-    );
-}
-
-
-// if not defined boot section, will be defined firstly (!)
-__attribute__ ((section ("boot"))) void __boot() {
-
-#if 1
-	__asm__ volatile (
-		"add sp, zero, %0"
-		:
-		: "r" (&_stack_start)  /* input : register */
-		: /* clobbers: none */);
-
-#endif
-	/*__asm__ volatile (
-		"lui   sp, %hi(_stack_start)\n"
-		"addi  sp, %lo(_stack_start)\n"
-	);*/
-
-//	set_stack_pointer();
-
-	__rt0();
 	main();
-
-	__asm__ volatile ("ebreak");
 }
-
-
-
 

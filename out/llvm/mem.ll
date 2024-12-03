@@ -183,6 +183,21 @@ declare %Int @putchar(%Int %char)
 declare %Int @puts(%ConstCharStr* %str)
 declare %Int @ungetc(%Int %char, %File* %f)
 declare void @perror(%ConstCharStr* %str)
+; from included stdlib
+declare void @abort()
+declare %Int @abs(%Int %x)
+declare %Int @atexit(void ()* %x)
+declare %Double @atof([0 x %ConstChar]* %nptr)
+declare %Int @atoi([0 x %ConstChar]* %nptr)
+declare %LongInt @atol([0 x %ConstChar]* %nptr)
+declare i8* @calloc(%SizeT %num, %SizeT %size)
+declare void @exit(%Int %x)
+declare void @free(i8* %ptr)
+declare %Str* @getenv(%Str* %name)
+declare %LongInt @labs(%LongInt %x)
+declare %Str* @secure_getenv(%Str* %name)
+declare i8* @malloc(%SizeT %size)
+declare %Int @system([0 x %ConstChar]* %string)
 ; -- end print includes --
 ; -- print imports --
 ; from included ctypes
@@ -211,8 +226,21 @@ define [0 x %Word8]* @mem_get_rom_ptr() {
 	ret [0 x %Word8]* %1
 }
 
+
+@memviolationCnt = internal global %Int32 0
+
 define internal void @memoryViolation(%Char8 %rw, %Int32 %adr) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str1 to [0 x i8]*), %Char8 %rw, %Int32 %adr)
+	%2 = load %Int32, %Int32* @memviolationCnt
+	%3 = icmp ugt %Int32 %2, 10
+	br %Bool %3 , label %then_0, label %endif_0
+then_0:
+	call void @exit(%Int 1)
+	br label %endif_0
+endif_0:
+	%4 = load %Int32, %Int32* @memviolationCnt
+	%5 = add %Int32 %4, 1
+	store %Int32 %5, %Int32* @memviolationCnt
 	;	memoryViolation_event(0x55) // !
 	ret void
 }

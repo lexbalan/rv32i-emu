@@ -10,19 +10,24 @@ MEMORY
 	RAM (rw) : ORIGIN = 0x10000000, LENGTH = 4096
 }
 
+
+/* WARNING: Есть какая то херня с попыткой разместить .isr_vector в отдельную секцию .isr
+	При формировании bin файла у любой другой секции и text происходит наложение VMA & VLA
+	(у всех они нулевые) и .text перекрывает их так что в итоге в bin попадает только text
+	Я так и не смог разобраться с этим, так что воткнул .isr_vector в .text и так заработало */
+
 SECTIONS
 {
-	.boot : {
-		*(.isr_vector)
-		*(boot)
-	} > ROM
-	
-	.text : {
+	.text :
+	{
+		*(.isr_vector*)
+		*(.startup*)
 		*(.text*)
 		*(.rodata*)
 	} > ROM
 
-	.data : {
+	.data :
+	{
 		_data_start = .;
 		*(.sdata SORT(.data.*))
 		*(.data SORT(.data.*))
@@ -31,7 +36,8 @@ SECTIONS
 	
 	_data_flash_start = LOADADDR(.data);
 	
-	.bss : {
+	.bss :
+	{
 		_bss_start = .;
 		*(.sbss SORT(.bss.*) COMMON)
 		*(.bss SORT(.bss.*) COMMON)
@@ -41,7 +47,7 @@ SECTIONS
 	.heap :
 	{
 		. = ALIGN(4);
-		PROVIDE ( end = . );
+		   PROVIDE ( end = . );
 		_heap_start = .;
 		. = . + __heap_size;
 		. = ALIGN(4);

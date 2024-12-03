@@ -632,7 +632,6 @@ func doOpSystem(core: *Core, instr: Word32) {
 	let csr = unsafe Nat16 imm12
 
 	if instr == instrECALL {
-
 		if debugMode {
 			printf("ECALL\n")
 		}
@@ -641,10 +640,11 @@ func doOpSystem(core: *Core, instr: Word32) {
 		irq(core, intSysCall)
 
 	} else if instr == instrEBREAK {
-
 		if debugMode {
 			printf("EBREAK\n")
 		}
+
+		printf("EBREAK\n")
 
 		//
 		core.end = true

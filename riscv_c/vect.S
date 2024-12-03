@@ -1,22 +1,21 @@
 
-.section .isr_vector
-.align 8
-
-
 .global vectors
 .global _stack_start
-.global _start
+.global _stack_end
+.global main
 .global __mem_violation
 .global trap_empty
 .global system
-.global __boot
+.global _start
 
 
+.section .isr_vector
+.align 8
 
 vectors:
-	#j _start - делает короткий прыжок
+	jr zero, %lo(_start)
 	
-	jr zero, %lo(__boot)
+	jr zero, %lo(trap_empty)
 	
 	jr zero, %lo(trap_empty)
 	
@@ -47,14 +46,13 @@ vectors:
 
 
 _start:
-	# setup stack pointer
-	#lui sp, 0x10000
-	#addi sp, sp, 2047
-	
+	# setup stack pointer	
 	lui sp, %hi(_stack_start)
 	addi sp, sp, %lo(_stack_start)
 	
-	jr zero, %lo(__boot)
+	jr zero, %lo(startup)
+	
+	ebreak
 
 
 trap_empty:

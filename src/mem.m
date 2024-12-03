@@ -2,6 +2,7 @@
 //
 
 include "libc/stdio"
+include "libc/stdlib"
 
 import "mmio"
 
@@ -36,9 +37,13 @@ public func get_rom_ptr() -> *[]Word8 {
 }
 
 
-
+var memviolationCnt = Nat32 0
 func memoryViolation(rw: Char8, adr: Nat32) {
 	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
+	if memviolationCnt > 10 {
+		exit(1)
+	}
+	++memviolationCnt
 //	memoryViolation_event(0x55) // !
 }
 
