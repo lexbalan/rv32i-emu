@@ -9,6 +9,8 @@
 
 
 
+
+
 // see mem.ld
 #define mmioSize  0xFFFF
 #define mmioStart  0xF00C0000
@@ -25,10 +27,15 @@ uint8_t *mem_get_rom_ptr()
 {
 	return (uint8_t *)&rom;
 }
+static uint32_t memviolationCnt = 0;
 
 static void memoryViolation(char rw, uint32_t adr)
 {
 	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
+	if (memviolationCnt > 10) {
+		exit(1);
+	}
+	memviolationCnt = memviolationCnt + 1;
 	//	memoryViolation_event(0x55) // !
 }
 
