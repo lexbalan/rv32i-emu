@@ -2,7 +2,7 @@
 COMPILER_PATH=/opt/homebrew/opt/llvm@14/bin
 
 CC=$(COMPILER_PATH)/clang
-MACHINE = --target=riscv32 -march=rv32i
+MACHINE = --target=riscv32 -march=rv32im
 
 
 # only-section=.isr  не поможет - эту секцию хрен продавишь, хз почему так

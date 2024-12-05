@@ -118,9 +118,23 @@ define %Word8 @decode_extract_op(%Word32 %instr) {
 	ret %Word8 %2
 }
 
+define %Word8 @decode_extract_funct2(%Word32 %instr) {
+	%1 = lshr %Word32 %instr, 25
+	%2 = and %Word32 %1, 3
+	%3 = trunc %Word32 %2 to %Word8
+	ret %Word8 %3
+}
+
 define %Word8 @decode_extract_funct3(%Word32 %instr) {
 	%1 = lshr %Word32 %instr, 12
 	%2 = and %Word32 %1, 7
+	%3 = trunc %Word32 %2 to %Word8
+	ret %Word8 %3
+}
+
+define %Word8 @decode_extract_funct5(%Word32 %instr) {
+	%1 = lshr %Word32 %instr, 27
+	%2 = and %Word32 %1, 31
 	%3 = trunc %Word32 %2 to %Word8
 	ret %Word8 %3
 }

@@ -12,9 +12,19 @@ uint8_t decode_extract_op(uint32_t instr)
 	return (uint8_t)(instr & 0x7F);
 }
 
+uint8_t decode_extract_funct2(uint32_t instr)
+{
+	return (uint8_t)(instr >> 25 & 0x03);
+}
+
 uint8_t decode_extract_funct3(uint32_t instr)
 {
 	return (uint8_t)(instr >> 12 & 0x07);
+}
+
+uint8_t decode_extract_funct5(uint32_t instr)
+{
+	return (uint8_t)(instr >> 27 & 0x01F);
 }
 
 uint8_t decode_extract_rd(uint32_t instr)

@@ -29,9 +29,12 @@ char buf2[1024];
 
 int main()
 {
-	int a = 10;
+	volatile int jj = 3;
+	int a = 3 * jj;
 	int b = 5;
 	int c = b - a;
+
+	printf("A = %d\n", a);
 
 	printf("Hello World!\n");
 	printf("%% = '%%'\n");

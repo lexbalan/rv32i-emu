@@ -2,8 +2,14 @@
 public func extract_op(instr: Word32) -> Word8 {
 	return Word8 (instr and 0x7F)
 }
+public func extract_funct2(instr: Word32) -> Word8 {
+	return Word8 (instr >> 25 and 0x03)
+}
 public func extract_funct3(instr: Word32) -> Word8 {
 	return Word8 (instr >> 12 and 0x07)
+}
+public func extract_funct5(instr: Word32) -> Word8 {
+	return Word8 (instr >> 27 and 0x01F)
 }
 public func extract_rd(instr: Word32) -> Nat8 {
 	return Nat8 (instr >> 7 and 0x1F)

@@ -7,8 +7,18 @@ public func extract_op(instr: Word32) -> Word8 {
 }
 
 
+public func extract_funct2(instr: Word32) -> Word8 {
+	return unsafe Word8 ((instr >> 25) and 0x03)
+}
+
+
 public func extract_funct3(instr: Word32) -> Word8 {
 	return unsafe Word8 ((instr >> 12) and 0x07)
+}
+
+
+public func extract_funct5(instr: Word32) -> Word8 {
+	return unsafe Word8 ((instr >> 27) and 0x01F)
 }
 
 

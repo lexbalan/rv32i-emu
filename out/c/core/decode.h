@@ -7,7 +7,9 @@
 
 
 uint8_t decode_extract_op(uint32_t instr);
+uint8_t decode_extract_funct2(uint32_t instr);
 uint8_t decode_extract_funct3(uint32_t instr);
+uint8_t decode_extract_funct5(uint32_t instr);
 uint8_t decode_extract_rd(uint32_t instr);
 uint8_t decode_extract_rs1(uint32_t instr);
 uint8_t decode_extract_rs2(uint32_t instr);

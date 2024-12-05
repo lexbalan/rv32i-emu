@@ -229,6 +229,53 @@ static void doOpR(core_Core *core, uint32_t instr)
 	const uint32_t v0 = core->reg[rs1];
 	const uint32_t v1 = core->reg[rs2];
 
+
+	const uint8_t f5 = decode_extract_funct5(instr);
+	const uint8_t f2 = decode_extract_funct2(instr);
+	if ((f5 == 0) && (f2 == 1)) {
+		printf("MUL(%i)\n", (int32_t)funct3);
+
+		// MUL Extension
+		if (funct3 == 0) {
+			// MUL rd, rs1, rs2
+			debug("mul x%d, x%d, x%d\n", rd, rs1, rs2);
+			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+		} else if (funct3 == 1) {
+			// MULH rd, rs1, rs2
+			// Записывает в целевой регистр старшие биты
+			// которые бы не поместились в него при обычном умножении
+			debug("mulh x%d, x%d, x%d\n", rd, rs1, rs2);
+			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+		} else if (funct3 == 2) {
+			// MULHSU rd, rs1, rs2
+			// mul high signed unsigned
+			debug("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2);
+			// NOT IMPLEMENTED!
+			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+		} else if (funct3 == 3) {
+			// MULHU rd, rs1, rs2
+			debug("mulhu x%d, x%d, x%d\n", rd, rs1, rs2);
+			// NOT IMPLEMENTED!
+			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+		} else if (funct3 == 4) {
+			// DIV rd, rs1, rs2
+			debug("div x%d, x%d, x%d\n", rd, rs1, rs2);
+			core->reg[rd] = (uint32_t)((int32_t)v0 / (int32_t)v1);
+		} else if (funct3 == 5) {
+			// DIVU rd, rs1, rs2
+			debug("divu x%d, x%d, x%d\n", rd, rs1, rs2);
+			core->reg[rd] = (uint32_t)((uint32_t)v0 / (uint32_t)v1);
+		} else if (funct3 == 6) {
+			// REM rd, rs1, rs2
+			debug("rem x%d, x%d, x%d\n", rd, rs1, rs2);
+			core->reg[rd] = (uint32_t)((int32_t)v0 % (int32_t)v1);
+		} else if (funct3 == 7) {
+			// REMU rd, rs1, rs2
+			debug("remu x%d, x%d, x%d\n", rd, rs1, rs2);
+			core->reg[rd] = (uint32_t)((uint32_t)v0 % (uint32_t)v1);
+		}
+	}
+
 	if ((funct3 == 0) && (funct7 == 0x00)) {
 		debug("add x%d, x%d, x%d\n", rd, rs1, rs2);
 
@@ -657,6 +704,7 @@ The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSR
 
 static void csr_rw(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
+	const uint32_t nv = core->reg[rs1];
 	if (csr == 0x340) {
 		// mscratch
 	} else if (csr == 0x341) {

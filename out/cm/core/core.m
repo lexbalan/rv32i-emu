@@ -204,6 +204,53 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 	let v0 = core.reg[rs1]
 	let v1 = core.reg[rs2]
 
+
+	let f5 = extract_funct5(instr)
+	let f2 = extract_funct2(instr)
+	if f5 == 0 and f2 == 1 {
+		printf("MUL(%i)\n", Int32 funct3)
+
+		// MUL Extension
+		if funct3 == 0 {
+			// MUL rd, rs1, rs2
+			debug("mul x%d, x%d, x%d\n", rd, rs1, rs2)
+			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+		} else if funct3 == 1 {
+			// MULH rd, rs1, rs2
+			// Записывает в целевой регистр старшие биты
+			// которые бы не поместились в него при обычном умножении
+			debug("mulh x%d, x%d, x%d\n", rd, rs1, rs2)
+			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+		} else if funct3 == 2 {
+			// MULHSU rd, rs1, rs2
+			// mul high signed unsigned
+			debug("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
+			// NOT IMPLEMENTED!
+			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+		} else if funct3 == 3 {
+			// MULHU rd, rs1, rs2
+			debug("mulhu x%d, x%d, x%d\n", rd, rs1, rs2)
+			// NOT IMPLEMENTED!
+			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+		} else if funct3 == 4 {
+			// DIV rd, rs1, rs2
+			debug("div x%d, x%d, x%d\n", rd, rs1, rs2)
+			core.reg[rd] = Word32 (Int32 v0 / Int32 v1)
+		} else if funct3 == 5 {
+			// DIVU rd, rs1, rs2
+			debug("divu x%d, x%d, x%d\n", rd, rs1, rs2)
+			core.reg[rd] = Word32 (Nat32 v0 / Nat32 v1)
+		} else if funct3 == 6 {
+			// REM rd, rs1, rs2
+			debug("rem x%d, x%d, x%d\n", rd, rs1, rs2)
+			core.reg[rd] = Word32 (Int32 v0 % Int32 v1)
+		} else if funct3 == 7 {
+			// REMU rd, rs1, rs2
+			debug("remu x%d, x%d, x%d\n", rd, rs1, rs2)
+			core.reg[rd] = Word32 (Nat32 v0 % Nat32 v1)
+		}
+	}
+
 	if funct3 == 0 and funct7 == 0x00 {
 		debug("add x%d, x%d, x%d\n", rd, rs1, rs2)
 
