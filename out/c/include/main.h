@@ -4,22 +4,13 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
-
-#include <stdlib.h>
-
-#include <stdio.h>
-
 #include "mem.h"
-#include "core/core.h"
+#include "core.h"
+
 
 int main();
 

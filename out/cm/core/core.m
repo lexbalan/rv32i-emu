@@ -4,6 +4,8 @@ include "libc/ctypes"
 include "libc/stdio"
 @c_include "unistd.h"
 include "libc/unistd"
+@c_include "stdlib.h"
+include "libc/stdlib"
 include "decode"
 const debugMode = false
 public const nRegs = 32
@@ -205,51 +207,74 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 	let v1 = core.reg[rs2]
 
 
-	let f5 = extract_funct5(instr)
-	let f2 = extract_funct2(instr)
-	if f5 == 0 and f2 == 1 {
-		printf("MUL(%i)\n", Int32 funct3)
+	let f7 = extract_funct7(instr)
+	//let f5 = extract_funct5(instr)
+	//let f2 = extract_funct2(instr)
+	//if f5 == 0 and f2 == 1 {
+	if f7 == 1 {
+		//printf("MUL(%i)\n", Int32 funct3)
 
-		// MUL Extension
+		//
+		// "M" extension
+		//
+
 		if funct3 == 0 {
 			// MUL rd, rs1, rs2
 			debug("mul x%d, x%d, x%d\n", rd, rs1, rs2)
+
 			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+
 		} else if funct3 == 1 {
 			// MULH rd, rs1, rs2
 			// Записывает в целевой регистр старшие биты
 			// которые бы не поместились в него при обычном умножении
 			debug("mulh x%d, x%d, x%d\n", rd, rs1, rs2)
-			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+
+			core.reg[rd] = Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
+
 		} else if funct3 == 2 {
 			// MULHSU rd, rs1, rs2
 			// mul high signed unsigned
 			debug("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
+
 			// NOT IMPLEMENTED!
-			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+			notImplemented("mulhsu x%d, x%d, x%d", rd, rs1, rs2)
+
 		} else if funct3 == 3 {
 			// MULHU rd, rs1, rs2
 			debug("mulhu x%d, x%d, x%d\n", rd, rs1, rs2)
+
 			// NOT IMPLEMENTED!
-			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
+			notImplemented("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
+
 		} else if funct3 == 4 {
 			// DIV rd, rs1, rs2
 			debug("div x%d, x%d, x%d\n", rd, rs1, rs2)
+
 			core.reg[rd] = Word32 (Int32 v0 / Int32 v1)
+
 		} else if funct3 == 5 {
 			// DIVU rd, rs1, rs2
 			debug("divu x%d, x%d, x%d\n", rd, rs1, rs2)
+
 			core.reg[rd] = Word32 (Nat32 v0 / Nat32 v1)
+
 		} else if funct3 == 6 {
 			// REM rd, rs1, rs2
 			debug("rem x%d, x%d, x%d\n", rd, rs1, rs2)
+
 			core.reg[rd] = Word32 (Int32 v0 % Int32 v1)
+
 		} else if funct3 == 7 {
 			// REMU rd, rs1, rs2
 			debug("remu x%d, x%d, x%d\n", rd, rs1, rs2)
+
 			core.reg[rd] = Word32 (Nat32 v0 % Nat32 v1)
 		}
+
+		return
 	}
+
 
 	if funct3 == 0 and funct7 == 0x00 {
 		debug("add x%d, x%d, x%d\n", rd, rs1, rs2)
@@ -680,6 +705,15 @@ func debug(form: *Str8, ...) -> Unit {
 		vprintf(form, va)
 	}
 	__va_end(va)
+}
+func notImplemented(form: *Str8, ...) -> Unit {
+	var va: va_list
+	__va_start(va, form)
+	printf("\n\nINSTRUCTION_NOT_IMPLEMENTED: \"")
+	vprintf(form, va)
+	__va_end(va)
+	puts("\"\n")
+	exit(-1)
 }
 public func show_regs(core: *Core) -> Unit {
 	var i: Int32 = 0

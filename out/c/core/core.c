@@ -4,7 +4,10 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdarg.h>
+
 #include "core.h"
+
+
 
 
 
@@ -57,40 +60,17 @@ static uint32_t fetch(core_Core *core)
 	return ((uint32_t (*) (uint32_t adr))core->bus->read32)(core->pc);
 }
 
-
 static void debug(char *form, ...);
-
-
 static void doOpI(core_Core *core, uint32_t instr);
-
-
 static void doOpR(core_Core *core, uint32_t instr);
-
-
 static void doOpLUI(core_Core *core, uint32_t instr);
-
-
 static void doOpAUIPC(core_Core *core, uint32_t instr);
-
-
 static void doOpJAL(core_Core *core, uint32_t instr);
-
-
 static void doOpJALR(core_Core *core, uint32_t instr);
-
-
 static void doOpB(core_Core *core, uint32_t instr);
-
-
 static void doOpL(core_Core *core, uint32_t instr);
-
-
 static void doOpS(core_Core *core, uint32_t instr);
-
-
 static void doOpSystem(core_Core *core, uint32_t instr);
-
-
 static void doOpFence(core_Core *core, uint32_t instr);
 
 void core_tick(core_Core *core)
@@ -213,6 +193,8 @@ static void doOpI(core_Core *core, uint32_t instr)
 	}
 }
 
+static void notImplemented(char *form, ...);
+
 static void doOpR(core_Core *core, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
@@ -230,51 +212,74 @@ static void doOpR(core_Core *core, uint32_t instr)
 	const uint32_t v1 = core->reg[rs2];
 
 
-	const uint8_t f5 = decode_extract_funct5(instr);
-	const uint8_t f2 = decode_extract_funct2(instr);
-	if ((f5 == 0) && (f2 == 1)) {
-		printf("MUL(%i)\n", (int32_t)funct3);
+	const uint8_t f7 = decode_extract_funct7(instr);
+	//let f5 = extract_funct5(instr)
+	//let f2 = extract_funct2(instr)
+	//if f5 == 0 and f2 == 1 {
+	if (f7 == 1) {
+		//printf("MUL(%i)\n", Int32 funct3)
 
-		// MUL Extension
+		//
+		// "M" extension
+		//
+
 		if (funct3 == 0) {
 			// MUL rd, rs1, rs2
 			debug("mul x%d, x%d, x%d\n", rd, rs1, rs2);
+
 			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+
 		} else if (funct3 == 1) {
 			// MULH rd, rs1, rs2
 			// Записывает в целевой регистр старшие биты
 			// которые бы не поместились в него при обычном умножении
 			debug("mulh x%d, x%d, x%d\n", rd, rs1, rs2);
-			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+
+			core->reg[rd] = (uint32_t)((uint64_t)((int64_t)v0 * (int64_t)v1) >> 32);
+
 		} else if (funct3 == 2) {
 			// MULHSU rd, rs1, rs2
 			// mul high signed unsigned
 			debug("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2);
+
 			// NOT IMPLEMENTED!
-			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+			notImplemented("mulhsu x%d, x%d, x%d", rd, rs1, rs2);
+
 		} else if (funct3 == 3) {
 			// MULHU rd, rs1, rs2
 			debug("mulhu x%d, x%d, x%d\n", rd, rs1, rs2);
+
 			// NOT IMPLEMENTED!
-			core->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
+			notImplemented("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2);
+
 		} else if (funct3 == 4) {
 			// DIV rd, rs1, rs2
 			debug("div x%d, x%d, x%d\n", rd, rs1, rs2);
+
 			core->reg[rd] = (uint32_t)((int32_t)v0 / (int32_t)v1);
+
 		} else if (funct3 == 5) {
 			// DIVU rd, rs1, rs2
 			debug("divu x%d, x%d, x%d\n", rd, rs1, rs2);
+
 			core->reg[rd] = (uint32_t)((uint32_t)v0 / (uint32_t)v1);
+
 		} else if (funct3 == 6) {
 			// REM rd, rs1, rs2
 			debug("rem x%d, x%d, x%d\n", rd, rs1, rs2);
+
 			core->reg[rd] = (uint32_t)((int32_t)v0 % (int32_t)v1);
+
 		} else if (funct3 == 7) {
 			// REMU rd, rs1, rs2
 			debug("remu x%d, x%d, x%d\n", rd, rs1, rs2);
+
 			core->reg[rd] = (uint32_t)((uint32_t)v0 % (uint32_t)v1);
 		}
+
+		return;
 	}
+
 
 	if ((funct3 == 0) && (funct7 == 0x00)) {
 		debug("add x%d, x%d, x%d\n", rd, rs1, rs2);
@@ -609,25 +614,12 @@ static void doOpS(core_Core *core, uint32_t instr)
 	}
 }
 
-
 void core_irq(core_Core *core, uint32_t irq);
-
-
 static void csr_rw(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1);
-
-
 static void csr_rs(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1);
-
-
 static void csr_rc(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1);
-
-
 static void csr_rwi(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm);
-
-
 static void csr_rsi(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm);
-
-
 static void csr_rci(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm);
 
 static void doOpSystem(core_Core *core, uint32_t instr)
@@ -760,6 +752,17 @@ static void debug(char *form, ...)
 		vprintf(form, va);
 	}
 	va_end(va);
+}
+
+static void notImplemented(char *form, ...)
+{
+	va_list va;
+	va_start(va, form);
+	printf("\n\nINSTRUCTION_NOT_IMPLEMENTED: \"");
+	vprintf(form, va);
+	va_end(va);
+	puts("\"\n");
+	exit(-1);
 }
 
 void core_show_regs(core_Core *core)

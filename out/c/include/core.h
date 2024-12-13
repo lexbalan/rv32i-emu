@@ -4,22 +4,19 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-
-#include <stdio.h>
-
-#include <unistd.h>
-
+#include <stdlib.h>
 #include "decode.h"
 
-#define core_nRegs  32
 
+#define core_nRegs  32
 struct core_BusInterface;
 typedef struct core_BusInterface core_BusInterface;
+
 
 struct core_Core {
 	uint32_t reg[core_nRegs];
@@ -46,7 +43,6 @@ struct core_BusInterface {
 	void *write16;
 	void *write32;
 };
-typedef struct core_BusInterface core_BusInterface;
 #define core_intSysCall  0x08
 #define core_intMemViolation  0x0B
 void core_init(core_Core *core, core_BusInterface *bus);

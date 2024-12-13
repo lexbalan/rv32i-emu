@@ -20,10 +20,7 @@ static core_Core core;
 //	core.irq(&core, riscvCore.intMemViolation)
 //}
 
-
 static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
-
-
 static void show_mem();
 
 int main()

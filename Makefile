@@ -7,6 +7,7 @@ CMPREFIX=$(OUTDIR)/cm/
 CPREFIX=$(OUTDIR)/c/
 LLVMPREFIX = $(OUTDIR)/llvm/
 
+COPTIONS = --include=$(CPREFIX)/include
 
 all: LLVM
 
@@ -28,12 +29,12 @@ CM:
 
 
 C:
-	mcc -o $(CPREFIX)/main -funsafe -mbackend=c $(INDIR)/main.m
-	mcc -o $(CPREFIX)/core/core -funsafe -mbackend=c $(INDIR)/core/core.m
-	mcc -o $(CPREFIX)/core/decode -funsafe -mbackend=c $(INDIR)/core/decode.m
-	mcc -o $(CPREFIX)/mem -funsafe -mbackend=c $(INDIR)/mem.m
-	mcc -o $(CPREFIX)/mmio -funsafe -mbackend=c $(INDIR)/mmio.m
-	CC $(CPREFIX)/main.c $(CPREFIX)/core/core.c $(CPREFIX)/core/decode.c $(CPREFIX)/mem.c $(CPREFIX)/mmio.c
+	mcc -o $(CPREFIX)/main $(COPTIONS) -funsafe -mbackend=c $(INDIR)/main.m
+	mcc -o $(CPREFIX)/core/core $(COPTIONS) -mbackend=c -funsafe $(INDIR)/core/core.m
+	mcc -o $(CPREFIX)/core/decode $(COPTIONS) -mbackend=c -funsafe $(INDIR)/core/decode.m
+	mcc -o $(CPREFIX)/mem -funsafe $(COPTIONS) -mbackend=c $(INDIR)/mem.m
+	mcc -o $(CPREFIX)/mmio -funsafe $(COPTIONS) -mbackend=c $(INDIR)/mmio.m
+	CC -I$(CPREFIX)/include $(CPREFIX)/main.c $(CPREFIX)/core/core.c $(CPREFIX)/core/decode.c $(CPREFIX)/mem.c $(CPREFIX)/mmio.c
 
 
 clean:

@@ -4,17 +4,12 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#include <stdio.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdio.h>
-
-#include <stdlib.h>
-
 #include "mmio.h"
+
 
 #define mem_ramSize  4096
 #define mem_ramStart  0x10000000

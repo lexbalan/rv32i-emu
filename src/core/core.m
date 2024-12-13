@@ -754,7 +754,7 @@ func csr_rci(core: *Core, csr: Nat16, rd: Nat8, imm: Nat8) {
 
 
 func debug(form: *Str8, ...) -> Unit {
-	var va: VA_List
+	var va: __VA_List
 	__va_start(va, form)
 	if debugMode {
 		vprintf(form, va)
@@ -764,7 +764,7 @@ func debug(form: *Str8, ...) -> Unit {
 
 
 func notImplemented(form: *Str8, ...) -> Unit {
-	var va: VA_List
+	var va: __VA_List
 	__va_start(va, form)
 	printf("\n\nINSTRUCTION_NOT_IMPLEMENTED: \"")
 	vprintf(form, va)
