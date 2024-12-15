@@ -145,7 +145,7 @@ static void doOpI(core_Core *core, uint32_t instr)
 		debug("slli x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
-		core->reg[rd] = core->reg[rs1] << imm;
+		core->reg[rd] = core->reg[rs1] << (uint8_t)imm;
 
 	} else if (funct3 == 2) {
 		// SLTI - set [1 to rd if rs1] less than immediate
@@ -171,13 +171,13 @@ static void doOpI(core_Core *core, uint32_t instr)
 		debug("srli x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
-		core->reg[rd] = core->reg[rs1] >> imm;
+		core->reg[rd] = core->reg[rs1] >> (uint8_t)imm;
 
 	} else if ((funct3 == 5) && (funct7 == 0x20)) {
 		debug("srai x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
-		core->reg[rd] = core->reg[rs1] >> imm;
+		core->reg[rd] = core->reg[rs1] >> (uint8_t)imm;
 
 	} else if (funct3 == 6) {
 		debug("ori x%d, x%d, %d\n", rd, rs1, imm);
@@ -299,7 +299,7 @@ static void doOpR(core_Core *core, uint32_t instr)
 		debug("sll x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
-		core->reg[rd] = v0 << (int32_t)v1;
+		core->reg[rd] = v0 << (uint8_t)v1;
 
 	} else if (funct3 == 2) {
 		// set less than
@@ -329,7 +329,7 @@ static void doOpR(core_Core *core, uint32_t instr)
 
 		debug("srl x%d, x%d, x%d\n", rd, rs1, rs2);
 
-		core->reg[rd] = v0 >> (int32_t)v1;
+		core->reg[rd] = v0 >> (uint8_t)v1;
 
 	} else if ((funct3 == 5) && (funct7 == 0x20)) {
 		// shift right arithmetical

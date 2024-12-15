@@ -156,7 +156,7 @@ func doOpI(core: *Core, instr: Word32) {
 		debug("slli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		core.reg[rd] = core.reg[rs1] << imm
+		core.reg[rd] = core.reg[rs1] << unsafe Nat8 imm
 
 	} else if funct3 == 2 {
 		// SLTI - set [1 to rd if rs1] less than immediate
@@ -182,13 +182,13 @@ func doOpI(core: *Core, instr: Word32) {
 		debug("srli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		core.reg[rd] = (core.reg[rs1] >> imm)
+		core.reg[rd] = (core.reg[rs1] >> unsafe Nat8 imm)
 
 	} else if funct3 == 5 and funct7 == 0x20 {
 		debug("srai x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		core.reg[rd] = core.reg[rs1] >> imm
+		core.reg[rd] = core.reg[rs1] >> unsafe Nat8 imm
 
 	} else if funct3 == 6 {
 		debug("ori x%d, x%d, %d\n", rd, rs1, imm)
@@ -308,7 +308,7 @@ func doOpR(core: *Core, instr: Word32) {
 		debug("sll x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		core.reg[rd] = v0 << Int32 v1
+		core.reg[rd] = v0 << unsafe Nat8 v1
 
 	} else if funct3 == 2 {
 		// set less than
@@ -338,7 +338,7 @@ func doOpR(core: *Core, instr: Word32) {
 
 		debug("srl x%d, x%d, x%d\n", rd, rs1, rs2)
 
-		core.reg[rd] = v0 >> Int32 v1
+		core.reg[rd] = v0 >> unsafe Nat8 v1
 
 	} else if funct3 == 5 and funct7 == 0x20 {
 		// shift right arithmetical
