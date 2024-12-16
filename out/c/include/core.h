@@ -13,6 +13,8 @@
 #include "decode.h"
 
 
+
+
 #define core_nRegs  32
 struct core_BusInterface;
 typedef struct core_BusInterface core_BusInterface;
@@ -43,11 +45,22 @@ struct core_BusInterface {
 	void *write16;
 	void *write32;
 };
+
+
 #define core_intSysCall  0x08
 #define core_intMemViolation  0x0B
+
+
+
 void core_init(core_Core *core, core_BusInterface *bus);
+
+
 void core_tick(core_Core *core);
+
+
 void core_irq(core_Core *core, uint32_t irq);
+
+
 void core_show_regs(core_Core *core);
 
 #endif /* CORE_H */

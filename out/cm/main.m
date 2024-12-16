@@ -6,12 +6,19 @@ include "libc/stdlib"
 include "libc/stdio"
 import "mem"
 import "core/core"
+
+
 const text_filename = "./image.bin"
+
 const showText = false
+
+
 var core: Core
 //public func mem_violation_event(reason: Nat32) {
 //	core.irq(&core, riscvCore.intMemViolation)
 //}
+
+
 public func main() -> Int {
 	printf("RISC-V VM\n")
 
@@ -48,6 +55,8 @@ public func main() -> Int {
 
 	return 0
 }
+
+
 func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	printf("LOAD: %s\n", filename)
 
@@ -76,6 +85,8 @@ func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 
 	return Nat32 n
 }
+
+
 func show_mem() -> Unit {
 	var i: Int32 = 0
 	let ramptr = mem.get_ram_ptr()

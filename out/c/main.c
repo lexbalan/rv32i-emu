@@ -8,20 +8,19 @@
 
 
 
-
-
-
-
-
 #define text_filename  "./image.bin"
+
 #define showText  false
+
+
 static core_Core core;
 //public func mem_violation_event(reason: Nat32) {
 //	core.irq(&core, riscvCore.intMemViolation)
 //}
-
 static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
 static void show_mem();
+
+
 
 int main()
 {
@@ -61,6 +60,7 @@ int main()
 	return 0;
 }
 
+
 static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 {
 	printf("LOAD: %s\n", filename);
@@ -90,6 +90,7 @@ static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 
 	return (uint32_t)n;
 }
+
 
 static void show_mem()
 {

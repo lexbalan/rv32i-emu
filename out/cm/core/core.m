@@ -7,7 +7,11 @@ include "libc/unistd"
 @c_include "stdlib.h"
 include "libc/stdlib"
 include "decode"
+
+
 const debugMode = false
+
+
 public const nRegs = 32
 
 public type Core record {
@@ -34,6 +38,8 @@ public type BusInterface record {
 	write16: *(adr: Nat32, value: Word16) -> Unit
 	write32: *(adr: Nat32, value: Word32) -> Unit
 }
+
+
 const opL = 0x03
 // load
 const opI = 0x13
@@ -44,6 +50,7 @@ const opR = 0x33
 // reg
 const opB = 0x63
 // branch
+
 const opLUI = 0x37
 // load upper immediate
 const opAUIPC = 0x17
@@ -52,10 +59,13 @@ const opJAL = 0x6F
 // jump and link
 const opJALR = 0x67
 // jump and link by register
+
 const opSYSTEM = 0x73
 //
 const opFENCE = 0x0F
 //
+
+
 const instrECALL = opSYSTEM or 0x00000000
 const instrEBREAK = opSYSTEM or 0x00100000
 const instrPAUSE = opFENCE or 0x01000000
@@ -66,15 +76,24 @@ const funct3_CSRRC = 3
 const funct3_CSRRWI = 4
 const funct3_CSRRSI = 5
 const funct3_CSRRCI = 6
+
+
 public const intSysCall = 0x08
 public const intMemViolation = 0x0B
+
+
+
 public func init(core: *Core, bus: *BusInterface) -> Unit {
 	// clear all fields & setup Core#bus
 	*core = Core {bus = bus}
 }
+
+
 func fetch(core: *Core) -> Word32 {
 	return core.bus.read32(core.pc)
 }
+
+
 public func tick(core: *Core) -> Unit {
 	if core.interrupt > 0 {
 		debug("\nINT #%02X\n", core.interrupt)
@@ -117,6 +136,8 @@ public func tick(core: *Core) -> Unit {
 	core.nexpc = core.pc + 4
 	core.cnt = core.cnt + 1
 }
+
+
 func doOpI(core: *Core, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
@@ -191,6 +212,8 @@ func doOpI(core: *Core, instr: Word32) -> Unit {
 		core.reg[rd] = core.reg[rs1] and Word32 imm
 	}
 }
+
+
 func doOpR(core: *Core, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
@@ -347,6 +370,8 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 		core.reg[rd] = v0 and v1
 	}
 }
+
+
 func doOpLUI(core: *Core, instr: Word32) -> Unit {
 	// load upper immediate
 
@@ -359,6 +384,8 @@ func doOpLUI(core: *Core, instr: Word32) -> Unit {
 		core.reg[rd] = Word32 imm << 12
 	}
 }
+
+
 func doOpAUIPC(core: *Core, instr: Word32) -> Unit {
 	// Add upper immediate to PC
 
@@ -372,6 +399,8 @@ func doOpAUIPC(core: *Core, instr: Word32) -> Unit {
 		core.reg[rd] = Word32 x
 	}
 }
+
+
 func doOpJAL(core: *Core, instr: Word32) -> Unit {
 	// Jump and link
 
@@ -387,6 +416,8 @@ func doOpJAL(core: *Core, instr: Word32) -> Unit {
 
 	core.nexpc = Nat32 (Int32 core.pc + imm)
 }
+
+
 func doOpJALR(core: *Core, instr: Word32) -> Unit {
 	// Jump and link (by register)
 
@@ -407,6 +438,8 @@ func doOpJALR(core: *Core, instr: Word32) -> Unit {
 
 	core.nexpc = Nat32 jump_to
 }
+
+
 func doOpB(core: *Core, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let imm12_10to5 = extract_funct7(instr)
@@ -489,6 +522,8 @@ func doOpB(core: *Core, instr: Word32) -> Unit {
 		}
 	}
 }
+
+
 func doOpL(core: *Core, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
@@ -551,6 +586,8 @@ func doOpL(core: *Core, instr: Word32) -> Unit {
 		}
 	}
 }
+
+
 func doOpS(core: *Core, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
@@ -594,6 +631,8 @@ func doOpS(core: *Core, instr: Word32) -> Unit {
 		core.bus.write32(adr, val)
 	}
 }
+
+
 func doOpSystem(core: *Core, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
@@ -643,11 +682,15 @@ func doOpSystem(core: *Core, instr: Word32) -> Unit {
 		core.end = true
 	}
 }
+
+
 func doOpFence(core: *Core, instr: Word32) -> Unit {
 	if instr == instrPAUSE {
 		debug("PAUSE\n")
 	}
 }
+
+
 public func irq(core: *Core, irq: Nat32) -> Unit {
 	if core.interrupt == 0 {
 		core.interrupt = irq
@@ -687,6 +730,8 @@ func csr_rc(core: *Core, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
 // -
+
+
 func csr_rwi(core: *Core, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
@@ -698,6 +743,9 @@ func csr_rsi(core: *Core, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 func csr_rci(core: *Core, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
+
+
+
 func debug(form: *Str8, ...) -> Unit {
 	var va: va_list
 	__va_start(va, form)
@@ -706,6 +754,8 @@ func debug(form: *Str8, ...) -> Unit {
 	}
 	__va_end(va)
 }
+
+
 func notImplemented(form: *Str8, ...) -> Unit {
 	var va: va_list
 	__va_start(va, form)
@@ -715,6 +765,8 @@ func notImplemented(form: *Str8, ...) -> Unit {
 	puts("\"\n")
 	exit(-1)
 }
+
+
 public func show_regs(core: *Core) -> Unit {
 	var i: Int32 = 0
 	while i < 16 {

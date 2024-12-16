@@ -9,13 +9,9 @@
 
 
 
-
-
-
-
-
-
 #define debugMode  false
+
+
 #define opL  0x03
 // load
 #define opI  0x13
@@ -26,6 +22,7 @@
 // reg
 #define opB  0x63
 // branch
+
 #define opLUI  0x37
 // load upper immediate
 #define opAUIPC  0x17
@@ -34,10 +31,13 @@
 // jump and link
 #define opJALR  0x67
 // jump and link by register
+
 #define opSYSTEM  0x73
 //
 #define opFENCE  0x0F
 //
+
+
 #define instrECALL  (opSYSTEM | 0x00000000)
 #define instrEBREAK  (opSYSTEM | 0x00100000)
 #define instrPAUSE  (opFENCE | 0x01000000)
@@ -49,17 +49,19 @@
 #define funct3_CSRRSI  5
 #define funct3_CSRRCI  6
 
+
+
 void core_init(core_Core *core, core_BusInterface *bus)
 {
 	// clear all fields & setup Core#bus
 	*core = (core_Core){.bus = bus};
 }
 
+
 static uint32_t fetch(core_Core *core)
 {
 	return ((uint32_t (*) (uint32_t adr))core->bus->read32)(core->pc);
 }
-
 static void debug(char *form, ...);
 static void doOpI(core_Core *core, uint32_t instr);
 static void doOpR(core_Core *core, uint32_t instr);
@@ -72,6 +74,8 @@ static void doOpL(core_Core *core, uint32_t instr);
 static void doOpS(core_Core *core, uint32_t instr);
 static void doOpSystem(core_Core *core, uint32_t instr);
 static void doOpFence(core_Core *core, uint32_t instr);
+
+
 
 void core_tick(core_Core *core)
 {
@@ -116,6 +120,7 @@ void core_tick(core_Core *core)
 	core->nexpc = core->pc + 4;
 	core->cnt = core->cnt + 1;
 }
+
 
 static void doOpI(core_Core *core, uint32_t instr)
 {
@@ -192,8 +197,9 @@ static void doOpI(core_Core *core, uint32_t instr)
 		core->reg[rd] = core->reg[rs1] & (uint32_t)imm;
 	}
 }
-
 static void notImplemented(char *form, ...);
+
+
 
 static void doOpR(core_Core *core, uint32_t instr)
 {
@@ -353,6 +359,7 @@ static void doOpR(core_Core *core, uint32_t instr)
 	}
 }
 
+
 static void doOpLUI(core_Core *core, uint32_t instr)
 {
 	// load upper immediate
@@ -366,6 +373,7 @@ static void doOpLUI(core_Core *core, uint32_t instr)
 		core->reg[rd] = (uint32_t)imm << 12;
 	}
 }
+
 
 static void doOpAUIPC(core_Core *core, uint32_t instr)
 {
@@ -381,6 +389,7 @@ static void doOpAUIPC(core_Core *core, uint32_t instr)
 		core->reg[rd] = (uint32_t)x;
 	}
 }
+
 
 static void doOpJAL(core_Core *core, uint32_t instr)
 {
@@ -398,6 +407,7 @@ static void doOpJAL(core_Core *core, uint32_t instr)
 
 	core->nexpc = (uint32_t)((int32_t)core->pc + imm);
 }
+
 
 static void doOpJALR(core_Core *core, uint32_t instr)
 {
@@ -420,6 +430,7 @@ static void doOpJALR(core_Core *core, uint32_t instr)
 
 	core->nexpc = (uint32_t)jump_to;
 }
+
 
 static void doOpB(core_Core *core, uint32_t instr)
 {
@@ -505,6 +516,7 @@ static void doOpB(core_Core *core, uint32_t instr)
 	}
 }
 
+
 static void doOpL(core_Core *core, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
@@ -569,6 +581,7 @@ static void doOpL(core_Core *core, uint32_t instr)
 	}
 }
 
+
 static void doOpS(core_Core *core, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
@@ -613,7 +626,6 @@ static void doOpS(core_Core *core, uint32_t instr)
 		((void (*) (uint32_t adr, uint32_t value))core->bus->write32)(adr, val);
 	}
 }
-
 void core_irq(core_Core *core, uint32_t irq);
 static void csr_rw(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1);
 static void csr_rs(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1);
@@ -621,6 +633,8 @@ static void csr_rc(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1);
 static void csr_rwi(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm);
 static void csr_rsi(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm);
 static void csr_rci(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm);
+
+
 
 static void doOpSystem(core_Core *core, uint32_t instr)
 {
@@ -673,12 +687,14 @@ static void doOpSystem(core_Core *core, uint32_t instr)
 	}
 }
 
+
 static void doOpFence(core_Core *core, uint32_t instr)
 {
 	if (instr == instrPAUSE) {
 		debug("PAUSE\n");
 	}
 }
+
 
 void core_irq(core_Core *core, uint32_t irq)
 {
@@ -693,7 +709,6 @@ void core_irq(core_Core *core, uint32_t irq)
 /*
 The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
 */
-
 static void csr_rw(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	const uint32_t nv = core->reg[rs1];
@@ -712,7 +727,6 @@ static void csr_rw(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1)
 /*
 The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
 */
-
 static void csr_rs(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	//TODO
@@ -720,29 +734,29 @@ static void csr_rs(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1)
 /*
 The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
 */
-
 static void csr_rc(core_Core *core, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	//TODO
 }
 // -
 
+
 static void csr_rwi(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm)
 {
 	//TODO
 }
 // read+clear immediate(5-bit)
-
 static void csr_rsi(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm)
 {
 	//TODO
 }
 // read+clear immediate(5-bit)
-
 static void csr_rci(core_Core *core, uint16_t csr, uint8_t rd, uint8_t imm)
 {
 	//TODO
 }
+
+
 
 static void debug(char *form, ...)
 {
@@ -754,6 +768,7 @@ static void debug(char *form, ...)
 	va_end(va);
 }
 
+
 static void notImplemented(char *form, ...)
 {
 	va_list va;
@@ -764,6 +779,7 @@ static void notImplemented(char *form, ...)
 	puts("\"\n");
 	exit(-1);
 }
+
 
 void core_show_regs(core_Core *core)
 {
