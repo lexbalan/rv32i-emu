@@ -12,13 +12,9 @@ include "decode"
 const debugMode = false
 
 
-public const nRegs = 32
-
 public type Core record {
-	reg: [nRegs]Word32
-	pc: Nat32
-
-	nexpc: Nat32
+	reg: [32]Word32
+	pc, nexpc: Nat32
 
 	bus: *BusInterface
 
@@ -30,13 +26,13 @@ public type Core record {
 
 
 public type BusInterface record {
-	read8: *(adr: Nat32) -> Word8
-	read16: *(adr: Nat32) -> Word16
-	read32: *(adr: Nat32) -> Word32
+	public read8: *(adr: Nat32) -> Word8
+	public read16: *(adr: Nat32) -> Word16
+	public read32: *(adr: Nat32) -> Word32
 
-	write8: *(adr: Nat32, value: Word8) -> Unit
-	write16: *(adr: Nat32, value: Word16) -> Unit
-	write32: *(adr: Nat32, value: Word32) -> Unit
+	public write8: *(adr: Nat32, value: Word8) -> Unit
+	public write16: *(adr: Nat32, value: Word16) -> Unit
+	public write32: *(adr: Nat32, value: Word32) -> Unit
 }
 
 
@@ -75,8 +71,9 @@ public const intMemViolation = 0x0B
 
 
 public func init(core: *Core, bus: *BusInterface) {
-	// clear all fields & setup Core#bus
-	*core = Core {bus=bus}
+	*core = Core {
+		bus=bus
+	}
 }
 
 
@@ -142,6 +139,7 @@ func doOpI(core: *Core, instr: Word32) {
 	}
 
 	if funct3 == 0 {
+		// Add immediate
 
 		debug("addi x%d, x%d, %d\n", rd, rs1, imm)
 

@@ -13,17 +13,14 @@
 #include "decode.h"
 
 
-
-
-#define core_nRegs  32
 struct core_BusInterface;
 typedef struct core_BusInterface core_BusInterface;
 
 
-struct core_Core {
-	uint32_t reg[core_nRegs];
-	uint32_t pc;
 
+struct core_Core {
+	uint32_t reg[32];
+	uint32_t pc;
 	uint32_t nexpc;
 
 	core_BusInterface *bus;
