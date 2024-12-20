@@ -407,46 +407,45 @@ break_1:
 define internal %Int32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str7 to [0 x i8]*), %Str8* %filename)
 	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str8 to [0 x i8]*))
-	%3 = bitcast i8* null to %File*
-	%4 = icmp eq %File* %2, %3
-	br %Bool %4 , label %then_0, label %endif_0
+	%3 = icmp eq %File* %2, bitcast (i8* null to %File*)
+	br %Bool %3 , label %then_0, label %endif_0
 then_0:
-	%5 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str9 to [0 x i8]*), %Str8* %filename)
+	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str9 to [0 x i8]*), %Str8* %filename)
 	ret %Int32 0
 	br label %endif_0
 endif_0:
-	%7 = bitcast [0 x %Word8]* %bufptr to i8*
-	%8 = zext %Int32 %buf_size to %SizeT
-	%9 = call %SizeT @fread(i8* %7, %SizeT 1, %SizeT %8, %File* %2)
-	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str10 to [0 x i8]*), %SizeT %9)
+	%6 = bitcast [0 x %Word8]* %bufptr to i8*
+	%7 = zext %Int32 %buf_size to %SizeT
+	%8 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %2)
+	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str10 to [0 x i8]*), %SizeT %8)
 	br %Bool 0 , label %then_1, label %endif_1
 then_1:
-	%11 = alloca %SizeT, align 8
-	store %SizeT 0, %SizeT* %11
+	%10 = alloca %SizeT, align 8
+	store %SizeT 0, %SizeT* %10
 	br label %again_1
 again_1:
-	%12 = load %SizeT, %SizeT* %11
-	%13 = udiv %SizeT %9, 4
-	%14 = icmp ult %SizeT %12, %13
-	br %Bool %14 , label %body_1, label %break_1
+	%11 = udiv %SizeT %8, 4
+	%12 = load %SizeT, %SizeT* %10
+	%13 = icmp ult %SizeT %12, %11
+	br %Bool %13 , label %body_1, label %break_1
 body_1:
-	%15 = load %SizeT, %SizeT* %11
-	%16 = bitcast [0 x %Word8]* %bufptr to [0 x %Int32]*
-	%17 = load %SizeT, %SizeT* %11
-	%18 = getelementptr inbounds [0 x %Int32], [0 x %Int32]* %16, %Int32 0, %SizeT %17
-	%19 = load %Int32, %Int32* %18
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %15, %Int32 %19)
-	%21 = load %SizeT, %SizeT* %11
-	%22 = add %SizeT %21, 4
-	store %SizeT %22, %SizeT* %11
+	%14 = load %SizeT, %SizeT* %10
+	%15 = bitcast [0 x %Word8]* %bufptr to [0 x %Int32]*
+	%16 = load %SizeT, %SizeT* %10
+	%17 = getelementptr inbounds [0 x %Int32], [0 x %Int32]* %15, %Int32 0, %SizeT %16
+	%18 = load %Int32, %Int32* %17
+	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %14, %Int32 %18)
+	%20 = load %SizeT, %SizeT* %10
+	%21 = add %SizeT %20, 4
+	store %SizeT %21, %SizeT* %10
 	br label %again_1
 break_1:
-	%23 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str12 to [0 x i8]*))
+	%22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str12 to [0 x i8]*))
 	br label %endif_1
 endif_1:
-	%24 = call %Int @fclose(%File* %2)
-	%25 = trunc %SizeT %9 to %Int32
-	ret %Int32 %25
+	%23 = call %Int @fclose(%File* %2)
+	%24 = trunc %SizeT %8 to %Int32
+	ret %Int32 %24
 }
 
 define internal void @show_mem() {

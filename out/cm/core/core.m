@@ -81,8 +81,9 @@ public const intMemViolation = 0x0B
 
 
 public func init(core: *Core, bus: *BusInterface) -> Unit {
-	// clear all fields & setup Core#bus
-	*core = Core {bus = bus}
+	*core = Core {
+		bus = bus
+	}
 }
 
 
@@ -148,6 +149,7 @@ func doOpI(core: *Core, instr: Word32) -> Unit {
 	}
 
 	if funct3 == 0 {
+		// Add immediate
 
 		debug("addi x%d, x%d, %d\n", rd, rs1, imm)
 

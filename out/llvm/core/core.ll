@@ -390,7 +390,6 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 
 
 define void @core_init(%core_Core* %core, %core_BusInterface* %bus) {
-	; clear all fields & setup Core#bus
 	%1 = insertvalue [32 x %Word32] zeroinitializer, %Word32 0, 0
 	%2 = insertvalue [32 x %Word32] %1, %Word32 0, 1
 	%3 = insertvalue [32 x %Word32] %2, %Word32 0, 2
@@ -603,6 +602,7 @@ endif_0:
 	%9 = icmp eq %Word8 %1, 0
 	br %Bool %9 , label %then_1, label %else_1
 then_1:
+	; Add immediate
 	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str3 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 	;
 	%10 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
@@ -627,10 +627,10 @@ then_2:
 	%22 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %21, %Int32 0, %Int8 %5
 	%23 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%24 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %23, %Int32 0, %Int8 %6
-	%25 = load %Word32, %Word32* %24
-	%26 = trunc %Int32 %4 to %Int8
-	%27 = zext %Int8 %26 to %Word32
-	%28 = shl %Word32 %25, %27
+	%25 = trunc %Int32 %4 to %Int8
+	%26 = load %Word32, %Word32* %24
+	%27 = zext %Int8 %25 to %Word32
+	%28 = shl %Word32 %26, %27
 	store %Word32 %28, %Word32* %22
 	br label %endif_2
 else_2:
@@ -677,9 +677,9 @@ then_5:
 	%50 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %49, %Int32 0, %Int8 %5
 	%51 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%52 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %51, %Int32 0, %Int8 %6
-	%53 = load %Word32, %Word32* %52
-	%54 = bitcast %Int32 %4 to %Word32
-	%55 = xor %Word32 %53, %54
+	%53 = bitcast %Int32 %4 to %Word32
+	%54 = load %Word32, %Word32* %52
+	%55 = xor %Word32 %54, %53
 	store %Word32 %55, %Word32* %50
 	br label %endif_5
 else_5:
@@ -694,10 +694,10 @@ then_6:
 	%60 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %59, %Int32 0, %Int8 %5
 	%61 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%62 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %61, %Int32 0, %Int8 %6
-	%63 = load %Word32, %Word32* %62
-	%64 = trunc %Int32 %4 to %Int8
-	%65 = zext %Int8 %64 to %Word32
-	%66 = lshr %Word32 %63, %65
+	%63 = trunc %Int32 %4 to %Int8
+	%64 = load %Word32, %Word32* %62
+	%65 = zext %Int8 %63 to %Word32
+	%66 = lshr %Word32 %64, %65
 	store %Word32 %66, %Word32* %60
 	br label %endif_6
 else_6:
@@ -712,10 +712,10 @@ then_7:
 	%71 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %70, %Int32 0, %Int8 %5
 	%72 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%73 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %72, %Int32 0, %Int8 %6
-	%74 = load %Word32, %Word32* %73
-	%75 = trunc %Int32 %4 to %Int8
-	%76 = zext %Int8 %75 to %Word32
-	%77 = lshr %Word32 %74, %76
+	%74 = trunc %Int32 %4 to %Int8
+	%75 = load %Word32, %Word32* %73
+	%76 = zext %Int8 %74 to %Word32
+	%77 = lshr %Word32 %75, %76
 	store %Word32 %77, %Word32* %71
 	br label %endif_7
 else_7:
@@ -728,9 +728,9 @@ then_8:
 	%80 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %79, %Int32 0, %Int8 %5
 	%81 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%82 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %81, %Int32 0, %Int8 %6
-	%83 = load %Word32, %Word32* %82
-	%84 = bitcast %Int32 %4 to %Word32
-	%85 = or %Word32 %83, %84
+	%83 = bitcast %Int32 %4 to %Word32
+	%84 = load %Word32, %Word32* %82
+	%85 = or %Word32 %84, %83
 	store %Word32 %85, %Word32* %80
 	br label %endif_8
 else_8:
@@ -743,9 +743,9 @@ then_9:
 	%88 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %87, %Int32 0, %Int8 %5
 	%89 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%90 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %89, %Int32 0, %Int8 %6
-	%91 = load %Word32, %Word32* %90
-	%92 = bitcast %Int32 %4 to %Word32
-	%93 = and %Word32 %91, %92
+	%91 = bitcast %Int32 %4 to %Word32
+	%92 = load %Word32, %Word32* %90
+	%93 = and %Word32 %92, %91
 	store %Word32 %93, %Word32* %88
 	br label %endif_9
 endif_9:
@@ -1103,11 +1103,11 @@ define internal void @doOpAUIPC(%core_Core* %core, %Word32 %instr) {
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = call %Int32 @decode_expand12(%Word32 %1)
 	%3 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 1
-	%4 = load %Int32, %Int32* %3
-	%5 = bitcast %Int32 %2 to %Word32
-	%6 = shl %Word32 %5, 12
-	%7 = bitcast %Word32 %6 to %Int32
-	%8 = add %Int32 %4, %7
+	%4 = bitcast %Int32 %2 to %Word32
+	%5 = shl %Word32 %4, 12
+	%6 = bitcast %Word32 %5 to %Int32
+	%7 = load %Int32, %Int32* %3
+	%8 = add %Int32 %7, %6
 	%9 = call %Int8 @decode_extract_rd(%Word32 %instr)
 	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str33 to [0 x i8]*), %Int8 %9, %Int32 %2)
 	%10 = icmp ne %Int8 %9, 0
@@ -1227,11 +1227,11 @@ then_1:
 	; Branch if two registers are equal
 	%28 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%29 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %28, %Int32 0, %Int8 %5
-	%30 = load %Word32, %Word32* %29
-	%31 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%32 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %31, %Int32 0, %Int8 %6
-	%33 = load %Word32, %Word32* %32
-	%34 = icmp eq %Word32 %30, %33
+	%30 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%31 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %30, %Int32 0, %Int8 %6
+	%32 = load %Word32, %Word32* %29
+	%33 = load %Word32, %Word32* %31
+	%34 = icmp eq %Word32 %32, %33
 	br %Bool %34 , label %then_2, label %endif_2
 then_2:
 	%35 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 2
@@ -1254,11 +1254,11 @@ then_3:
 	;
 	%43 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%44 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %43, %Int32 0, %Int8 %5
-	%45 = load %Word32, %Word32* %44
-	%46 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%47 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %46, %Int32 0, %Int8 %6
-	%48 = load %Word32, %Word32* %47
-	%49 = icmp ne %Word32 %45, %48
+	%45 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%46 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %45, %Int32 0, %Int8 %6
+	%47 = load %Word32, %Word32* %44
+	%48 = load %Word32, %Word32* %46
+	%49 = icmp ne %Word32 %47, %48
 	br %Bool %49 , label %then_4, label %endif_4
 then_4:
 	%50 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 2

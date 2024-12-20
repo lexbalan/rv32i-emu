@@ -53,8 +53,9 @@
 
 void core_init(core_Core *core, core_BusInterface *bus)
 {
-	// clear all fields & setup Core#bus
-	*core = (core_Core){.bus = bus};
+	*core = (core_Core){
+		.bus = bus
+	};
 }
 
 
@@ -136,6 +137,7 @@ static void doOpI(core_Core *core, uint32_t instr)
 	}
 
 	if (funct3 == 0) {
+		// Add immediate
 
 		debug("addi x%d, x%d, %d\n", rd, rs1, imm);
 
