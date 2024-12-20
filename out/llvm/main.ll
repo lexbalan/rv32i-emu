@@ -378,28 +378,24 @@ then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	%12 = bitcast %core_Core* @core to %core_Core*
-	%13 = bitcast %core_BusInterface* %2 to %core_BusInterface*
-	call void @core_init(%core_Core* %12, %core_BusInterface* %13)
-	%14 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+	call void @core_init(%core_Core* @core, %core_BusInterface* %2)
+	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 	br label %again_1
 again_1:
-	%15 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 6
-	%16 = load %Bool, %Bool* %15
-	%17 = xor %Bool %16, -1
-	br %Bool %17 , label %body_1, label %break_1
+	%13 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 6
+	%14 = load %Bool, %Bool* %13
+	%15 = xor %Bool %14, -1
+	br %Bool %15 , label %body_1, label %break_1
 body_1:
-	%18 = bitcast %core_Core* @core to %core_Core*
-	call void @core_tick(%core_Core* %18)
+	call void @core_tick(%core_Core* @core)
 	br label %again_1
 break_1:
-	%19 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 5
-	%20 = load %Int32, %Int32* %19
-	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %20)
-	%22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
-	%23 = bitcast %core_Core* @core to %core_Core*
-	call void @core_show_regs(%core_Core* %23)
-	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
+	%16 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 5
+	%17 = load %Int32, %Int32* %16
+	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %17)
+	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
+	call void @core_show_regs(%core_Core* @core)
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
 	call void @show_mem()
 	ret %Int 0
 }
