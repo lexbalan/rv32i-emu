@@ -167,6 +167,7 @@ define %Word8 @decode_extract_funct7(%Word32 %instr) {
 	ret %Word8 %3
 }
 
+; bits: (31 .. 20)
 define %Word32 @decode_extract_imm12(%Word32 %instr) {
 	%1 = lshr %Word32 %instr, 20
 	%2 = and %Word32 %1, 4095
@@ -199,6 +200,7 @@ define %Word32 @decode_extract_jal_imm(%Word32 %instr) {
 	ret %Word32 %16
 }
 
+; sign expand (12bit -> 32bit)
 define %Int32 @decode_expand12(%Word32 %val_12bit) {
 	%1 = alloca %Word32, align 4
 	store %Word32 %val_12bit, %Word32* %1
@@ -217,6 +219,7 @@ endif_0:
 	ret %Int32 %8
 }
 
+; sign expand (20bit -> 32bit)
 define %Int32 @decode_expand20(%Word32 %val_20bit) {
 	%1 = alloca %Word32, align 4
 	store %Word32 %val_20bit, %Word32* %1

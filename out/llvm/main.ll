@@ -359,6 +359,9 @@ declare void @core_show_regs(%core_Core* %core)
 
 
 @core = internal global %core_Core zeroinitializer
+;public func mem_violation_event(reason: Nat32) {
+;	core.irq(&core, riscvCore.intMemViolation)
+;}
 
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
