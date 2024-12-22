@@ -42,18 +42,18 @@ int main()
 		exit(1);
 	}
 
-	core_init((core_Core *)&core, (core_BusInterface *)&memctl);
+	core_init(&core, &memctl);
 
 	printf("~~~ START ~~~\n");
 
 	while (!core.end) {
-		core_tick((core_Core *)&core);
+		core_tick(&core);
 	}
 
 	printf("core.cnt = %u\n", core.cnt);
 
 	printf("\nCore dump:\n");
-	core_show_regs((core_Core *)&core);
+	core_show_regs(&core);
 	printf("\n");
 	show_mem();
 

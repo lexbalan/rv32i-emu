@@ -87,32 +87,32 @@ void core_tick(core_Core *core)
 		core->interrupt = 0;
 	}
 
-	const uint32_t instr = fetch((core_Core *)core);
+	const uint32_t instr = fetch(core);
 	const uint8_t op = decode_extract_op(instr);
 	const uint8_t funct3 = decode_extract_funct3(instr);
 
 	if (op == opI) {
-		doOpI((core_Core *)core, instr);
+		doOpI(core, instr);
 	} else if (op == opR) {
-		doOpR((core_Core *)core, instr);
+		doOpR(core, instr);
 	} else if (op == opLUI) {
-		doOpLUI((core_Core *)core, instr);
+		doOpLUI(core, instr);
 	} else if (op == opAUIPC) {
-		doOpAUIPC((core_Core *)core, instr);
+		doOpAUIPC(core, instr);
 	} else if (op == opJAL) {
-		doOpJAL((core_Core *)core, instr);
+		doOpJAL(core, instr);
 	} else if ((op == opJALR) && (funct3 == 0)) {
-		doOpJALR((core_Core *)core, instr);
+		doOpJALR(core, instr);
 	} else if (op == opB) {
-		doOpB((core_Core *)core, instr);
+		doOpB(core, instr);
 	} else if (op == opL) {
-		doOpL((core_Core *)core, instr);
+		doOpL(core, instr);
 	} else if (op == opS) {
-		doOpS((core_Core *)core, instr);
+		doOpS(core, instr);
 	} else if (op == opSYSTEM) {
-		doOpSystem((core_Core *)core, instr);
+		doOpSystem(core, instr);
 	} else if (op == opFENCE) {
-		doOpFence((core_Core *)core, instr);
+		doOpFence(core, instr);
 	} else {
 		debug("UNKNOWN OPCODE: %08X\n", op);
 	}
@@ -424,7 +424,7 @@ static void doOpJALR(core_Core *core, uint32_t instr)
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
 	const int32_t next_instr_ptr = (int32_t)(core->pc + 4);
-	const uint32_t jump_to = (uint32_t)((int32_t)core->reg[rs1] + imm) & 0xFFFFFFFE;
+	const uint32_t jump_to = (uint32_t)((int32_t)core->reg[rs1] + imm) & 0xFFFFFFFEU;
 
 	if (rd != 0) {
 		core->reg[rd] = (uint32_t)next_instr_ptr;
@@ -653,7 +653,7 @@ static void doOpSystem(core_Core *core, uint32_t instr)
 		debug("ECALL\n");
 
 		//
-		core_irq((core_Core *)core, core_intSysCall);
+		core_irq(core, core_intSysCall);
 
 	} else if (instr == instrEBREAK) {
 		debug("EBREAK\n");
@@ -665,24 +665,24 @@ static void doOpSystem(core_Core *core, uint32_t instr)
 		// CSR instructions
 	} else if (funct3 == funct3_CSRRW) {
 		// CSR read & write
-		csr_rw((core_Core *)core, csr, rd, rs1);
+		csr_rw(core, csr, rd, rs1);
 	} else if (funct3 == funct3_CSRRS) {
 		// CSR read & set bit
 		const uint8_t mask_reg = rs1;
-		csr_rs((core_Core *)core, csr, rd, mask_reg);
+		csr_rs(core, csr, rd, mask_reg);
 	} else if (funct3 == funct3_CSRRC) {
 		// CSR read & clear bit
 		const uint8_t mask_reg = rs1;
-		csr_rc((core_Core *)core, csr, rd, mask_reg);
+		csr_rc(core, csr, rd, mask_reg);
 	} else if (funct3 == funct3_CSRRWI) {
 		const uint8_t imm = rs1;
-		csr_rwi((core_Core *)core, csr, rd, imm);
+		csr_rwi(core, csr, rd, imm);
 	} else if (funct3 == funct3_CSRRSI) {
 		const uint8_t imm = rs1;
-		csr_rsi((core_Core *)core, csr, rd, imm);
+		csr_rsi(core, csr, rd, imm);
 	} else if (funct3 == funct3_CSRRCI) {
 		const uint8_t imm = rs1;
-		csr_rci((core_Core *)core, csr, rd, imm);
+		csr_rci(core, csr, rd, imm);
 	} else {
 		debug("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr);
 		core->end = true;

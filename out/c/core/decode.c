@@ -81,7 +81,7 @@ int32_t decode_expand12(uint32_t val_12bit)
 {
 	uint32_t v = val_12bit;
 	if ((v & 0x800) != 0) {
-		v = v | 0xFFFFF000;
+		v = v | 0xFFFFF000U;
 	}
 	return (int32_t)v;
 }
@@ -90,7 +90,7 @@ int32_t decode_expand20(uint32_t val_20bit)
 {
 	uint32_t v = val_20bit;
 	if ((v & 0x80000) != 0) {
-		v = v | 0xFFF00000;
+		v = v | 0xFFF00000U;
 	}
 	return (int32_t)v;
 }
