@@ -69,11 +69,11 @@ uint32_t decode_extract_imm31_12(uint32_t instr)
 
 uint32_t decode_extract_jal_imm(uint32_t instr)
 {
-	const uint32_t imm = decode_extract_imm31_12(instr);
-	const uint32_t bit19to12_msk = (imm >> 0 & 0xFF) << 12;
-	const uint32_t bit11_msk = (imm >> 8 & 0x1) << 11;
-	const uint32_t bit10to1 = (imm >> 9 & 0x3FF) << 1;
-	const uint32_t bit20_msk = (imm >> 20 & 0x1) << 20;
+	uint32_t imm = decode_extract_imm31_12(instr);
+	uint32_t bit19to12_msk = (imm >> 0 & 0xFF) << 12;
+	uint32_t bit11_msk = (imm >> 8 & 0x1) << 11;
+	uint32_t bit10to1 = (imm >> 9 & 0x3FF) << 1;
+	uint32_t bit20_msk = (imm >> 20 & 0x1) << 20;
 	return bit20_msk | bit19to12_msk | bit11_msk | bit10to1;
 }
 // sign expand (12bit -> 32bit)

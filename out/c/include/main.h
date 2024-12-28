@@ -12,8 +12,6 @@
 #include "core.h"
 
 
-
-
 int main();
 
 #endif /* MAIN_H */

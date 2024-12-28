@@ -35,8 +35,8 @@ int main()
 		.write32 = &mem_write32
 	};
 
-	uint8_t *const romptr = mem_get_rom_ptr();
-	const uint32_t nbytes = loader(text_filename, romptr, mem_romSize);
+	uint8_t *romptr = mem_get_rom_ptr();
+	uint32_t nbytes = loader(text_filename, romptr, mem_romSize);
 
 	if (nbytes <= 0) {
 		exit(1);
@@ -46,7 +46,7 @@ int main()
 
 	printf("~~~ START ~~~\n");
 
-	while (!core.end) {
+	while (!(core.end)) {
 		core_tick(&core);
 	}
 
@@ -65,14 +65,14 @@ static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 {
 	printf("LOAD: %s\n", filename);
 
-	FILE *const fp = fopen(filename, "rb");
+	FILE *fp = fopen(filename, "rb");
 
 	if (fp == NULL) {
 		printf("error: cannot open file '%s'", filename);
 		return 0;
 	}
 
-	const size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
+	size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
 
 	printf("LOADED: %zu bytes\n", n);
 
@@ -95,7 +95,7 @@ static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 static void show_mem()
 {
 	int32_t i = 0;
-	uint8_t *const ramptr = mem_get_ram_ptr();
+	uint8_t *ramptr = mem_get_ram_ptr();
 	while (i < 256) {
 		printf("%08X", i * 16);
 

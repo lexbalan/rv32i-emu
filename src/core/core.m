@@ -696,6 +696,26 @@ public func irq(core: *Core, irq: Nat32) {
 //
 
 
+
+const mstatus_adr = 0x300
+const misa_adr = 0x301
+const mie_adr = 0x304
+const mtvec_adr = 0x305
+const mcause_adr = 0x342
+const mtval_adr = 0x343
+const mip_adr = 0x344
+
+
+const satp_adr = 0x180
+
+const sstatus_adr = 0x100
+const sie_adr = 0x104
+const stvec_adr = 0x105
+const scause_adr = 0x142
+const stval_adr = 0x143
+const sip_adr = 0x144
+
+
 /*
 The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
 */

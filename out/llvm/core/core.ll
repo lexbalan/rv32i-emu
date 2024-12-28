@@ -1687,9 +1687,11 @@ endif_0:
 ; CSR's
 ;https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
 ;
+
 ;
 ;The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
 ;
+
 define internal void @csr_rw(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %rs1) {
 	%1 = getelementptr inbounds %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%2 = getelementptr inbounds [32 x %Word32], [32 x %Word32]* %1, %Int32 0, %Int8 %rs1

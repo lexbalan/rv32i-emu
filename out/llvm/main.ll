@@ -387,7 +387,7 @@ endif_0:
 again_1:
 	%13 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 6
 	%14 = load %Bool, %Bool* %13
-	%15 = xor %Bool %14, -1
+	%15 = xor %Bool %14, 1
 	br %Bool %15 , label %body_1, label %break_1
 body_1:
 	call void @core_tick(%core_Core* @core)

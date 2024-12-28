@@ -16,8 +16,6 @@
 struct core_BusInterface;
 typedef struct core_BusInterface core_BusInterface;
 
-
-
 struct core_Core {
 	uint32_t reg[32];
 	uint32_t pc;
@@ -31,33 +29,20 @@ struct core_Core {
 	bool end;
 };
 typedef struct core_Core core_Core;
-
-
 struct core_BusInterface {
-	void *read8;
-	void *read16;
-	void *read32;
+	uint8_t(*read8)(uint32_t adr);
+	uint16_t(*read16)(uint32_t adr);
+	uint32_t(*read32)(uint32_t adr);
 
-	void *write8;
-	void *write16;
-	void *write32;
+	void(*write8)(uint32_t adr, uint8_t value);
+	void(*write16)(uint32_t adr, uint16_t value);
+	void(*write32)(uint32_t adr, uint32_t value);
 };
-
-
 #define core_intSysCall  0x08
 #define core_intMemViolation  0x0B
-
-
-
 void core_init(core_Core *core, core_BusInterface *bus);
-
-
 void core_tick(core_Core *core);
-
-
 void core_irq(core_Core *core, uint32_t irq);
-
-
 void core_show_regs(core_Core *core);
 
 #endif /* CORE_H */
