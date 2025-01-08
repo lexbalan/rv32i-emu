@@ -1,3 +1,3 @@
-# RV32I emulator
+# RV32IM emulator
 
 Just for fun; now in research.
