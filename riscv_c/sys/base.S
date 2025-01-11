@@ -1,14 +1,26 @@
 
 .text
 
-# void zset(void *mem, uint32_t len);
-.global zset
-zset:
+# void memzero(void *mem, uint32_t len);
+.global memzero
+memzero:
 	add t0, a0, a1		 # t0 = mem + len
-zset_loop:
+memzero_loop:
 	sb zero, 0(a0)		 # *mem = 0
 	addi a0, a0, 1		 # mem = mem + 1
-	blt a0, t0, zset_loop  # if (a0 < t0) goto zset_loop
+	blt a0, t0, memzero_loop  # if (a0 < t0) goto zset_loop
+	ret
+
+
+
+# void memset(void *mem, char x, uint32_t len);
+.global memset
+memset:
+	add t0, a0, a2		 # t0 = mem + len
+memset_loop:
+	sb a1, 0(a0)		 # *mem = a1
+	addi a0, a0, 1		 # mem = mem + 1
+	blt a0, t0, memset_loop  # if (a0 < t0) goto memset_loop
 	ret
 
 
@@ -17,9 +29,9 @@ zset_loop:
 # t1 - mcpy_4 lim adr
 # t2 - mcpy_1 lim adr
 
-# void mcpy(void *dst, void *src, uint32_t len);
-.global mcpy
-mcpy:
+# void memcopy(void *dst, void *src, uint32_t len);
+.global memcopy
+memcopy:
 	# вычисляю предельные адреса для mcpy_4 & mcpy_1
 	li t0, 0xFFFFFFFC
 	and t0, a2, t0		  # t0 = len & 0xFFFFFFFC; // n words

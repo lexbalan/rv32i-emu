@@ -55,7 +55,7 @@ int printf(const char *str, ...)
 			char buf[10+1];
 			char *sptr = &buf[0];
 
-			if (c == 'd') {
+			if ((c == 'd') || (c == 'i')) {
 				int d = va_arg(a_list, int);
 				sprintf_dec32(sptr, d);
 			} else if (c == 'x') {

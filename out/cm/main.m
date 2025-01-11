@@ -14,6 +14,8 @@ const showText = false
 
 
 var core: Core
+
+
 //public func mem_violation_event(reason: Nat32) {
 //	core.irq(&core, riscvCore.intMemViolation)
 //}
@@ -42,7 +44,7 @@ public func main() -> Int {
 
 	printf("~~~ START ~~~\n")
 
-	while notcore.end {
+	while not(core.end) {
 		core.tick(&core)
 	}
 
@@ -74,7 +76,7 @@ func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	if showText {
 		var i: SizeT = SizeT 0
 		while i < n / 4 {
-			printf("%08zx: 0x%08x\n", i, (*[]Nat32 bufptr)[i])
+			printf("%08zx: 0x%08x\n", i, *[]Nat32 bufptr[i])
 			i = i + 4
 		}
 

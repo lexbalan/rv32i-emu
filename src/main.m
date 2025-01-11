@@ -38,7 +38,7 @@ public func main() -> Int {
 	if nbytes <= 0 {
 		exit(1)
 	}
-	
+
 	riscvCore.init(&core, &memctl)
 
 	printf("~~~ START ~~~\n")

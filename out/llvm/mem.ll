@@ -211,25 +211,20 @@ declare %Word32 @mmio_read32(%Int32 %adr)
 ; -- strings --
 @str1 = private constant [38 x i8] [i8 42, i8 42, i8 42, i8 32, i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
 ; -- endstrings --
+
+
 ; see mem.ld
-
-
-@rom = internal global [65536 x %Word8] zeroinitializer
-@ram = internal global [4096 x %Word8] zeroinitializer
-
+@rom = internal global [1048576 x %Word8] zeroinitializer
+@ram = internal global [16384 x %Word8] zeroinitializer
 define [0 x %Word8]* @mem_get_ram_ptr() {
-	%1 = bitcast [4096 x %Word8]* @ram to [0 x %Word8]*
-	ret [0 x %Word8]* %1
+	ret [0 x %Word8]* bitcast ([16384 x %Word8]* @ram to [0 x %Word8]*)
 }
 
 define [0 x %Word8]* @mem_get_rom_ptr() {
-	%1 = bitcast [65536 x %Word8]* @rom to [0 x %Word8]*
-	ret [0 x %Word8]* %1
+	ret [0 x %Word8]* bitcast ([1048576 x %Word8]* @rom to [0 x %Word8]*)
 }
 
-
 @memviolationCnt = internal global %Int32 0
-
 define internal void @memoryViolation(%Char8 %rw, %Int32 %adr) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str1 to [0 x i8]*), %Char8 %rw, %Int32 %adr)
 	%2 = load %Int32, %Int32* @memviolationCnt
@@ -256,11 +251,11 @@ define internal %Bool @isAdressInRange(%Int32 %x, %Int32 %a, %Int32 %b) {
 define %Word8 @mem_read8(%Int32 %adr) {
 	%1 = alloca %Word8, align 1
 	store %Word8 0, %Word8* %1
-	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268439552)
+	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %2 , label %then_0, label %else_0
 then_0:
 	%3 = sub %Int32 %adr, 268435456
-	%4 = getelementptr inbounds [4096 x %Word8], [4096 x %Word8]* @ram, %Int32 0, %Int32 %3
+	%4 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %3
 	%5 = bitcast %Word8* %4 to i8*
 	%6 = bitcast i8* %5 to %Word8*
 	%7 = load %Word8, %Word8* %6
@@ -273,11 +268,11 @@ then_1:
 	;
 	br label %endif_1
 else_1:
-	%9 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 65536)
+	%9 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
 	br %Bool %9 , label %then_2, label %else_2
 then_2:
 	%10 = sub %Int32 %adr, 0
-	%11 = getelementptr inbounds [65536 x %Word8], [65536 x %Word8]* @rom, %Int32 0, %Int32 %10
+	%11 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @rom, %Int32 0, %Int32 %10
 	%12 = bitcast %Word8* %11 to i8*
 	%13 = bitcast i8* %12 to %Word8*
 	%14 = load %Word8, %Word8* %13
@@ -292,6 +287,7 @@ endif_2:
 endif_1:
 	br label %endif_0
 endif_0:
+
 	;printf("MEM_READ_8[%x] = 0x%x\n", adr, x to Nat32)
 	%15 = load %Word8, %Word8* %1
 	ret %Word8 %15
@@ -300,11 +296,11 @@ endif_0:
 define %Word16 @mem_read16(%Int32 %adr) {
 	%1 = alloca %Word16, align 2
 	store %Word16 0, %Word16* %1
-	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268439552)
+	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %2 , label %then_0, label %else_0
 then_0:
 	%3 = sub %Int32 %adr, 268435456
-	%4 = getelementptr inbounds [4096 x %Word8], [4096 x %Word8]* @ram, %Int32 0, %Int32 %3
+	%4 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %3
 	%5 = bitcast %Word8* %4 to i8*
 	%6 = bitcast i8* %5 to %Word16*
 	%7 = load %Word16, %Word16* %6
@@ -317,11 +313,11 @@ then_1:
 	;
 	br label %endif_1
 else_1:
-	%9 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 65536)
+	%9 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
 	br %Bool %9 , label %then_2, label %else_2
 then_2:
 	%10 = sub %Int32 %adr, 0
-	%11 = getelementptr inbounds [65536 x %Word8], [65536 x %Word8]* @rom, %Int32 0, %Int32 %10
+	%11 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @rom, %Int32 0, %Int32 %10
 	%12 = bitcast %Word8* %11 to i8*
 	%13 = bitcast i8* %12 to %Word16*
 	%14 = load %Word16, %Word16* %13
@@ -335,6 +331,7 @@ endif_2:
 endif_1:
 	br label %endif_0
 endif_0:
+
 	;printf("MEM_READ_16[%x] = 0x%x\n", adr, x to Nat32)
 	%15 = load %Word16, %Word16* %1
 	ret %Word16 %15
@@ -343,22 +340,22 @@ endif_0:
 define %Word32 @mem_read32(%Int32 %adr) {
 	%1 = alloca %Word32, align 4
 	store %Word32 0, %Word32* %1
-	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 65536)
+	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
 	br %Bool %2 , label %then_0, label %else_0
 then_0:
 	%3 = sub %Int32 %adr, 0
-	%4 = getelementptr inbounds [65536 x %Word8], [65536 x %Word8]* @rom, %Int32 0, %Int32 %3
+	%4 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @rom, %Int32 0, %Int32 %3
 	%5 = bitcast %Word8* %4 to i8*
 	%6 = bitcast i8* %5 to %Word32*
 	%7 = load %Word32, %Word32* %6
 	store %Word32 %7, %Word32* %1
 	br label %endif_0
 else_0:
-	%8 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268439552)
+	%8 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %8 , label %then_1, label %else_1
 then_1:
 	%9 = sub %Int32 %adr, 268435456
-	%10 = getelementptr inbounds [4096 x %Word8], [4096 x %Word8]* @ram, %Int32 0, %Int32 %9
+	%10 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %9
 	%11 = bitcast %Word8* %10 to i8*
 	%12 = bitcast i8* %11 to %Word32*
 	%13 = load %Word32, %Word32* %12
@@ -378,17 +375,18 @@ endif_2:
 endif_1:
 	br label %endif_0
 endif_0:
+
 	;printf("MEM_READ_32[%x] = 0x%x\n", adr, x)
 	%15 = load %Word32, %Word32* %1
 	ret %Word32 %15
 }
 
 define void @mem_write8(%Int32 %adr, %Word8 %value) {
-	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268439552)
+	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
 	%2 = sub %Int32 %adr, 268435456
-	%3 = getelementptr inbounds [4096 x %Word8], [4096 x %Word8]* @ram, %Int32 0, %Int32 %2
+	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %2
 	%4 = bitcast %Word8* %3 to i8*
 	%5 = bitcast i8* %4 to %Word8*
 	store %Word8 %value, %Word8* %5
@@ -410,11 +408,11 @@ endif_0:
 }
 
 define void @mem_write16(%Int32 %adr, %Word16 %value) {
-	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268439552)
+	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
 	%2 = sub %Int32 %adr, 268435456
-	%3 = getelementptr inbounds [4096 x %Word8], [4096 x %Word8]* @ram, %Int32 0, %Int32 %2
+	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %2
 	%4 = bitcast %Word8* %3 to i8*
 	%5 = bitcast i8* %4 to %Word16*
 	store %Word16 %value, %Word16* %5
@@ -436,11 +434,11 @@ endif_0:
 }
 
 define void @mem_write32(%Int32 %adr, %Word32 %value) {
-	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268439552)
+	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
 	%2 = sub %Int32 %adr, 268435456
-	%3 = getelementptr inbounds [4096 x %Word8], [4096 x %Word8]* @ram, %Int32 0, %Int32 %2
+	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %2
 	%4 = bitcast %Word8* %3 to i8*
 	%5 = bitcast i8* %4 to %Word32*
 	store %Word32 %value, %Word32* %5
@@ -458,6 +456,7 @@ else_1:
 endif_1:
 	br label %endif_0
 endif_0:
+
 	;printf("MEM_WRITE_32[%x] = 0x%x\n", adr, value)
 	ret void
 }

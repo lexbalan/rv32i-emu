@@ -356,16 +356,15 @@ declare void @core_show_regs(%core_Core* %core)
 @str14 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
 @str15 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
-
-
 @core = internal global %core_Core zeroinitializer
+
+
 ;public func mem_violation_event(reason: Nat32) {
 ;	core.irq(&core, riscvCore.intMemViolation)
 ;}
-
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
-	%2 = alloca %core_BusInterface, align 8
+	%2 = alloca %core_BusInterface, align 64
 	%3 = insertvalue %core_BusInterface zeroinitializer, %Word8 (%Int32)* @mem_read8, 0
 	%4 = insertvalue %core_BusInterface %3, %Word16 (%Int32)* @mem_read16, 1
 	%5 = insertvalue %core_BusInterface %4, %Word32 (%Int32)* @mem_read32, 2
@@ -374,7 +373,7 @@ define %Int @main() {
 	%8 = insertvalue %core_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
 	store %core_BusInterface %8, %core_BusInterface* %2
 	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
-	%10 = call %Int32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 65536)
+	%10 = call %Int32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 1048576)
 	%11 = icmp ule %Int32 %10, 0
 	br %Bool %11 , label %then_0, label %endif_0
 then_0:
@@ -385,7 +384,7 @@ endif_0:
 	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 	br label %again_1
 again_1:
-	%13 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 6
+	%13 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 6
 	%14 = load %Bool, %Bool* %13
 	%15 = xor %Bool %14, 1
 	br %Bool %15 , label %body_1, label %break_1
@@ -393,7 +392,7 @@ body_1:
 	call void @core_tick(%core_Core* @core)
 	br label %again_1
 break_1:
-	%16 = getelementptr inbounds %core_Core, %core_Core* @core, %Int32 0, %Int32 5
+	%16 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 5
 	%17 = load %Int32, %Int32* %16
 	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %17)
 	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
@@ -406,7 +405,7 @@ break_1:
 define internal %Int32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str7 to [0 x i8]*), %Str8* %filename)
 	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str8 to [0 x i8]*))
-	%3 = icmp eq %File* %2, bitcast (i8* null to %File*)
+	%3 = icmp eq %File* %2, null
 	br %Bool %3 , label %then_0, label %endif_0
 then_0:
 	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str9 to [0 x i8]*), %Str8* %filename)
@@ -429,9 +428,9 @@ again_1:
 	br %Bool %13 , label %body_1, label %break_1
 body_1:
 	%14 = load %SizeT, %SizeT* %10
-	%15 = bitcast [0 x %Word8]* %bufptr to [0 x %Int32]*
-	%16 = load %SizeT, %SizeT* %10
-	%17 = getelementptr inbounds [0 x %Int32], [0 x %Int32]* %15, %Int32 0, %SizeT %16
+	%15 = load %SizeT, %SizeT* %10
+	%16 = bitcast [0 x %Word8]* %bufptr to [0 x %Int32]*
+	%17 = getelementptr [0 x %Int32], [0 x %Int32]* %16, %Int32 0, %SizeT %15
 	%18 = load %Int32, %Int32* %17
 	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %14, %Int32 %18)
 	%20 = load %SizeT, %SizeT* %10
@@ -471,7 +470,7 @@ body_2:
 	%11 = load %Int32, %Int32* %1
 	%12 = load %Int32, %Int32* %8
 	%13 = add %Int32 %11, %12
-	%14 = getelementptr inbounds [0 x %Word8], [0 x %Word8]* %2, %Int32 0, %Int32 %13
+	%14 = getelementptr [0 x %Word8], [0 x %Word8]* %2, %Int32 0, %Int32 %13
 	%15 = load %Word8, %Word8* %14
 	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str14 to [0 x i8]*), %Word8 %15)
 	%17 = load %Int32, %Int32* %8

@@ -1,4 +1,3 @@
-// ./out/c//core/decode.c
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -54,6 +53,8 @@ uint8_t decode_extract_funct7(uint32_t instr)
 {
 	return (uint8_t)(instr >> 25 & 0x7F);
 }
+
+
 // bits: (31 .. 20)
 uint32_t decode_extract_imm12(uint32_t instr)
 {
@@ -76,6 +77,8 @@ uint32_t decode_extract_jal_imm(uint32_t instr)
 	uint32_t bit20_msk = (imm >> 20 & 0x1) << 20;
 	return bit20_msk | bit19to12_msk | bit11_msk | bit10to1;
 }
+
+
 // sign expand (12bit -> 32bit)
 int32_t decode_expand12(uint32_t val_12bit)
 {
@@ -85,6 +88,8 @@ int32_t decode_expand12(uint32_t val_12bit)
 	}
 	return (int32_t)v;
 }
+
+
 // sign expand (20bit -> 32bit)
 int32_t decode_expand20(uint32_t val_20bit)
 {

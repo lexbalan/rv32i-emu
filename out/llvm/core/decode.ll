@@ -111,7 +111,6 @@ break_2:
 ; -- end print imports --
 ; -- strings --
 ; -- endstrings --
-
 define %Word8 @decode_extract_op(%Word32 %instr) {
 	%1 = and %Word32 %instr, 127
 	%2 = trunc %Word32 %1 to %Word8
@@ -167,6 +166,8 @@ define %Word8 @decode_extract_funct7(%Word32 %instr) {
 	ret %Word8 %3
 }
 
+
+
 ; bits: (31 .. 20)
 define %Word32 @decode_extract_imm12(%Word32 %instr) {
 	%1 = lshr %Word32 %instr, 20
@@ -200,6 +201,8 @@ define %Word32 @decode_extract_jal_imm(%Word32 %instr) {
 	ret %Word32 %16
 }
 
+
+
 ; sign expand (12bit -> 32bit)
 define %Int32 @decode_expand12(%Word32 %val_12bit) {
 	%1 = alloca %Word32, align 4
@@ -218,6 +221,8 @@ endif_0:
 	%8 = bitcast %Word32 %7 to %Int32
 	ret %Int32 %8
 }
+
+
 
 ; sign expand (20bit -> 32bit)
 define %Int32 @decode_expand20(%Word32 %val_20bit) {

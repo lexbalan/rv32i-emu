@@ -193,8 +193,6 @@ declare void @perror(%ConstCharStr* %str)
 @str3 = private constant [3 x i8] [i8 37, i8 120, i8 0]
 @str4 = private constant [4 x i8] [i8 37, i8 117, i8 120, i8 0]
 ; -- endstrings --
-
-
 define void @mmio_write8(%Int32 %adr, %Word8 %value) {
 	%1 = icmp eq %Int32 %adr, 16
 	br %Bool %1 , label %then_0, label %endif_0

@@ -39,6 +39,8 @@ public func extract_rs2(instr: Word32) -> Nat8 {
 public func extract_funct7(instr: Word32) -> Word8 {
 	return Word8 (instr >> 25 and 0x7F)
 }
+
+
 // bits: (31 .. 20)
 public func extract_imm12(instr: Word32) -> Word32 {
 	return instr >> 20 and 0xFFF
@@ -58,6 +60,8 @@ public func extract_jal_imm(instr: Word32) -> Word32 {
 	let bit20_msk = (imm >> 20 and 0x1) << 20
 	return bit20_msk or bit19to12_msk or bit11_msk or bit10to1
 }
+
+
 // sign expand (12bit -> 32bit)
 public func expand12(val_12bit: Word32) -> Int32 {
 	var v: Word32 = val_12bit
@@ -66,6 +70,8 @@ public func expand12(val_12bit: Word32) -> Int32 {
 	}
 	return Int32 v
 }
+
+
 // sign expand (20bit -> 32bit)
 public func expand20(val_20bit: Word32) -> Int32 {
 	var v: Word32 = val_20bit
