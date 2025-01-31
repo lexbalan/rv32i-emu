@@ -24,8 +24,6 @@
 
 
 
-
-
 void mmio_write8(uint32_t adr, uint8_t value);
 
 

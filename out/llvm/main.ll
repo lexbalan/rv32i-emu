@@ -200,13 +200,19 @@ declare %Int @puts(%ConstCharStr* %str)
 declare %Int @ungetc(%Int %char, %File* %f)
 declare void @perror(%ConstCharStr* %str)
 ; -- end print includes --
-; -- print imports --
+; -- print imports 'main' --
+; -- 2
+; ?? mem ??
+; ?? mmio ??
+; from import
 declare void @mmio_write8(%Int32 %adr, %Word8 %value)
 declare void @mmio_write16(%Int32 %adr, %Word16 %value)
 declare void @mmio_write32(%Int32 %adr, %Word32 %value)
 declare %Word8 @mmio_read8(%Int32 %adr)
 declare %Word16 @mmio_read16(%Int32 %adr)
 declare %Word32 @mmio_read32(%Int32 %adr)
+; end from import
+; from import
 declare [0 x %Word8]* @mem_get_ram_ptr()
 declare [0 x %Word8]* @mem_get_rom_ptr()
 declare %Word8 @mem_read8(%Int32 %adr)
@@ -215,6 +221,8 @@ declare %Word32 @mem_read32(%Int32 %adr)
 declare void @mem_write8(%Int32 %adr, %Word8 %value)
 declare void @mem_write16(%Int32 %adr, %Word16 %value)
 declare void @mem_write32(%Int32 %adr, %Word32 %value)
+; end from import
+; ?? riscvCore ??
 ; from included unistd
 declare %Int @access([0 x %ConstChar]* %path, %Int %amode)
 declare %UnsignedInt @alarm(%UnsignedInt %seconds)
@@ -315,6 +323,7 @@ declare %Word32 @decode_extract_imm31_12(%Word32 %instr)
 declare %Word32 @decode_extract_jal_imm(%Word32 %instr)
 declare %Int32 @decode_expand12(%Word32 %val_12bit)
 declare %Int32 @decode_expand20(%Word32 %val_20bit)
+; from import
 %core_Core = type {
 	[32 x %Word32],
 	%Int32,
@@ -338,7 +347,8 @@ declare void @core_init(%core_Core* %core, %core_BusInterface* %bus)
 declare void @core_tick(%core_Core* %core)
 declare void @core_irq(%core_Core* %core, %Int32 %irq)
 declare void @core_show_regs(%core_Core* %core)
-; -- end print imports --
+; end from import
+; -- end print imports 'main' --
 ; -- strings --
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
 @str2 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]
@@ -356,7 +366,7 @@ declare void @core_show_regs(%core_Core* %core)
 @str14 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
 @str15 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
-@core = internal global %core_Core zeroinitializer
+@main_core = internal global %core_Core zeroinitializer
 
 
 ;public func mem_violation_event(reason: Nat32) {
@@ -373,36 +383,36 @@ define %Int @main() {
 	%8 = insertvalue %core_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
 	store %core_BusInterface %8, %core_BusInterface* %2
 	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
-	%10 = call %Int32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 1048576)
+	%10 = call %Int32 @main_loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 1048576)
 	%11 = icmp ule %Int32 %10, 0
 	br %Bool %11 , label %then_0, label %endif_0
 then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	call void @core_init(%core_Core* @core, %core_BusInterface* %2)
+	call void @core_init(%core_Core* @main_core, %core_BusInterface* %2)
 	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 	br label %again_1
 again_1:
-	%13 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 6
+	%13 = getelementptr %core_Core, %core_Core* @main_core, %Int32 0, %Int32 6
 	%14 = load %Bool, %Bool* %13
 	%15 = xor %Bool %14, 1
 	br %Bool %15 , label %body_1, label %break_1
 body_1:
-	call void @core_tick(%core_Core* @core)
+	call void @core_tick(%core_Core* @main_core)
 	br label %again_1
 break_1:
-	%16 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 5
+	%16 = getelementptr %core_Core, %core_Core* @main_core, %Int32 0, %Int32 5
 	%17 = load %Int32, %Int32* %16
 	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %17)
 	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
-	call void @core_show_regs(%core_Core* @core)
+	call void @core_show_regs(%core_Core* @main_core)
 	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
-	call void @show_mem()
+	call void @main_show_mem()
 	ret %Int 0
 }
 
-define internal %Int32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
+define internal %Int32 @main_loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str7 to [0 x i8]*), %Str8* %filename)
 	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str8 to [0 x i8]*))
 	%3 = icmp eq %File* %2, null
@@ -446,7 +456,7 @@ endif_1:
 	ret %Int32 %24
 }
 
-define internal void @show_mem() {
+define internal void @main_show_mem() {
 	%1 = alloca %Int32, align 4
 	store %Int32 0, %Int32* %1
 	%2 = call [0 x %Word8]* @mem_get_ram_ptr()

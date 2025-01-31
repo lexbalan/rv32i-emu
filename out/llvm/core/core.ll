@@ -303,8 +303,9 @@ declare %Word32 @decode_extract_jal_imm(%Word32 %instr)
 declare %Int32 @decode_expand12(%Word32 %val_12bit)
 declare %Int32 @decode_expand20(%Word32 %val_20bit)
 ; -- end print includes --
-; -- print imports --
-; -- end print imports --
+; -- print imports 'core' --
+; -- 0
+; -- end print imports 'core' --
 ; -- strings --
 @str1 = private constant [12 x i8] [i8 10, i8 73, i8 78, i8 84, i8 32, i8 35, i8 37, i8 48, i8 50, i8 88, i8 10, i8 0]
 @str2 = private constant [22 x i8] [i8 85, i8 78, i8 75, i8 78, i8 79, i8 87, i8 78, i8 32, i8 79, i8 80, i8 67, i8 79, i8 68, i8 69, i8 58, i8 32, i8 37, i8 48, i8 56, i8 88, i8 10, i8 0]
@@ -394,7 +395,7 @@ define void @core_init(%core_Core* %core, %core_BusInterface* %bus) {
 	ret void
 }
 
-define internal %Word32 @fetch(%core_Core* %core) {
+define internal %Word32 @core_fetch(%core_Core* %core) {
 	%1 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
 	%2 = load %Int32, %Int32* %1
 	%3 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
@@ -413,7 +414,7 @@ define void @core_tick(%core_Core* %core) {
 then_0:
 	%4 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 4
 	%5 = load %Int32, %Int32* %4
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([12 x i8]* @str1 to [0 x i8]*), %Int32 %5)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([12 x i8]* @str1 to [0 x i8]*), %Int32 %5)
 	%6 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 4
 	%7 = load %Int32, %Int32* %6
 	%8 = mul %Int32 %7, 4
@@ -423,37 +424,37 @@ then_0:
 	store %Int32 0, %Int32* %10
 	br label %endif_0
 endif_0:
-	%11 = call %Word32 @fetch(%core_Core* %core)
+	%11 = call %Word32 @core_fetch(%core_Core* %core)
 	%12 = call %Word8 @decode_extract_op(%Word32 %11)
 	%13 = call %Word8 @decode_extract_funct3(%Word32 %11)
 	%14 = icmp eq %Word8 %12, 19
 	br %Bool %14 , label %then_1, label %else_1
 then_1:
-	call void @doOpI(%core_Core* %core, %Word32 %11)
+	call void @core_doOpI(%core_Core* %core, %Word32 %11)
 	br label %endif_1
 else_1:
 	%15 = icmp eq %Word8 %12, 51
 	br %Bool %15 , label %then_2, label %else_2
 then_2:
-	call void @doOpR(%core_Core* %core, %Word32 %11)
+	call void @core_doOpR(%core_Core* %core, %Word32 %11)
 	br label %endif_2
 else_2:
 	%16 = icmp eq %Word8 %12, 55
 	br %Bool %16 , label %then_3, label %else_3
 then_3:
-	call void @doOpLUI(%core_Core* %core, %Word32 %11)
+	call void @core_doOpLUI(%core_Core* %core, %Word32 %11)
 	br label %endif_3
 else_3:
 	%17 = icmp eq %Word8 %12, 23
 	br %Bool %17 , label %then_4, label %else_4
 then_4:
-	call void @doOpAUIPC(%core_Core* %core, %Word32 %11)
+	call void @core_doOpAUIPC(%core_Core* %core, %Word32 %11)
 	br label %endif_4
 else_4:
 	%18 = icmp eq %Word8 %12, 111
 	br %Bool %18 , label %then_5, label %else_5
 then_5:
-	call void @doOpJAL(%core_Core* %core, %Word32 %11)
+	call void @core_doOpJAL(%core_Core* %core, %Word32 %11)
 	br label %endif_5
 else_5:
 	%19 = icmp eq %Word8 %12, 103
@@ -461,40 +462,40 @@ else_5:
 	%21 = and %Bool %19, %20
 	br %Bool %21 , label %then_6, label %else_6
 then_6:
-	call void @doOpJALR(%core_Core* %core, %Word32 %11)
+	call void @core_doOpJALR(%core_Core* %core, %Word32 %11)
 	br label %endif_6
 else_6:
 	%22 = icmp eq %Word8 %12, 99
 	br %Bool %22 , label %then_7, label %else_7
 then_7:
-	call void @doOpB(%core_Core* %core, %Word32 %11)
+	call void @core_doOpB(%core_Core* %core, %Word32 %11)
 	br label %endif_7
 else_7:
 	%23 = icmp eq %Word8 %12, 3
 	br %Bool %23 , label %then_8, label %else_8
 then_8:
-	call void @doOpL(%core_Core* %core, %Word32 %11)
+	call void @core_doOpL(%core_Core* %core, %Word32 %11)
 	br label %endif_8
 else_8:
 	%24 = icmp eq %Word8 %12, 35
 	br %Bool %24 , label %then_9, label %else_9
 then_9:
-	call void @doOpS(%core_Core* %core, %Word32 %11)
+	call void @core_doOpS(%core_Core* %core, %Word32 %11)
 	br label %endif_9
 else_9:
 	%25 = icmp eq %Word8 %12, 115
 	br %Bool %25 , label %then_10, label %else_10
 then_10:
-	call void @doOpSystem(%core_Core* %core, %Word32 %11)
+	call void @core_doOpSystem(%core_Core* %core, %Word32 %11)
 	br label %endif_10
 else_10:
 	%26 = icmp eq %Word8 %12, 15
 	br %Bool %26 , label %then_11, label %else_11
 then_11:
-	call void @doOpFence(%core_Core* %core, %Word32 %11)
+	call void @core_doOpFence(%core_Core* %core, %Word32 %11)
 	br label %endif_11
 else_11:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([22 x i8]* @str2 to [0 x i8]*), %Word8 %12)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([22 x i8]* @str2 to [0 x i8]*), %Word8 %12)
 	br label %endif_11
 endif_11:
 	br label %endif_10
@@ -534,7 +535,7 @@ endif_1:
 	ret void
 }
 
-define internal void @doOpI(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpI(%core_Core* %core, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -551,7 +552,7 @@ endif_0:
 	br %Bool %9 , label %then_1, label %else_1
 then_1:
 	; Add immediate
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str3 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str3 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%10 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
@@ -573,17 +574,17 @@ then_2:
 ; SLLI is a logical left shift (zeros are shifted
 ;		into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
 ;		is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). 
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str4 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str4 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%21 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%22 = getelementptr [32 x %Word32], [32 x %Word32]* %21, %Int32 0, %Int8 %5
 	%23 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%24 = getelementptr [32 x %Word32], [32 x %Word32]* %23, %Int32 0, %Int8 %6
-	%25 = trunc %Int32 %4 to %Int8
-	%26 = load %Word32, %Word32* %24
-	%27 = zext %Int8 %25 to %Word32
-	%28 = shl %Word32 %26, %27
+	%25 = load %Word32, %Word32* %24
+	%26 = trunc %Int32 %4 to %Int8
+	%27 = zext %Int8 %26 to %Word32
+	%28 = shl %Word32 %25, %27
 	store %Word32 %28, %Word32* %22
 	br label %endif_2
 else_2:
@@ -591,7 +592,7 @@ else_2:
 	br %Bool %29 , label %then_3, label %else_3
 then_3:
 	; SLTI - set [1 to rd if rs1] less than immediate
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str5 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str5 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%30 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
@@ -608,7 +609,7 @@ else_3:
 	%38 = icmp eq %Word8 %1, 3
 	br %Bool %38 , label %then_4, label %else_4
 then_4:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([20 x i8]* @str6 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([20 x i8]* @str6 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%39 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
@@ -626,7 +627,7 @@ else_4:
 	%48 = icmp eq %Word8 %1, 4
 	br %Bool %48 , label %then_5, label %else_5
 then_5:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str7 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str7 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%49 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
@@ -644,17 +645,17 @@ else_5:
 	%58 = and %Bool %56, %57
 	br %Bool %58 , label %then_6, label %else_6
 then_6:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str8 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str8 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%59 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%60 = getelementptr [32 x %Word32], [32 x %Word32]* %59, %Int32 0, %Int8 %5
 	%61 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%62 = getelementptr [32 x %Word32], [32 x %Word32]* %61, %Int32 0, %Int8 %6
-	%63 = trunc %Int32 %4 to %Int8
-	%64 = load %Word32, %Word32* %62
-	%65 = zext %Int8 %63 to %Word32
-	%66 = lshr %Word32 %64, %65
+	%63 = load %Word32, %Word32* %62
+	%64 = trunc %Int32 %4 to %Int8
+	%65 = zext %Int8 %64 to %Word32
+	%66 = lshr %Word32 %63, %65
 	store %Word32 %66, %Word32* %60
 	br label %endif_6
 else_6:
@@ -663,24 +664,24 @@ else_6:
 	%69 = and %Bool %67, %68
 	br %Bool %69 , label %then_7, label %else_7
 then_7:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str9 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str9 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%70 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%71 = getelementptr [32 x %Word32], [32 x %Word32]* %70, %Int32 0, %Int8 %5
 	%72 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%73 = getelementptr [32 x %Word32], [32 x %Word32]* %72, %Int32 0, %Int8 %6
-	%74 = trunc %Int32 %4 to %Int8
-	%75 = load %Word32, %Word32* %73
-	%76 = zext %Int8 %74 to %Word32
-	%77 = lshr %Word32 %75, %76
+	%74 = load %Word32, %Word32* %73
+	%75 = trunc %Int32 %4 to %Int8
+	%76 = zext %Int8 %75 to %Word32
+	%77 = lshr %Word32 %74, %76
 	store %Word32 %77, %Word32* %71
 	br label %endif_7
 else_7:
 	%78 = icmp eq %Word8 %1, 6
 	br %Bool %78 , label %then_8, label %else_8
 then_8:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str10 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str10 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%79 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
@@ -696,7 +697,7 @@ else_8:
 	%86 = icmp eq %Word8 %1, 7
 	br %Bool %86 , label %then_9, label %endif_9
 then_9:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str11 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str11 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int32 %4)
 
 	;
 	%87 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
@@ -728,7 +729,7 @@ endif_1:
 	ret void
 }
 
-define internal void @doOpR(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpR(%core_Core* %core, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -764,7 +765,7 @@ then_1:
 	br %Bool %18 , label %then_2, label %else_2
 then_2:
 	; MUL rd, rs1, rs2
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str12 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str12 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 	%19 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%20 = getelementptr [32 x %Word32], [32 x %Word32]* %19, %Int32 0, %Int8 %5
 	%21 = bitcast %Word32 %12 to %Int32
@@ -780,93 +781,94 @@ then_3:
 	; MULH rd, rs1, rs2
 	; Записывает в целевой регистр старшие биты
 	; которые бы не поместились в него при обычном умножении
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([20 x i8]* @str13 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([20 x i8]* @str13 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 	%26 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%27 = getelementptr [32 x %Word32], [32 x %Word32]* %26, %Int32 0, %Int8 %5
 	%28 = sext %Word32 %12 to %Int64
 	%29 = sext %Word32 %15 to %Int64
 	%30 = mul %Int64 %28, %29
 	%31 = bitcast %Int64 %30 to %Word64
-	%32 = lshr %Word64 %31, 32
-	%33 = trunc %Word64 %32 to %Word32
-	store %Word32 %33, %Word32* %27
+	%32 = zext i8 32 to %Word64
+	%33 = lshr %Word64 %31, %32
+	%34 = trunc %Word64 %33 to %Word32
+	store %Word32 %34, %Word32* %27
 	br label %endif_3
 else_3:
-	%34 = icmp eq %Word8 %1, 2
-	br %Bool %34 , label %then_4, label %else_4
+	%35 = icmp eq %Word8 %1, 2
+	br %Bool %35 , label %then_4, label %else_4
 then_4:
 	; MULHSU rd, rs1, rs2
 	; mul high signed unsigned
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([22 x i8]* @str14 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([22 x i8]* @str14 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	; NOT IMPLEMENTED!
-	call void (%Str8*, ...) @notImplemented(%Str8* bitcast ([21 x i8]* @str15 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_notImplemented(%Str8* bitcast ([21 x i8]* @str15 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 	br label %endif_4
 else_4:
-	%35 = icmp eq %Word8 %1, 3
-	br %Bool %35 , label %then_5, label %else_5
+	%36 = icmp eq %Word8 %1, 3
+	br %Bool %36 , label %then_5, label %else_5
 then_5:
 	; MULHU rd, rs1, rs2
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([21 x i8]* @str16 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([21 x i8]* @str16 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	; NOT IMPLEMENTED!
-	call void (%Str8*, ...) @notImplemented(%Str8* bitcast ([22 x i8]* @str17 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_notImplemented(%Str8* bitcast ([22 x i8]* @str17 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 	br label %endif_5
 else_5:
-	%36 = icmp eq %Word8 %1, 4
-	br %Bool %36 , label %then_6, label %else_6
+	%37 = icmp eq %Word8 %1, 4
+	br %Bool %37 , label %then_6, label %else_6
 then_6:
 	; DIV rd, rs1, rs2
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str18 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
-	%37 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%38 = getelementptr [32 x %Word32], [32 x %Word32]* %37, %Int32 0, %Int8 %5
-	%39 = bitcast %Word32 %12 to %Int32
-	%40 = bitcast %Word32 %15 to %Int32
-	%41 = sdiv %Int32 %39, %40
-	%42 = bitcast %Int32 %41 to %Word32
-	store %Word32 %42, %Word32* %38
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str18 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	%38 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%39 = getelementptr [32 x %Word32], [32 x %Word32]* %38, %Int32 0, %Int8 %5
+	%40 = bitcast %Word32 %12 to %Int32
+	%41 = bitcast %Word32 %15 to %Int32
+	%42 = sdiv %Int32 %40, %41
+	%43 = bitcast %Int32 %42 to %Word32
+	store %Word32 %43, %Word32* %39
 	br label %endif_6
 else_6:
-	%43 = icmp eq %Word8 %1, 5
-	br %Bool %43 , label %then_7, label %else_7
+	%44 = icmp eq %Word8 %1, 5
+	br %Bool %44 , label %then_7, label %else_7
 then_7:
 	; DIVU rd, rs1, rs2
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([20 x i8]* @str19 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
-	%44 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%45 = getelementptr [32 x %Word32], [32 x %Word32]* %44, %Int32 0, %Int8 %5
-	%46 = bitcast %Word32 %12 to %Int32
-	%47 = bitcast %Word32 %15 to %Int32
-	%48 = udiv %Int32 %46, %47
-	%49 = bitcast %Int32 %48 to %Word32
-	store %Word32 %49, %Word32* %45
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([20 x i8]* @str19 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	%45 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%46 = getelementptr [32 x %Word32], [32 x %Word32]* %45, %Int32 0, %Int8 %5
+	%47 = bitcast %Word32 %12 to %Int32
+	%48 = bitcast %Word32 %15 to %Int32
+	%49 = udiv %Int32 %47, %48
+	%50 = bitcast %Int32 %49 to %Word32
+	store %Word32 %50, %Word32* %46
 	br label %endif_7
 else_7:
-	%50 = icmp eq %Word8 %1, 6
-	br %Bool %50 , label %then_8, label %else_8
+	%51 = icmp eq %Word8 %1, 6
+	br %Bool %51 , label %then_8, label %else_8
 then_8:
 	; REM rd, rs1, rs2
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str20 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
-	%51 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%52 = getelementptr [32 x %Word32], [32 x %Word32]* %51, %Int32 0, %Int8 %5
-	%53 = bitcast %Word32 %12 to %Int32
-	%54 = bitcast %Word32 %15 to %Int32
-	%55 = srem %Int32 %53, %54
-	%56 = bitcast %Int32 %55 to %Word32
-	store %Word32 %56, %Word32* %52
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str20 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	%52 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%53 = getelementptr [32 x %Word32], [32 x %Word32]* %52, %Int32 0, %Int8 %5
+	%54 = bitcast %Word32 %12 to %Int32
+	%55 = bitcast %Word32 %15 to %Int32
+	%56 = srem %Int32 %54, %55
+	%57 = bitcast %Int32 %56 to %Word32
+	store %Word32 %57, %Word32* %53
 	br label %endif_8
 else_8:
-	%57 = icmp eq %Word8 %1, 7
-	br %Bool %57 , label %then_9, label %endif_9
+	%58 = icmp eq %Word8 %1, 7
+	br %Bool %58 , label %then_9, label %endif_9
 then_9:
 	; REMU rd, rs1, rs2
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([20 x i8]* @str21 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
-	%58 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%59 = getelementptr [32 x %Word32], [32 x %Word32]* %58, %Int32 0, %Int8 %5
-	%60 = bitcast %Word32 %12 to %Int32
-	%61 = bitcast %Word32 %15 to %Int32
-	%62 = urem %Int32 %60, %61
-	%63 = bitcast %Int32 %62 to %Word32
-	store %Word32 %63, %Word32* %59
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([20 x i8]* @str21 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	%59 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%60 = getelementptr [32 x %Word32], [32 x %Word32]* %59, %Int32 0, %Int8 %5
+	%61 = bitcast %Word32 %12 to %Int32
+	%62 = bitcast %Word32 %15 to %Int32
+	%63 = urem %Int32 %61, %62
+	%64 = bitcast %Int32 %63 to %Word32
+	store %Word32 %64, %Word32* %60
 	br label %endif_9
 endif_9:
 	br label %endif_8
@@ -886,148 +888,148 @@ endif_2:
 	ret void
 	br label %endif_1
 endif_1:
-	%65 = icmp eq %Word8 %1, 0
-	%66 = icmp eq %Word8 %2, 0
-	%67 = and %Bool %65, %66
-	br %Bool %67 , label %then_10, label %else_10
+	%66 = icmp eq %Word8 %1, 0
+	%67 = icmp eq %Word8 %2, 0
+	%68 = and %Bool %66, %67
+	br %Bool %68 , label %then_10, label %else_10
 then_10:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str22 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str22 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%68 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%69 = getelementptr [32 x %Word32], [32 x %Word32]* %68, %Int32 0, %Int8 %5
-	%70 = bitcast %Word32 %12 to %Int32
-	%71 = bitcast %Word32 %15 to %Int32
-	%72 = add %Int32 %70, %71
-	%73 = bitcast %Int32 %72 to %Word32
-	store %Word32 %73, %Word32* %69
+	%69 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%70 = getelementptr [32 x %Word32], [32 x %Word32]* %69, %Int32 0, %Int8 %5
+	%71 = bitcast %Word32 %12 to %Int32
+	%72 = bitcast %Word32 %15 to %Int32
+	%73 = add %Int32 %71, %72
+	%74 = bitcast %Int32 %73 to %Word32
+	store %Word32 %74, %Word32* %70
 	br label %endif_10
 else_10:
-	%74 = icmp eq %Word8 %1, 0
-	%75 = icmp eq %Word8 %2, 32
-	%76 = and %Bool %74, %75
-	br %Bool %76 , label %then_11, label %else_11
+	%75 = icmp eq %Word8 %1, 0
+	%76 = icmp eq %Word8 %2, 32
+	%77 = and %Bool %75, %76
+	br %Bool %77 , label %then_11, label %else_11
 then_11:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str23 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str23 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%77 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%78 = getelementptr [32 x %Word32], [32 x %Word32]* %77, %Int32 0, %Int8 %5
-	%79 = bitcast %Word32 %12 to %Int32
-	%80 = bitcast %Word32 %15 to %Int32
-	%81 = sub %Int32 %79, %80
-	%82 = bitcast %Int32 %81 to %Word32
-	store %Word32 %82, %Word32* %78
+	%78 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%79 = getelementptr [32 x %Word32], [32 x %Word32]* %78, %Int32 0, %Int8 %5
+	%80 = bitcast %Word32 %12 to %Int32
+	%81 = bitcast %Word32 %15 to %Int32
+	%82 = sub %Int32 %80, %81
+	%83 = bitcast %Int32 %82 to %Word32
+	store %Word32 %83, %Word32* %79
 	br label %endif_11
 else_11:
-	%83 = icmp eq %Word8 %1, 1
-	br %Bool %83 , label %then_12, label %else_12
+	%84 = icmp eq %Word8 %1, 1
+	br %Bool %84 , label %then_12, label %else_12
 then_12:
 	; shift left logical
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str24 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str24 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%84 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%85 = getelementptr [32 x %Word32], [32 x %Word32]* %84, %Int32 0, %Int8 %5
-	%86 = trunc %Word32 %15 to %Int8
-	%87 = zext %Int8 %86 to %Word32
-	%88 = shl %Word32 %12, %87
-	store %Word32 %88, %Word32* %85
+	%85 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%86 = getelementptr [32 x %Word32], [32 x %Word32]* %85, %Int32 0, %Int8 %5
+	%87 = trunc %Word32 %15 to %Int8
+	%88 = zext %Int8 %87 to %Word32
+	%89 = shl %Word32 %12, %88
+	store %Word32 %89, %Word32* %86
 	br label %endif_12
 else_12:
-	%89 = icmp eq %Word8 %1, 2
-	br %Bool %89 , label %then_13, label %else_13
+	%90 = icmp eq %Word8 %1, 2
+	br %Bool %90 , label %then_13, label %else_13
 then_13:
 	; set less than
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str25 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str25 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%90 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%91 = getelementptr [32 x %Word32], [32 x %Word32]* %90, %Int32 0, %Int8 %5
-	%92 = bitcast %Word32 %12 to %Int32
-	%93 = bitcast %Word32 %15 to %Int32
-	%94 = icmp slt %Int32 %92, %93
-	%95 = zext %Bool %94 to %Word32
-	store %Word32 %95, %Word32* %91
+	%91 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%92 = getelementptr [32 x %Word32], [32 x %Word32]* %91, %Int32 0, %Int8 %5
+	%93 = bitcast %Word32 %12 to %Int32
+	%94 = bitcast %Word32 %15 to %Int32
+	%95 = icmp slt %Int32 %93, %94
+	%96 = zext %Bool %95 to %Word32
+	store %Word32 %96, %Word32* %92
 	br label %endif_13
 else_13:
-	%96 = icmp eq %Word8 %1, 3
-	br %Bool %96 , label %then_14, label %else_14
+	%97 = icmp eq %Word8 %1, 3
+	br %Bool %97 , label %then_14, label %else_14
 then_14:
 	; set less than unsigned
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([20 x i8]* @str26 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([20 x i8]* @str26 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%97 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%98 = getelementptr [32 x %Word32], [32 x %Word32]* %97, %Int32 0, %Int8 %5
-	%99 = bitcast %Word32 %12 to %Int32
-	%100 = bitcast %Word32 %15 to %Int32
-	%101 = icmp ult %Int32 %99, %100
-	%102 = zext %Bool %101 to %Word32
-	store %Word32 %102, %Word32* %98
+	%98 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%99 = getelementptr [32 x %Word32], [32 x %Word32]* %98, %Int32 0, %Int8 %5
+	%100 = bitcast %Word32 %12 to %Int32
+	%101 = bitcast %Word32 %15 to %Int32
+	%102 = icmp ult %Int32 %100, %101
+	%103 = zext %Bool %102 to %Word32
+	store %Word32 %103, %Word32* %99
 	br label %endif_14
 else_14:
-	%103 = icmp eq %Word8 %1, 4
-	br %Bool %103 , label %then_15, label %else_15
+	%104 = icmp eq %Word8 %1, 4
+	br %Bool %104 , label %then_15, label %else_15
 then_15:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str27 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str27 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%104 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%105 = getelementptr [32 x %Word32], [32 x %Word32]* %104, %Int32 0, %Int8 %5
-	%106 = xor %Word32 %12, %15
-	store %Word32 %106, %Word32* %105
+	%105 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%106 = getelementptr [32 x %Word32], [32 x %Word32]* %105, %Int32 0, %Int8 %5
+	%107 = xor %Word32 %12, %15
+	store %Word32 %107, %Word32* %106
 	br label %endif_15
 else_15:
-	%107 = icmp eq %Word8 %1, 5
-	%108 = icmp eq %Word8 %2, 0
-	%109 = and %Bool %107, %108
-	br %Bool %109 , label %then_16, label %else_16
+	%108 = icmp eq %Word8 %1, 5
+	%109 = icmp eq %Word8 %2, 0
+	%110 = and %Bool %108, %109
+	br %Bool %110 , label %then_16, label %else_16
 then_16:
 	; shift right logical
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str28 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
-	%110 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%111 = getelementptr [32 x %Word32], [32 x %Word32]* %110, %Int32 0, %Int8 %5
-	%112 = trunc %Word32 %15 to %Int8
-	%113 = zext %Int8 %112 to %Word32
-	%114 = lshr %Word32 %12, %113
-	store %Word32 %114, %Word32* %111
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str28 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	%111 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%112 = getelementptr [32 x %Word32], [32 x %Word32]* %111, %Int32 0, %Int8 %5
+	%113 = trunc %Word32 %15 to %Int8
+	%114 = zext %Int8 %113 to %Word32
+	%115 = lshr %Word32 %12, %114
+	store %Word32 %115, %Word32* %112
 	br label %endif_16
 else_16:
-	%115 = icmp eq %Word8 %1, 5
-	%116 = icmp eq %Word8 %2, 32
-	%117 = and %Bool %115, %116
-	br %Bool %117 , label %then_17, label %else_17
+	%116 = icmp eq %Word8 %1, 5
+	%117 = icmp eq %Word8 %2, 32
+	%118 = and %Bool %116, %117
+	br %Bool %118 , label %then_17, label %else_17
 then_17:
 	; shift right arithmetical
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str29 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str29 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	; ERROR: не реализован арифм сдвиг!
 	;core.reg[rd] = v0 >> Int32 v1
 	br label %endif_17
 else_17:
-	%118 = icmp eq %Word8 %1, 6
-	br %Bool %118 , label %then_18, label %else_18
+	%119 = icmp eq %Word8 %1, 6
+	br %Bool %119 , label %then_18, label %else_18
 then_18:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str30 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str30 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%119 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%120 = getelementptr [32 x %Word32], [32 x %Word32]* %119, %Int32 0, %Int8 %5
-	%121 = or %Word32 %12, %15
-	store %Word32 %121, %Word32* %120
+	%120 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%121 = getelementptr [32 x %Word32], [32 x %Word32]* %120, %Int32 0, %Int8 %5
+	%122 = or %Word32 %12, %15
+	store %Word32 %122, %Word32* %121
 	br label %endif_18
 else_18:
-	%122 = icmp eq %Word8 %1, 7
-	br %Bool %122 , label %then_19, label %endif_19
+	%123 = icmp eq %Word8 %1, 7
+	br %Bool %123 , label %then_19, label %endif_19
 then_19:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str31 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str31 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int8 %7)
 
 	;
-	%123 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%124 = getelementptr [32 x %Word32], [32 x %Word32]* %123, %Int32 0, %Int8 %5
-	%125 = and %Word32 %12, %15
-	store %Word32 %125, %Word32* %124
+	%124 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%125 = getelementptr [32 x %Word32], [32 x %Word32]* %124, %Int32 0, %Int8 %5
+	%126 = and %Word32 %12, %15
+	store %Word32 %126, %Word32* %125
 	br label %endif_19
 endif_19:
 	br label %endif_18
@@ -1051,55 +1053,57 @@ endif_10:
 	ret void
 }
 
-define internal void @doOpLUI(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpLUI(%core_Core* %core, %Word32 %instr) {
 	; load upper immediate
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = call %Int32 @decode_expand12(%Word32 %1)
 	%3 = call %Int8 @decode_extract_rd(%Word32 %instr)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([15 x i8]* @str32 to [0 x i8]*), %Int8 %3, %Int32 %2)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([15 x i8]* @str32 to [0 x i8]*), %Int8 %3, %Int32 %2)
 	%4 = icmp ne %Int8 %3, 0
 	br %Bool %4 , label %then_0, label %endif_0
 then_0:
 	%5 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%6 = getelementptr [32 x %Word32], [32 x %Word32]* %5, %Int32 0, %Int8 %3
 	%7 = bitcast %Int32 %2 to %Word32
-	%8 = shl %Word32 %7, 12
-	store %Word32 %8, %Word32* %6
+	%8 = zext i8 12 to %Word32
+	%9 = shl %Word32 %7, %8
+	store %Word32 %9, %Word32* %6
 	br label %endif_0
 endif_0:
 	ret void
 }
 
-define internal void @doOpAUIPC(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpAUIPC(%core_Core* %core, %Word32 %instr) {
 	; Add upper immediate to PC
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = call %Int32 @decode_expand12(%Word32 %1)
 	%3 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
 	%4 = bitcast %Int32 %2 to %Word32
-	%5 = shl %Word32 %4, 12
-	%6 = bitcast %Word32 %5 to %Int32
-	%7 = load %Int32, %Int32* %3
-	%8 = add %Int32 %7, %6
-	%9 = call %Int8 @decode_extract_rd(%Word32 %instr)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str33 to [0 x i8]*), %Int8 %9, %Int32 %2)
-	%10 = icmp ne %Int8 %9, 0
-	br %Bool %10 , label %then_0, label %endif_0
+	%5 = zext i8 12 to %Word32
+	%6 = shl %Word32 %4, %5
+	%7 = bitcast %Word32 %6 to %Int32
+	%8 = load %Int32, %Int32* %3
+	%9 = add %Int32 %8, %7
+	%10 = call %Int8 @decode_extract_rd(%Word32 %instr)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([17 x i8]* @str33 to [0 x i8]*), %Int8 %10, %Int32 %2)
+	%11 = icmp ne %Int8 %10, 0
+	br %Bool %11 , label %then_0, label %endif_0
 then_0:
-	%11 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%12 = getelementptr [32 x %Word32], [32 x %Word32]* %11, %Int32 0, %Int8 %9
-	%13 = bitcast %Int32 %8 to %Word32
-	store %Word32 %13, %Word32* %12
+	%12 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%13 = getelementptr [32 x %Word32], [32 x %Word32]* %12, %Int32 0, %Int8 %10
+	%14 = bitcast %Int32 %9 to %Word32
+	store %Word32 %14, %Word32* %13
 	br label %endif_0
 endif_0:
 	ret void
 }
 
-define internal void @doOpJAL(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpJAL(%core_Core* %core, %Word32 %instr) {
 	; Jump and link
 	%1 = call %Int8 @decode_extract_rd(%Word32 %instr)
 	%2 = call %Word32 @decode_extract_jal_imm(%Word32 %instr)
 	%3 = call %Int32 @decode_expand20(%Word32 %2)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([13 x i8]* @str34 to [0 x i8]*), %Int8 %1, %Int32 %3)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([13 x i8]* @str34 to [0 x i8]*), %Int8 %1, %Int32 %3)
 	%4 = icmp ne %Int8 %1, 0
 	br %Bool %4 , label %then_0, label %endif_0
 then_0:
@@ -1122,13 +1126,13 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpJALR(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpJALR(%core_Core* %core, %Word32 %instr) {
 	; Jump and link (by register)
 	%1 = call %Int8 @decode_extract_rs1(%Word32 %instr)
 	%2 = call %Int8 @decode_extract_rd(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
 	%4 = call %Int32 @decode_expand12(%Word32 %3)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([14 x i8]* @str35 to [0 x i8]*), %Int32 %4, %Int8 %1)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([14 x i8]* @str35 to [0 x i8]*), %Int32 %4, %Int8 %1)
 
 	; rd <- pc + 4
 	; pc <- (rs1 + imm) & ~1
@@ -1158,7 +1162,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpB(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpB(%core_Core* %core, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Int8 @decode_extract_rd(%Word32 %instr)
@@ -1168,203 +1172,206 @@ define internal void @doOpB(%core_Core* %core, %Word32 %instr) {
 	%7 = and %Word16 %4, 30
 	%8 = and %Word8 %2, 63
 	%9 = zext %Word8 %8 to %Word16
-	%10 = shl %Word16 %9, 5
-	%11 = and %Word16 %4, 1
-	%12 = shl %Word16 %11, 11
-	%13 = and %Word8 %2, 64
-	%14 = zext %Word8 %13 to %Word16
-	%15 = shl %Word16 %14, 6
-	%16 = alloca %Word16, align 2
-	%17 = or %Word16 %10, %7
-	%18 = or %Word16 %12, %17
-	%19 = or %Word16 %15, %18
-	store %Word16 %19, %Word16* %16
+	%10 = zext i8 5 to %Word16
+	%11 = shl %Word16 %9, %10
+	%12 = and %Word16 %4, 1
+	%13 = zext i8 11 to %Word16
+	%14 = shl %Word16 %12, %13
+	%15 = and %Word8 %2, 64
+	%16 = zext %Word8 %15 to %Word16
+	%17 = zext i8 6 to %Word16
+	%18 = shl %Word16 %16, %17
+	%19 = alloca %Word16, align 2
+	%20 = or %Word16 %11, %7
+	%21 = or %Word16 %14, %20
+	%22 = or %Word16 %18, %21
+	store %Word16 %22, %Word16* %19
 
 	; распространяем знак, если он есть
-	%20 = load %Word16, %Word16* %16
-	%21 = and %Word16 %20, 4096
-	%22 = icmp ne %Word16 %21, 0
-	br %Bool %22 , label %then_0, label %endif_0
+	%23 = load %Word16, %Word16* %19
+	%24 = and %Word16 %23, 4096
+	%25 = icmp ne %Word16 %24, 0
+	br %Bool %25 , label %then_0, label %endif_0
 then_0:
-	%23 = load %Word16, %Word16* %16
-	%24 = or %Word16 61440, %23
-	store %Word16 %24, %Word16* %16
+	%26 = load %Word16, %Word16* %19
+	%27 = or %Word16 61440, %26
+	store %Word16 %27, %Word16* %19
 	br label %endif_0
 endif_0:
-	%25 = load %Word16, %Word16* %16
-	%26 = bitcast %Word16 %25 to %Int16
-	%27 = icmp eq %Word8 %1, 0
-	br %Bool %27 , label %then_1, label %else_1
+	%28 = load %Word16, %Word16* %19
+	%29 = bitcast %Word16 %28 to %Int16
+	%30 = icmp eq %Word8 %1, 0
+	br %Bool %30 , label %then_1, label %else_1
 then_1:
 	; BEQ - Branch if equal
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str36 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %26)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str36 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %29)
 
 	; Branch if two registers are equal
-	%28 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%29 = getelementptr [32 x %Word32], [32 x %Word32]* %28, %Int32 0, %Int8 %5
-	%30 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%31 = getelementptr [32 x %Word32], [32 x %Word32]* %30, %Int32 0, %Int8 %6
-	%32 = load %Word32, %Word32* %29
-	%33 = load %Word32, %Word32* %31
-	%34 = icmp eq %Word32 %32, %33
-	br %Bool %34 , label %then_2, label %endif_2
+	%31 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%32 = getelementptr [32 x %Word32], [32 x %Word32]* %31, %Int32 0, %Int8 %5
+	%33 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%34 = getelementptr [32 x %Word32], [32 x %Word32]* %33, %Int32 0, %Int8 %6
+	%35 = load %Word32, %Word32* %32
+	%36 = load %Word32, %Word32* %34
+	%37 = icmp eq %Word32 %35, %36
+	br %Bool %37 , label %then_2, label %endif_2
 then_2:
-	%35 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
-	%36 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
-	%37 = load %Int32, %Int32* %36
-	%38 = bitcast %Int32 %37 to %Int32
-	%39 = sext %Int16 %26 to %Int32
-	%40 = add %Int32 %38, %39
+	%38 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
+	%39 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
+	%40 = load %Int32, %Int32* %39
 	%41 = bitcast %Int32 %40 to %Int32
-	store %Int32 %41, %Int32* %35
+	%42 = sext %Int16 %29 to %Int32
+	%43 = add %Int32 %41, %42
+	%44 = bitcast %Int32 %43 to %Int32
+	store %Int32 %44, %Int32* %38
 	br label %endif_2
 endif_2:
 	br label %endif_1
 else_1:
-	%42 = icmp eq %Word8 %1, 1
-	br %Bool %42 , label %then_3, label %else_3
+	%45 = icmp eq %Word8 %1, 1
+	br %Bool %45 , label %then_3, label %else_3
 then_3:
 	; BNE - Branch if not equal
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str37 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %26)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str37 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %29)
 
 	;
-	%43 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%44 = getelementptr [32 x %Word32], [32 x %Word32]* %43, %Int32 0, %Int8 %5
-	%45 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%46 = getelementptr [32 x %Word32], [32 x %Word32]* %45, %Int32 0, %Int8 %6
-	%47 = load %Word32, %Word32* %44
-	%48 = load %Word32, %Word32* %46
-	%49 = icmp ne %Word32 %47, %48
-	br %Bool %49 , label %then_4, label %endif_4
+	%46 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%47 = getelementptr [32 x %Word32], [32 x %Word32]* %46, %Int32 0, %Int8 %5
+	%48 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%49 = getelementptr [32 x %Word32], [32 x %Word32]* %48, %Int32 0, %Int8 %6
+	%50 = load %Word32, %Word32* %47
+	%51 = load %Word32, %Word32* %49
+	%52 = icmp ne %Word32 %50, %51
+	br %Bool %52 , label %then_4, label %endif_4
 then_4:
-	%50 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
-	%51 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
-	%52 = load %Int32, %Int32* %51
-	%53 = bitcast %Int32 %52 to %Int32
-	%54 = sext %Int16 %26 to %Int32
-	%55 = add %Int32 %53, %54
+	%53 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
+	%54 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
+	%55 = load %Int32, %Int32* %54
 	%56 = bitcast %Int32 %55 to %Int32
-	store %Int32 %56, %Int32* %50
+	%57 = sext %Int16 %29 to %Int32
+	%58 = add %Int32 %56, %57
+	%59 = bitcast %Int32 %58 to %Int32
+	store %Int32 %59, %Int32* %53
 	br label %endif_4
 endif_4:
 	br label %endif_3
 else_3:
-	%57 = icmp eq %Word8 %1, 4
-	br %Bool %57 , label %then_5, label %else_5
+	%60 = icmp eq %Word8 %1, 4
+	br %Bool %60 , label %then_5, label %else_5
 then_5:
 	; BLT - Branch if less than (signed)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str38 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %26)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str38 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %29)
 
 	;
-	%58 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%59 = getelementptr [32 x %Word32], [32 x %Word32]* %58, %Int32 0, %Int8 %5
-	%60 = load %Word32, %Word32* %59
-	%61 = bitcast %Word32 %60 to %Int32
-	%62 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%63 = getelementptr [32 x %Word32], [32 x %Word32]* %62, %Int32 0, %Int8 %6
-	%64 = load %Word32, %Word32* %63
-	%65 = bitcast %Word32 %64 to %Int32
-	%66 = icmp slt %Int32 %61, %65
-	br %Bool %66 , label %then_6, label %endif_6
+	%61 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%62 = getelementptr [32 x %Word32], [32 x %Word32]* %61, %Int32 0, %Int8 %5
+	%63 = load %Word32, %Word32* %62
+	%64 = bitcast %Word32 %63 to %Int32
+	%65 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%66 = getelementptr [32 x %Word32], [32 x %Word32]* %65, %Int32 0, %Int8 %6
+	%67 = load %Word32, %Word32* %66
+	%68 = bitcast %Word32 %67 to %Int32
+	%69 = icmp slt %Int32 %64, %68
+	br %Bool %69 , label %then_6, label %endif_6
 then_6:
-	%67 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
-	%68 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
-	%69 = load %Int32, %Int32* %68
-	%70 = bitcast %Int32 %69 to %Int32
-	%71 = sext %Int16 %26 to %Int32
-	%72 = add %Int32 %70, %71
+	%70 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
+	%71 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
+	%72 = load %Int32, %Int32* %71
 	%73 = bitcast %Int32 %72 to %Int32
-	store %Int32 %73, %Int32* %67
+	%74 = sext %Int16 %29 to %Int32
+	%75 = add %Int32 %73, %74
+	%76 = bitcast %Int32 %75 to %Int32
+	store %Int32 %76, %Int32* %70
 	br label %endif_6
 endif_6:
 	br label %endif_5
 else_5:
-	%74 = icmp eq %Word8 %1, 5
-	br %Bool %74 , label %then_7, label %else_7
+	%77 = icmp eq %Word8 %1, 5
+	br %Bool %77 , label %then_7, label %else_7
 then_7:
 	; BGE - Branch if greater or equal (signed)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str39 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %26)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str39 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %29)
 
 	;
-	%75 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%76 = getelementptr [32 x %Word32], [32 x %Word32]* %75, %Int32 0, %Int8 %5
-	%77 = load %Word32, %Word32* %76
-	%78 = bitcast %Word32 %77 to %Int32
-	%79 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%80 = getelementptr [32 x %Word32], [32 x %Word32]* %79, %Int32 0, %Int8 %6
-	%81 = load %Word32, %Word32* %80
-	%82 = bitcast %Word32 %81 to %Int32
-	%83 = icmp sge %Int32 %78, %82
-	br %Bool %83 , label %then_8, label %endif_8
+	%78 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%79 = getelementptr [32 x %Word32], [32 x %Word32]* %78, %Int32 0, %Int8 %5
+	%80 = load %Word32, %Word32* %79
+	%81 = bitcast %Word32 %80 to %Int32
+	%82 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%83 = getelementptr [32 x %Word32], [32 x %Word32]* %82, %Int32 0, %Int8 %6
+	%84 = load %Word32, %Word32* %83
+	%85 = bitcast %Word32 %84 to %Int32
+	%86 = icmp sge %Int32 %81, %85
+	br %Bool %86 , label %then_8, label %endif_8
 then_8:
-	%84 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
-	%85 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
-	%86 = load %Int32, %Int32* %85
-	%87 = bitcast %Int32 %86 to %Int32
-	%88 = sext %Int16 %26 to %Int32
-	%89 = add %Int32 %87, %88
+	%87 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
+	%88 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
+	%89 = load %Int32, %Int32* %88
 	%90 = bitcast %Int32 %89 to %Int32
-	store %Int32 %90, %Int32* %84
+	%91 = sext %Int16 %29 to %Int32
+	%92 = add %Int32 %90, %91
+	%93 = bitcast %Int32 %92 to %Int32
+	store %Int32 %93, %Int32* %87
 	br label %endif_8
 endif_8:
 	br label %endif_7
 else_7:
-	%91 = icmp eq %Word8 %1, 6
-	br %Bool %91 , label %then_9, label %else_9
+	%94 = icmp eq %Word8 %1, 6
+	br %Bool %94 , label %then_9, label %else_9
 then_9:
 	; BLTU - Branch if less than (unsigned)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str40 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %26)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str40 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %29)
 
 	;
-	%92 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%93 = getelementptr [32 x %Word32], [32 x %Word32]* %92, %Int32 0, %Int8 %5
-	%94 = load %Word32, %Word32* %93
-	%95 = bitcast %Word32 %94 to %Int32
-	%96 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%97 = getelementptr [32 x %Word32], [32 x %Word32]* %96, %Int32 0, %Int8 %6
-	%98 = load %Word32, %Word32* %97
-	%99 = bitcast %Word32 %98 to %Int32
-	%100 = icmp ult %Int32 %95, %99
-	br %Bool %100 , label %then_10, label %endif_10
+	%95 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%96 = getelementptr [32 x %Word32], [32 x %Word32]* %95, %Int32 0, %Int8 %5
+	%97 = load %Word32, %Word32* %96
+	%98 = bitcast %Word32 %97 to %Int32
+	%99 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%100 = getelementptr [32 x %Word32], [32 x %Word32]* %99, %Int32 0, %Int8 %6
+	%101 = load %Word32, %Word32* %100
+	%102 = bitcast %Word32 %101 to %Int32
+	%103 = icmp ult %Int32 %98, %102
+	br %Bool %103 , label %then_10, label %endif_10
 then_10:
-	%101 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
-	%102 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
-	%103 = load %Int32, %Int32* %102
-	%104 = bitcast %Int32 %103 to %Int32
-	%105 = sext %Int16 %26 to %Int32
-	%106 = add %Int32 %104, %105
+	%104 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
+	%105 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
+	%106 = load %Int32, %Int32* %105
 	%107 = bitcast %Int32 %106 to %Int32
-	store %Int32 %107, %Int32* %101
+	%108 = sext %Int16 %29 to %Int32
+	%109 = add %Int32 %107, %108
+	%110 = bitcast %Int32 %109 to %Int32
+	store %Int32 %110, %Int32* %104
 	br label %endif_10
 endif_10:
 	br label %endif_9
 else_9:
-	%108 = icmp eq %Word8 %1, 7
-	br %Bool %108 , label %then_11, label %endif_11
+	%111 = icmp eq %Word8 %1, 7
+	br %Bool %111 , label %then_11, label %endif_11
 then_11:
 	; BGEU - Branch if greater or equal (unsigned)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([19 x i8]* @str41 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %26)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([19 x i8]* @str41 to [0 x i8]*), %Int8 %5, %Int8 %6, %Int16 %29)
 
 	;
-	%109 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%110 = getelementptr [32 x %Word32], [32 x %Word32]* %109, %Int32 0, %Int8 %5
-	%111 = load %Word32, %Word32* %110
-	%112 = bitcast %Word32 %111 to %Int32
-	%113 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%114 = getelementptr [32 x %Word32], [32 x %Word32]* %113, %Int32 0, %Int8 %6
-	%115 = load %Word32, %Word32* %114
-	%116 = bitcast %Word32 %115 to %Int32
-	%117 = icmp uge %Int32 %112, %116
-	br %Bool %117 , label %then_12, label %endif_12
+	%112 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%113 = getelementptr [32 x %Word32], [32 x %Word32]* %112, %Int32 0, %Int8 %5
+	%114 = load %Word32, %Word32* %113
+	%115 = bitcast %Word32 %114 to %Int32
+	%116 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%117 = getelementptr [32 x %Word32], [32 x %Word32]* %116, %Int32 0, %Int8 %6
+	%118 = load %Word32, %Word32* %117
+	%119 = bitcast %Word32 %118 to %Int32
+	%120 = icmp uge %Int32 %115, %119
+	br %Bool %120 , label %then_12, label %endif_12
 then_12:
-	%118 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
-	%119 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
-	%120 = load %Int32, %Int32* %119
-	%121 = bitcast %Int32 %120 to %Int32
-	%122 = sext %Int16 %26 to %Int32
-	%123 = add %Int32 %121, %122
+	%121 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 2
+	%122 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 1
+	%123 = load %Int32, %Int32* %122
 	%124 = bitcast %Int32 %123 to %Int32
-	store %Int32 %124, %Int32* %118
+	%125 = sext %Int16 %29 to %Int32
+	%126 = add %Int32 %124, %125
+	%127 = bitcast %Int32 %126 to %Int32
+	store %Int32 %127, %Int32* %121
 	br label %endif_12
 endif_12:
 	br label %endif_11
@@ -1382,7 +1389,7 @@ endif_1:
 	ret void
 }
 
-define internal void @doOpL(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpL(%core_Core* %core, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -1400,7 +1407,7 @@ define internal void @doOpL(%core_Core* %core, %Word32 %instr) {
 	br %Bool %14 , label %then_0, label %else_0
 then_0:
 	; LB (Load 8-bit signed integer value)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str42 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([17 x i8]* @str42 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
 	%15 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
 	%16 = load %core_BusInterface*, %core_BusInterface** %15
 	%17 = getelementptr %core_BusInterface, %core_BusInterface* %16, %Int32 0, %Int32 0
@@ -1422,7 +1429,7 @@ else_0:
 	br %Bool %25 , label %then_2, label %else_2
 then_2:
 	; LH (Load 16-bit signed integer value)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str43 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([17 x i8]* @str43 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
 	%26 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
 	%27 = load %core_BusInterface*, %core_BusInterface** %26
 	%28 = getelementptr %core_BusInterface, %core_BusInterface* %27, %Int32 0, %Int32 1
@@ -1444,7 +1451,7 @@ else_2:
 	br %Bool %36 , label %then_4, label %else_4
 then_4:
 	; LW (Load 32-bit signed integer value)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str44 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([17 x i8]* @str44 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
 	%37 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
 	%38 = load %core_BusInterface*, %core_BusInterface** %37
 	%39 = getelementptr %core_BusInterface, %core_BusInterface* %38, %Int32 0, %Int32 2
@@ -1464,7 +1471,7 @@ else_4:
 	br %Bool %45 , label %then_6, label %else_6
 then_6:
 	; LBU (Load 8-bit unsigned integer value)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str45 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str45 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
 	%46 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
 	%47 = load %core_BusInterface*, %core_BusInterface** %46
 	%48 = getelementptr %core_BusInterface, %core_BusInterface* %47, %Int32 0, %Int32 0
@@ -1486,7 +1493,7 @@ else_6:
 	br %Bool %56 , label %then_8, label %endif_8
 then_8:
 	; LHU (Load 16-bit unsigned integer value)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([18 x i8]* @str46 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([18 x i8]* @str46 to [0 x i8]*), %Int8 %5, %Int32 %4, %Int8 %6)
 	%57 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
 	%58 = load %core_BusInterface*, %core_BusInterface** %57
 	%59 = getelementptr %core_BusInterface, %core_BusInterface* %58, %Int32 0, %Int32 1
@@ -1515,7 +1522,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpS(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpS(%core_Core* %core, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Int8 @decode_extract_rd(%Word32 %instr)
@@ -1524,64 +1531,65 @@ define internal void @doOpS(%core_Core* %core, %Word32 %instr) {
 	%6 = zext %Int8 %3 to %Int32
 	%7 = zext %Word8 %2 to %Int32
 	%8 = bitcast %Int32 %7 to %Word32
-	%9 = shl %Word32 %8, 5
-	%10 = bitcast %Int32 %6 to %Word32
-	%11 = or %Word32 %9, %10
-	%12 = call %Int32 @decode_expand12(%Word32 %11)
-	%13 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%14 = getelementptr [32 x %Word32], [32 x %Word32]* %13, %Int32 0, %Int8 %4
-	%15 = load %Word32, %Word32* %14
-	%16 = bitcast %Word32 %15 to %Int32
-	%17 = add %Int32 %16, %12
-	%18 = bitcast %Int32 %17 to %Int32
-	%19 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
-	%20 = getelementptr [32 x %Word32], [32 x %Word32]* %19, %Int32 0, %Int8 %5
-	%21 = load %Word32, %Word32* %20
-	%22 = icmp eq %Word8 %1, 0
-	br %Bool %22 , label %then_0, label %else_0
+	%9 = zext i8 5 to %Word32
+	%10 = shl %Word32 %8, %9
+	%11 = bitcast %Int32 %6 to %Word32
+	%12 = or %Word32 %10, %11
+	%13 = call %Int32 @decode_expand12(%Word32 %12)
+	%14 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%15 = getelementptr [32 x %Word32], [32 x %Word32]* %14, %Int32 0, %Int8 %4
+	%16 = load %Word32, %Word32* %15
+	%17 = bitcast %Word32 %16 to %Int32
+	%18 = add %Int32 %17, %13
+	%19 = bitcast %Int32 %18 to %Int32
+	%20 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
+	%21 = getelementptr [32 x %Word32], [32 x %Word32]* %20, %Int32 0, %Int8 %5
+	%22 = load %Word32, %Word32* %21
+	%23 = icmp eq %Word8 %1, 0
+	br %Bool %23 , label %then_0, label %else_0
 then_0:
 	; SB (save 8-bit value)
 	; <source:reg>, <offset:12bit_imm>(<address:reg>)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str47 to [0 x i8]*), %Int8 %5, %Int32 %12, %Int8 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([17 x i8]* @str47 to [0 x i8]*), %Int8 %5, %Int32 %13, %Int8 %4)
 
 	;
-	%23 = trunc %Word32 %21 to %Word8
-	%24 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
-	%25 = load %core_BusInterface*, %core_BusInterface** %24
-	%26 = getelementptr %core_BusInterface, %core_BusInterface* %25, %Int32 0, %Int32 3
-	%27 = load void (%Int32, %Word8)*, void (%Int32, %Word8)** %26
-	call void %27(%Int32 %18, %Word8 %23)
+	%24 = trunc %Word32 %22 to %Word8
+	%25 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
+	%26 = load %core_BusInterface*, %core_BusInterface** %25
+	%27 = getelementptr %core_BusInterface, %core_BusInterface* %26, %Int32 0, %Int32 3
+	%28 = load void (%Int32, %Word8)*, void (%Int32, %Word8)** %27
+	call void %28(%Int32 %19, %Word8 %24)
 	br label %endif_0
 else_0:
-	%28 = icmp eq %Word8 %1, 1
-	br %Bool %28 , label %then_1, label %else_1
+	%29 = icmp eq %Word8 %1, 1
+	br %Bool %29 , label %then_1, label %else_1
 then_1:
 	; SH (save 16-bit value)
 	; <source:reg>, <offset:12bit_imm>(<address:reg>)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str48 to [0 x i8]*), %Int8 %5, %Int32 %12, %Int8 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([17 x i8]* @str48 to [0 x i8]*), %Int8 %5, %Int32 %13, %Int8 %4)
 
 	;
-	%29 = trunc %Word32 %21 to %Word16
-	%30 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
-	%31 = load %core_BusInterface*, %core_BusInterface** %30
-	%32 = getelementptr %core_BusInterface, %core_BusInterface* %31, %Int32 0, %Int32 4
-	%33 = load void (%Int32, %Word16)*, void (%Int32, %Word16)** %32
-	call void %33(%Int32 %18, %Word16 %29)
+	%30 = trunc %Word32 %22 to %Word16
+	%31 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
+	%32 = load %core_BusInterface*, %core_BusInterface** %31
+	%33 = getelementptr %core_BusInterface, %core_BusInterface* %32, %Int32 0, %Int32 4
+	%34 = load void (%Int32, %Word16)*, void (%Int32, %Word16)** %33
+	call void %34(%Int32 %19, %Word16 %30)
 	br label %endif_1
 else_1:
-	%34 = icmp eq %Word8 %1, 2
-	br %Bool %34 , label %then_2, label %endif_2
+	%35 = icmp eq %Word8 %1, 2
+	br %Bool %35 , label %then_2, label %endif_2
 then_2:
 	; SW (save 32-bit value)
 	; <source:reg>, <offset:12bit_imm>(<address:reg>)
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([17 x i8]* @str49 to [0 x i8]*), %Int8 %5, %Int32 %12, %Int8 %4)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([17 x i8]* @str49 to [0 x i8]*), %Int8 %5, %Int32 %13, %Int8 %4)
 
 	;
-	%35 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
-	%36 = load %core_BusInterface*, %core_BusInterface** %35
-	%37 = getelementptr %core_BusInterface, %core_BusInterface* %36, %Int32 0, %Int32 5
-	%38 = load void (%Int32, %Word32)*, void (%Int32, %Word32)** %37
-	call void %38(%Int32 %18, %Word32 %21)
+	%36 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 3
+	%37 = load %core_BusInterface*, %core_BusInterface** %36
+	%38 = getelementptr %core_BusInterface, %core_BusInterface* %37, %Int32 0, %Int32 5
+	%39 = load void (%Int32, %Word32)*, void (%Int32, %Word32)** %38
+	call void %39(%Int32 %19, %Word32 %22)
 	br label %endif_2
 endif_2:
 	br label %endif_1
@@ -1591,7 +1599,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpSystem(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpSystem(%core_Core* %core, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -1602,7 +1610,7 @@ define internal void @doOpSystem(%core_Core* %core, %Word32 %instr) {
 	%8 = icmp eq %Word32 %instr, 115
 	br %Bool %8 , label %then_0, label %else_0
 then_0:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([7 x i8]* @str50 to [0 x i8]*))
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([7 x i8]* @str50 to [0 x i8]*))
 
 	;
 	call void @core_irq(%core_Core* %core, %Int32 8)
@@ -1611,7 +1619,7 @@ else_0:
 	%9 = icmp eq %Word32 %instr, 1048691
 	br %Bool %9 , label %then_1, label %else_1
 then_1:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([8 x i8]* @str51 to [0 x i8]*))
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([8 x i8]* @str51 to [0 x i8]*))
 
 	;
 	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str52 to [0 x i8]*))
@@ -1625,42 +1633,42 @@ else_1:
 	br %Bool %12 , label %then_2, label %else_2
 then_2:
 	; CSR read & write
-	call void @csr_rw(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
+	call void @core_csr_rw(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
 	br label %endif_2
 else_2:
 	%13 = icmp eq %Word8 %1, 2
 	br %Bool %13 , label %then_3, label %else_3
 then_3:
 	; CSR read & set bit
-	call void @csr_rs(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
+	call void @core_csr_rs(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
 	br label %endif_3
 else_3:
 	%14 = icmp eq %Word8 %1, 3
 	br %Bool %14 , label %then_4, label %else_4
 then_4:
 	; CSR read & clear bit
-	call void @csr_rc(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
+	call void @core_csr_rc(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
 	br label %endif_4
 else_4:
 	%15 = icmp eq %Word8 %1, 4
 	br %Bool %15 , label %then_5, label %else_5
 then_5:
-	call void @csr_rwi(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
+	call void @core_csr_rwi(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
 	br label %endif_5
 else_5:
 	%16 = icmp eq %Word8 %1, 5
 	br %Bool %16 , label %then_6, label %else_6
 then_6:
-	call void @csr_rsi(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
+	call void @core_csr_rsi(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
 	br label %endif_6
 else_6:
 	%17 = icmp eq %Word8 %1, 6
 	br %Bool %17 , label %then_7, label %else_7
 then_7:
-	call void @csr_rci(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
+	call void @core_csr_rci(%core_Core* %core, %Int16 %7, %Int8 %5, %Int8 %6)
 	br label %endif_7
 else_7:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([34 x i8]* @str53 to [0 x i8]*), %Word32 %instr)
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([34 x i8]* @str53 to [0 x i8]*), %Word32 %instr)
 	%18 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 6
 	store %Bool 1, %Bool* %18
 	br label %endif_7
@@ -1682,11 +1690,11 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpFence(%core_Core* %core, %Word32 %instr) {
+define internal void @core_doOpFence(%core_Core* %core, %Word32 %instr) {
 	%1 = icmp eq %Word32 %instr, 16777231
 	br %Bool %1 , label %then_0, label %endif_0
 then_0:
-	call void (%Str8*, ...) @debug(%Str8* bitcast ([7 x i8]* @str54 to [0 x i8]*))
+	call void (%Str8*, ...) @core_debug(%Str8* bitcast ([7 x i8]* @str54 to [0 x i8]*))
 	br label %endif_0
 endif_0:
 	ret void
@@ -1719,7 +1727,7 @@ endif_0:
 ;
 ;The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
 ;
-define internal void @csr_rw(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %rs1) {
+define internal void @core_csr_rw(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %rs1) {
 	%1 = getelementptr %core_Core, %core_Core* %core, %Int32 0, %Int32 0
 	%2 = getelementptr [32 x %Word32], [32 x %Word32]* %1, %Int32 0, %Int8 %rs1
 	%3 = load %Word32, %Word32* %2
@@ -1769,7 +1777,7 @@ endif_0:
 ;
 ;The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
 ;
-define internal void @csr_rs(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %rs1) {
+define internal void @core_csr_rs(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %rs1) {
 	;TODO
 	ret void
 }
@@ -1778,7 +1786,7 @@ define internal void @csr_rs(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %r
 ;
 ;The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
 ;
-define internal void @csr_rc(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %rs1) {
+define internal void @core_csr_rc(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %rs1) {
 	;TODO
 	ret void
 }
@@ -1786,7 +1794,7 @@ define internal void @csr_rc(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %r
 
 
 ; -
-define internal void @csr_rwi(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %imm) {
+define internal void @core_csr_rwi(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %imm) {
 	;TODO
 	ret void
 }
@@ -1794,7 +1802,7 @@ define internal void @csr_rwi(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %
 
 
 ; read+clear immediate(5-bit)
-define internal void @csr_rsi(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %imm) {
+define internal void @core_csr_rsi(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %imm) {
 	;TODO
 	ret void
 }
@@ -1802,12 +1810,12 @@ define internal void @csr_rsi(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %
 
 
 ; read+clear immediate(5-bit)
-define internal void @csr_rci(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %imm) {
+define internal void @core_csr_rci(%core_Core* %core, %Int16 %csr, %Int8 %rd, %Int8 %imm) {
 	;TODO
 	ret void
 }
 
-define internal void @debug(%Str8* %form, ...) {
+define internal void @core_debug(%Str8* %form, ...) {
 	%1 = alloca i8*, align 1
 	%2 = bitcast i8** %1 to i8*
 	call void @llvm.va_start(i8* %2)
@@ -1822,7 +1830,7 @@ endif_0:
 	ret void
 }
 
-define internal void @notImplemented(%Str8* %form, ...) {
+define internal void @core_notImplemented(%Str8* %form, ...) {
 	%1 = alloca i8*, align 1
 	%2 = bitcast i8** %1 to i8*
 	call void @llvm.va_start(i8* %2)

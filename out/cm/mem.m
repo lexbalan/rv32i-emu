@@ -1,18 +1,16 @@
 
 @c_include "stdio.h"
-include "libc/stdio"
 @c_include "stdlib.h"
-include "libc/stdlib"
-import "mmio"
+import "mmio" as mmio
 
 
 // see mem.ld
-public const ramSize = 4096
+public const ramSize = 1024 * 16
 public const ramStart = 0x10000000
 public const ramEnd = ramStart + ramSize
 
 
-public const romSize = 0x10000
+public const romSize = 0x100000
 public const romStart = 0x00000000
 public const romEnd = romStart + romSize
 
@@ -38,9 +36,9 @@ public func get_rom_ptr() -> *[]Word8 {
 
 var memviolationCnt: Nat32 = Nat32 0
 func memoryViolation(rw: Char8, adr: Nat32) -> Unit {
-	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
+	stdio.printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
 	if memviolationCnt > 10 {
-		exit(1)
+		stdlib.exit(1)
 	}
 	memviolationCnt = memviolationCnt + 1
 	//	memoryViolation_event(0x55) // !

@@ -1,7 +1,5 @@
 
-include "libc/ctypes"
 @c_include "stdio.h"
-include "libc/stdio"
 
 
 const consoleMMIOAdr = 0x10
@@ -20,7 +18,7 @@ const consolePrintUInt64Adr = consoleMMIOAdr + 0x28
 
 public func write8(adr: Nat32, value: Word8) -> Unit {
 	if adr == consolePutAdr {
-		putchar(Int value)
+		stdio.putchar(ctypes64.Int value)
 		return
 	}
 }
@@ -28,7 +26,7 @@ public func write8(adr: Nat32, value: Word8) -> Unit {
 
 public func write16(adr: Nat32, value: Word16) -> Unit {
 	if adr == consolePutAdr {
-		putchar(Int value)
+		stdio.putchar(ctypes64.Int value)
 		return
 	}
 }
@@ -36,19 +34,19 @@ public func write16(adr: Nat32, value: Word16) -> Unit {
 
 public func write32(adr: Nat32, value: Word32) -> Unit {
 	if adr == consolePutAdr {
-		putchar(Int value)
+		stdio.putchar(ctypes64.Int value)
 		return
 	} else if adr == consolePrintInt32Adr {
-		printf("%u", value)
+		stdio.printf("%u", value)
 		return
 	} else if adr == consolePrintUInt32Adr {
-		printf("%u", value)
+		stdio.printf("%u", value)
 		return
 	} else if adr == consolePrintInt32HexAdr {
-		printf("%x", value)
+		stdio.printf("%x", value)
 		return
 	} else if adr == consolePrintUInt32HexAdr {
-		printf("%ux", value)
+		stdio.printf("%ux", value)
 		return
 	}
 }

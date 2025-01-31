@@ -1,11 +1,8 @@
 
-include "libc/ctypes"
 @c_include "stdlib.h"
-include "libc/stdlib"
 @c_include "stdio.h"
-include "libc/stdio"
-import "mem"
-import "core/core"
+import "mem" as mem
+import "core/core" as riscvCore
 
 
 const text_filename = "./image.bin"
@@ -13,7 +10,7 @@ const text_filename = "./image.bin"
 const showText = false
 
 
-var core: Core
+var core: core.Core
 
 
 //public func mem_violation_event(reason: Nat32) {
@@ -21,10 +18,10 @@ var core: Core
 //}
 
 
-public func main() -> Int {
-	printf("RISC-V VM\n")
+public func main() -> ctypes64.Int {
+	stdio.printf("RISC-V VM\n")
 
-	var memctl: BusInterface = BusInterface {
+	var memctl: core.BusInterface = core.BusInterface {
 		read8 = &mem.read8
 		read16 = &mem.read16
 		read32 = &mem.read32
@@ -37,22 +34,22 @@ public func main() -> Int {
 	let nbytes = loader(text_filename, romptr, mem.romSize)
 
 	if nbytes <= 0 {
-		exit(1)
+		stdlib.exit(1)
 	}
 
 	core.init(&core, &memctl)
 
-	printf("~~~ START ~~~\n")
+	stdio.printf("~~~ START ~~~\n")
 
-	while not(core.end) {
+	while notcore.end {
 		core.tick(&core)
 	}
 
-	printf("core.cnt = %u\n", core.cnt)
+	stdio.printf("core.cnt = %u\n", core.cnt)
 
-	printf("\nCore dump:\n")
+	stdio.printf("\nCore dump:\n")
 	core.show_regs(&core)
-	printf("\n")
+	stdio.printf("\n")
 	show_mem()
 
 	return 0
@@ -60,30 +57,30 @@ public func main() -> Int {
 
 
 func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
-	printf("LOAD: %s\n", filename)
+	stdio.printf("LOAD: %s\n", filename)
 
-	let fp = fopen(filename, "rb")
+	let fp = stdio.fopen(filename, "rb")
 
 	if fp == nil {
-		printf("error: cannot open file '%s'", filename)
+		stdio.printf("error: cannot open file '%s'", filename)
 		return 0
 	}
 
-	let n = fread(bufptr, 1, SizeT buf_size, fp)
+	let n = stdio.fread(bufptr, 1, ctypes64.SizeT buf_size, fp)
 
-	printf("LOADED: %zu bytes\n", n)
+	stdio.printf("LOADED: %zu bytes\n", n)
 
 	if showText {
-		var i: SizeT = SizeT 0
+		var i: ctypes64.SizeT = ctypes64.SizeT 0
 		while i < n / 4 {
-			printf("%08zx: 0x%08x\n", i, *[]Nat32 bufptr[i])
+			stdio.printf("%08zx: 0x%08x\n", i, *[]Nat32 bufptr[i])
 			i = i + 4
 		}
 
-		printf("-----------\n")
+		stdio.printf("-----------\n")
 	}
 
-	fclose(fp)
+	stdio.fclose(fp)
 
 	return Nat32 n
 }
@@ -93,15 +90,15 @@ func show_mem() -> Unit {
 	var i: Int32 = 0
 	let ramptr = mem.get_ram_ptr()
 	while i < 256 {
-		printf("%08X", i * 16)
+		stdio.printf("%08X", i * 16)
 
 		var j: Int32 = 0
 		while j < 16 {
-			printf(" %02X", ramptr[i + j])
+			stdio.printf(" %02X", ramptr[i + j])
 			j = j + 1
 		}
 
-		printf("\n")
+		stdio.printf("\n")
 
 		i = i + 16
 	}

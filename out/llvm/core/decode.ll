@@ -107,8 +107,9 @@ break_2:
 
 ; -- print includes --
 ; -- end print includes --
-; -- print imports --
-; -- end print imports --
+; -- print imports 'decode' --
+; -- 0
+; -- end print imports 'decode' --
 ; -- strings --
 ; -- endstrings --
 define %Word8 @decode_extract_op(%Word32 %instr) {
@@ -118,87 +119,104 @@ define %Word8 @decode_extract_op(%Word32 %instr) {
 }
 
 define %Word8 @decode_extract_funct2(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 25
-	%2 = and %Word32 %1, 3
-	%3 = trunc %Word32 %2 to %Word8
-	ret %Word8 %3
+	%1 = zext i8 25 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 3
+	%4 = trunc %Word32 %3 to %Word8
+	ret %Word8 %4
 }
 
 define %Word8 @decode_extract_funct3(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 12
-	%2 = and %Word32 %1, 7
-	%3 = trunc %Word32 %2 to %Word8
-	ret %Word8 %3
+	%1 = zext i8 12 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 7
+	%4 = trunc %Word32 %3 to %Word8
+	ret %Word8 %4
 }
 
 define %Word8 @decode_extract_funct5(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 27
-	%2 = and %Word32 %1, 31
-	%3 = trunc %Word32 %2 to %Word8
-	ret %Word8 %3
+	%1 = zext i8 27 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 31
+	%4 = trunc %Word32 %3 to %Word8
+	ret %Word8 %4
 }
 
 define %Int8 @decode_extract_rd(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 7
-	%2 = and %Word32 %1, 31
-	%3 = trunc %Word32 %2 to %Int8
-	ret %Int8 %3
+	%1 = zext i8 7 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 31
+	%4 = trunc %Word32 %3 to %Int8
+	ret %Int8 %4
 }
 
 define %Int8 @decode_extract_rs1(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 15
-	%2 = and %Word32 %1, 31
-	%3 = trunc %Word32 %2 to %Int8
-	ret %Int8 %3
+	%1 = zext i8 15 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 31
+	%4 = trunc %Word32 %3 to %Int8
+	ret %Int8 %4
 }
 
 define %Int8 @decode_extract_rs2(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 20
-	%2 = and %Word32 %1, 31
-	%3 = trunc %Word32 %2 to %Int8
-	ret %Int8 %3
+	%1 = zext i8 20 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 31
+	%4 = trunc %Word32 %3 to %Int8
+	ret %Int8 %4
 }
 
 define %Word8 @decode_extract_funct7(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 25
-	%2 = and %Word32 %1, 127
-	%3 = trunc %Word32 %2 to %Word8
-	ret %Word8 %3
+	%1 = zext i8 25 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 127
+	%4 = trunc %Word32 %3 to %Word8
+	ret %Word8 %4
 }
 
 
 
 ; bits: (31 .. 20)
 define %Word32 @decode_extract_imm12(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 20
-	%2 = and %Word32 %1, 4095
-	ret %Word32 %2
+	%1 = zext i8 20 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 4095
+	ret %Word32 %3
 }
 
 define %Word32 @decode_extract_imm31_12(%Word32 %instr) {
-	%1 = lshr %Word32 %instr, 12
-	%2 = and %Word32 %1, 1048575
-	ret %Word32 %2
+	%1 = zext i8 12 to %Word32
+	%2 = lshr %Word32 %instr, %1
+	%3 = and %Word32 %2, 1048575
+	ret %Word32 %3
 }
 
 define %Word32 @decode_extract_jal_imm(%Word32 %instr) {
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
-	%2 = lshr %Word32 %1, 0
-	%3 = and %Word32 %2, 255
-	%4 = shl %Word32 %3, 12
-	%5 = lshr %Word32 %1, 8
-	%6 = and %Word32 %5, 1
-	%7 = shl %Word32 %6, 11
-	%8 = lshr %Word32 %1, 9
-	%9 = and %Word32 %8, 1023
-	%10 = shl %Word32 %9, 1
-	%11 = lshr %Word32 %1, 20
-	%12 = and %Word32 %11, 1
-	%13 = shl %Word32 %12, 20
-	%14 = or %Word32 %7, %10
-	%15 = or %Word32 %4, %14
-	%16 = or %Word32 %13, %15
-	ret %Word32 %16
+	%2 = zext i8 0 to %Word32
+	%3 = lshr %Word32 %1, %2
+	%4 = and %Word32 %3, 255
+	%5 = zext i8 12 to %Word32
+	%6 = shl %Word32 %4, %5
+	%7 = zext i8 8 to %Word32
+	%8 = lshr %Word32 %1, %7
+	%9 = and %Word32 %8, 1
+	%10 = zext i8 11 to %Word32
+	%11 = shl %Word32 %9, %10
+	%12 = zext i8 9 to %Word32
+	%13 = lshr %Word32 %1, %12
+	%14 = and %Word32 %13, 1023
+	%15 = zext i8 1 to %Word32
+	%16 = shl %Word32 %14, %15
+	%17 = zext i8 20 to %Word32
+	%18 = lshr %Word32 %1, %17
+	%19 = and %Word32 %18, 1
+	%20 = zext i8 20 to %Word32
+	%21 = shl %Word32 %19, %20
+	%22 = or %Word32 %11, %16
+	%23 = or %Word32 %6, %22
+	%24 = or %Word32 %21, %23
+	ret %Word32 %24
 }
 
 

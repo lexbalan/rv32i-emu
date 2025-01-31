@@ -1,12 +1,7 @@
 
-include "libc/ctypes"
 @c_include "stdio.h"
-include "libc/stdio"
 @c_include "unistd.h"
-include "libc/unistd"
 @c_include "stdlib.h"
-include "libc/stdlib"
-include "decode"
 
 
 const debugMode = false
@@ -79,7 +74,7 @@ public func init(core: *Core, bus: *BusInterface) -> Unit {
 
 
 func fetch(core: *Core) -> Word32 {
-	return (core.bus).read32(core.pc)
+	return core.bus.read32(core.pc)
 }
 
 
@@ -92,8 +87,8 @@ public func tick(core: *Core) -> Unit {
 	}
 
 	let instr = fetch(core)
-	let op = extract_op(instr)
-	let funct3 = extract_funct3(instr)
+	let op = decode.extract_op(instr)
+	let funct3 = decode.extract_funct3(instr)
 
 	if op == opI {
 		doOpI(core, instr)
@@ -128,12 +123,12 @@ public func tick(core: *Core) -> Unit {
 
 
 func doOpI(core: *Core, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
+	let funct3 = decode.extract_funct3(instr)
+	let funct7 = decode.extract_funct7(instr)
+	let imm12 = decode.extract_imm12(instr)
+	let imm = decode.expand12(imm12)
+	let rd = decode.extract_rd(instr)
+	let rs1 = decode.extract_rs1(instr)
 
 	if rd == 0 {
 		return
@@ -145,7 +140,7 @@ func doOpI(core: *Core, instr: Word32) -> Unit {
 		debug("addi x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = Word32 (Int32 ((core.reg)[rs1]) + imm)
+		core.reg[rd] = Word32 Int32 core.reg[rs1] + imm
 
 	} else if funct3 == 1 and funct7 == 0 {
 		/* SLLI is a logical left shift (zeros are shifted
@@ -155,7 +150,7 @@ func doOpI(core: *Core, instr: Word32) -> Unit {
 		debug("slli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = (core.reg)[rs1] << Nat8 imm
+		core.reg[rd] = core.reg[rs1] << Nat8 imm
 
 	} else if funct3 == 2 {
 		// SLTI - set [1 to rd if rs1] less than immediate
@@ -163,64 +158,64 @@ func doOpI(core: *Core, instr: Word32) -> Unit {
 		debug("slti x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = Word32 (Int32 ((core.reg)[rs1]) < imm)
+		core.reg[rd] = Word32 Int32 core.reg[rs1] < imm
 
 	} else if funct3 == 3 {
 		debug("sltiu x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = Word32 (Nat32 ((core.reg)[rs1]) < Nat32 imm)
+		core.reg[rd] = Word32 Nat32 core.reg[rs1] < Nat32 imm
 
 	} else if funct3 == 4 {
 		debug("xori x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = (core.reg)[rs1] xor Word32 imm
+		core.reg[rd] = core.reg[rs1] xor Word32 imm
 
 	} else if funct3 == 5 and funct7 == 0 {
 		debug("srli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = (core.reg)[rs1] >> Nat8 imm
+		core.reg[rd] = core.reg[rs1] >> Nat8 imm
 
 	} else if funct3 == 5 and funct7 == 0x20 {
 		debug("srai x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = (core.reg)[rs1] >> Nat8 imm
+		core.reg[rd] = core.reg[rs1] >> Nat8 imm
 
 	} else if funct3 == 6 {
 		debug("ori x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = (core.reg)[rs1] or Word32 imm
+		core.reg[rd] = core.reg[rs1] or Word32 imm
 
 	} else if funct3 == 7 {
 		debug("andi x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		(core.reg)[rd] = (core.reg)[rs1] and Word32 imm
+		core.reg[rd] = core.reg[rs1] and Word32 imm
 	}
 }
 
 
 func doOpR(core: *Core, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm = expand12(extract_imm12(instr))
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let funct3 = decode.extract_funct3(instr)
+	let funct7 = decode.extract_funct7(instr)
+	let imm = decode.expand12(decode.extract_imm12(instr))
+	let rd = decode.extract_rd(instr)
+	let rs1 = decode.extract_rs1(instr)
+	let rs2 = decode.extract_rs2(instr)
 
 	if rd == 0 {
 		return
 	}
 
-	let v0 = (core.reg)[rs1]
-	let v1 = (core.reg)[rs2]
+	let v0 = core.reg[rs1]
+	let v1 = core.reg[rs2]
 
 
-	let f7 = extract_funct7(instr)
+	let f7 = decode.extract_funct7(instr)
 	//let f5 = extract_funct5(instr)
 	//let f2 = extract_funct2(instr)
 	//if f5 == 0 and f2 == 1 {
@@ -235,7 +230,7 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 			// MUL rd, rs1, rs2
 			debug("mul x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			(core.reg)[rd] = Word32 (Int32 v0 * Int32 v1)
+			core.reg[rd] = Word32 Int32 v0 * Int32 v1
 
 		} else if funct3 == 1 {
 			// MULH rd, rs1, rs2
@@ -243,7 +238,7 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 			// которые бы не поместились в него при обычном умножении
 			debug("mulh x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			(core.reg)[rd] = Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
+			core.reg[rd] = Word32 Word64 Int64 v0 * Int64 v1 >> 32
 
 		} else if funct3 == 2 {
 			// MULHSU rd, rs1, rs2
@@ -264,25 +259,25 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 			// DIV rd, rs1, rs2
 			debug("div x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			(core.reg)[rd] = Word32 (Int32 v0 / Int32 v1)
+			core.reg[rd] = Word32 Int32 v0 / Int32 v1
 
 		} else if funct3 == 5 {
 			// DIVU rd, rs1, rs2
 			debug("divu x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			(core.reg)[rd] = Word32 (Nat32 v0 / Nat32 v1)
+			core.reg[rd] = Word32 Nat32 v0 / Nat32 v1
 
 		} else if funct3 == 6 {
 			// REM rd, rs1, rs2
 			debug("rem x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			(core.reg)[rd] = Word32 (Int32 v0 % Int32 v1)
+			core.reg[rd] = Word32 Int32 v0 % Int32 v1
 
 		} else if funct3 == 7 {
 			// REMU rd, rs1, rs2
 			debug("remu x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			(core.reg)[rd] = Word32 (Nat32 v0 % Nat32 v1)
+			core.reg[rd] = Word32 Nat32 v0 % Nat32 v1
 		}
 
 		return
@@ -293,13 +288,13 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 		debug("add x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = Word32 (Int32 v0 + Int32 v1)
+		core.reg[rd] = Word32 Int32 v0 + Int32 v1
 
 	} else if funct3 == 0 and funct7 == 0x20 {
 		debug("sub x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = Word32 (Int32 v0 - Int32 v1)
+		core.reg[rd] = Word32 Int32 v0 - Int32 v1
 
 	} else if funct3 == 1 {
 		// shift left logical
@@ -307,7 +302,7 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 		debug("sll x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = v0 << Nat8 v1
+		core.reg[rd] = v0 << Nat8 v1
 
 	} else if funct3 == 2 {
 		// set less than
@@ -315,7 +310,7 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 		debug("slt x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = Word32 (Int32 v0 < Int32 v1)
+		core.reg[rd] = Word32 Int32 v0 < Int32 v1
 
 	} else if funct3 == 3 {
 		// set less than unsigned
@@ -323,21 +318,21 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 		debug("sltu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = Word32 (Nat32 v0 < Nat32 v1)
+		core.reg[rd] = Word32 Nat32 v0 < Nat32 v1
 
 	} else if funct3 == 4 {
 
 		debug("xor x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = v0 xor v1
+		core.reg[rd] = v0 xor v1
 
 	} else if funct3 == 5 and funct7 == 0 {
 		// shift right logical
 
 		debug("srl x%d, x%d, x%d\n", rd, rs1, rs2)
 
-		(core.reg)[rd] = v0 >> Nat8 v1
+		core.reg[rd] = v0 >> Nat8 v1
 
 	} else if funct3 == 5 and funct7 == 0x20 {
 		// shift right arithmetical
@@ -351,13 +346,13 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 		debug("or x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = v0 or v1
+		core.reg[rd] = v0 or v1
 
 	} else if funct3 == 7 {
 		debug("and x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		(core.reg)[rd] = v0 and v1
+		core.reg[rd] = v0 and v1
 	}
 }
 
@@ -365,13 +360,13 @@ func doOpR(core: *Core, instr: Word32) -> Unit {
 func doOpLUI(core: *Core, instr: Word32) -> Unit {
 	// load upper immediate
 
-	let imm = expand12(extract_imm31_12(instr))
-	let rd = extract_rd(instr)
+	let imm = decode.expand12(decode.extract_imm31_12(instr))
+	let rd = decode.extract_rd(instr)
 
 	debug("lui x%d, 0x%X\n", rd, imm)
 
 	if rd != 0 {
-		(core.reg)[rd] = Word32 imm << 12
+		core.reg[rd] = Word32 imm << 12
 	}
 }
 
@@ -379,14 +374,14 @@ func doOpLUI(core: *Core, instr: Word32) -> Unit {
 func doOpAUIPC(core: *Core, instr: Word32) -> Unit {
 	// Add upper immediate to PC
 
-	let imm = expand12(extract_imm31_12(instr))
-	let x = core.pc + Nat32 (Word32 imm << 12)
-	let rd = extract_rd(instr)
+	let imm = decode.expand12(decode.extract_imm31_12(instr))
+	let x = core.pc + Nat32 Word32 imm << 12
+	let rd = decode.extract_rd(instr)
 
 	debug("auipc x%d, 0x%X\n", rd, imm)
 
 	if rd != 0 {
-		(core.reg)[rd] = Word32 x
+		core.reg[rd] = Word32 x
 	}
 }
 
@@ -394,36 +389,36 @@ func doOpAUIPC(core: *Core, instr: Word32) -> Unit {
 func doOpJAL(core: *Core, instr: Word32) -> Unit {
 	// Jump and link
 
-	let rd = extract_rd(instr)
-	let raw_imm = extract_jal_imm(instr)
-	let imm = expand20(raw_imm)
+	let rd = decode.extract_rd(instr)
+	let raw_imm = decode.extract_jal_imm(instr)
+	let imm = decode.expand20(raw_imm)
 
 	debug("jal x%d, %d\n", rd, imm)
 
 	if rd != 0 {
-		(core.reg)[rd] = Word32 (core.pc + 4)
+		core.reg[rd] = Word32 core.pc + 4
 	}
 
-	core.nexpc = Nat32 (Int32 (core.pc) + imm)
+	core.nexpc = Nat32 Int32 core.pc + imm
 }
 
 
 func doOpJALR(core: *Core, instr: Word32) -> Unit {
 	// Jump and link (by register)
 
-	let rs1 = extract_rs1(instr)
-	let rd = extract_rd(instr)
-	let imm = expand12(extract_imm12(instr))
+	let rs1 = decode.extract_rs1(instr)
+	let rd = decode.extract_rd(instr)
+	let imm = decode.expand12(decode.extract_imm12(instr))
 
 	debug("jalr %d(x%d)\n", imm, rs1)
 
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
-	let next_instr_ptr = Int32 (core.pc + 4)
-	let jump_to = Word32 (Int32 ((core.reg)[rs1]) + imm) and 0xFFFFFFFE
+	let next_instr_ptr = Int32 core.pc + 4
+	let jump_to = Word32 Int32 core.reg[rs1] + imm and 0xFFFFFFFE
 
 	if rd != 0 {
-		(core.reg)[rd] = Word32 next_instr_ptr
+		core.reg[rd] = Word32 next_instr_ptr
 	}
 
 	core.nexpc = Nat32 jump_to
@@ -431,16 +426,16 @@ func doOpJALR(core: *Core, instr: Word32) -> Unit {
 
 
 func doOpB(core: *Core, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let imm12_10to5 = extract_funct7(instr)
-	let imm4to1_11 = Word16 (extract_rd(instr))
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let funct3 = decode.extract_funct3(instr)
+	let imm12_10to5 = decode.extract_funct7(instr)
+	let imm4to1_11 = Word16 decode.extract_rd(instr)
+	let rs1 = decode.extract_rs1(instr)
+	let rs2 = decode.extract_rs2(instr)
 
 	let bit4to1 = imm4to1_11 and 0x1E
-	let bit10to5 = Word16 (imm12_10to5 and 0x3F) << 5
+	let bit10to5 = Word16 imm12_10to5 and 0x3F << 5
 	let bit11 = (imm4to1_11 and 0x1) << 11
-	let bit12 = Word16 (imm12_10to5 and 0x40) << 6
+	let bit12 = Word16 imm12_10to5 and 0x40 << 6
 
 	var bits: Word16 = bit12 or bit11 or bit10to5 or bit4to1
 
@@ -457,8 +452,8 @@ func doOpB(core: *Core, instr: Word32) -> Unit {
 		debug("beq x%d, x%d, %d\n", rs1, rs2, imm)
 
 		// Branch if two registers are equal
-		if (core.reg)[rs1] == (core.reg)[rs2] {
-			core.nexpc = Nat32 (Int32 (core.pc) + Int32 imm)
+		if core.reg[rs1] == core.reg[rs2] {
+			core.nexpc = Nat32 Int32 core.pc + Int32 imm
 		}
 
 	} else if funct3 == 1 {
@@ -467,8 +462,8 @@ func doOpB(core: *Core, instr: Word32) -> Unit {
 		debug("bne x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
-		if (core.reg)[rs1] != (core.reg)[rs2] {
-			core.nexpc = Nat32 (Int32 (core.pc) + Int32 imm)
+		if core.reg[rs1] != core.reg[rs2] {
+			core.nexpc = Nat32 Int32 core.pc + Int32 imm
 		}
 
 	} else if funct3 == 4 {
@@ -477,8 +472,8 @@ func doOpB(core: *Core, instr: Word32) -> Unit {
 		debug("blt x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
-		if Int32 ((core.reg)[rs1]) < Int32 ((core.reg)[rs2]) {
-			core.nexpc = Nat32 (Int32 (core.pc) + Int32 imm)
+		if Int32 core.reg[rs1] < Int32 core.reg[rs2] {
+			core.nexpc = Nat32 Int32 core.pc + Int32 imm
 		}
 
 	} else if funct3 == 5 {
@@ -487,8 +482,8 @@ func doOpB(core: *Core, instr: Word32) -> Unit {
 		debug("bge x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
-		if Int32 ((core.reg)[rs1]) >= Int32 ((core.reg)[rs2]) {
-			core.nexpc = Nat32 (Int32 (core.pc) + Int32 imm)
+		if Int32 core.reg[rs1] >= Int32 core.reg[rs2] {
+			core.nexpc = Nat32 Int32 core.pc + Int32 imm
 		}
 
 	} else if funct3 == 6 {
@@ -497,8 +492,8 @@ func doOpB(core: *Core, instr: Word32) -> Unit {
 		debug("bltu x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
-		if Nat32 ((core.reg)[rs1]) < Nat32 ((core.reg)[rs2]) {
-			core.nexpc = Nat32 (Int32 (core.pc) + Int32 imm)
+		if Nat32 core.reg[rs1] < Nat32 core.reg[rs2] {
+			core.nexpc = Nat32 Int32 core.pc + Int32 imm
 		}
 
 	} else if funct3 == 7 {
@@ -507,32 +502,32 @@ func doOpB(core: *Core, instr: Word32) -> Unit {
 		debug("bgeu x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
-		if Nat32 ((core.reg)[rs1]) >= Nat32 ((core.reg)[rs2]) {
-			core.nexpc = Nat32 (Int32 (core.pc) + Int32 imm)
+		if Nat32 core.reg[rs1] >= Nat32 core.reg[rs2] {
+			core.nexpc = Nat32 Int32 core.pc + Int32 imm
 		}
 	}
 }
 
 
 func doOpL(core: *Core, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let funct3 = decode.extract_funct3(instr)
+	let funct7 = decode.extract_funct7(instr)
+	let imm12 = decode.extract_imm12(instr)
+	let imm = decode.expand12(imm12)
+	let rd = decode.extract_rd(instr)
+	let rs1 = decode.extract_rs1(instr)
+	let rs2 = decode.extract_rs2(instr)
 
-	let adr = Nat32 (Int32 ((core.reg)[rs1]) + imm)
+	let adr = Nat32 Int32 core.reg[rs1] + imm
 
 	if funct3 == 0 {
 		// LB (Load 8-bit signed integer value)
 
 		debug("lb x%d, %d(x%d)\n", rd, imm, rs1)
 
-		let val = Int32 ((core.bus).read8(adr))
+		let val = Int32 core.bus.read8(adr)
 		if rd != 0 {
-			(core.reg)[rd] = Word32 val
+			core.reg[rd] = Word32 val
 		}
 
 	} else if funct3 == 1 {
@@ -540,9 +535,9 @@ func doOpL(core: *Core, instr: Word32) -> Unit {
 
 		debug("lh x%d, %d(x%d)\n", rd, imm, rs1)
 
-		let val = Int32 ((core.bus).read16(adr))
+		let val = Int32 core.bus.read16(adr)
 		if rd != 0 {
-			(core.reg)[rd] = Word32 val
+			core.reg[rd] = Word32 val
 		}
 
 	} else if funct3 == 2 {
@@ -550,9 +545,9 @@ func doOpL(core: *Core, instr: Word32) -> Unit {
 
 		debug("lw x%d, %d(x%d)\n", rd, imm, rs1)
 
-		let val = (core.bus).read32(adr)
+		let val = core.bus.read32(adr)
 		if rd != 0 {
-			(core.reg)[rd] = val
+			core.reg[rd] = val
 		}
 
 	} else if funct3 == 4 {
@@ -560,9 +555,9 @@ func doOpL(core: *Core, instr: Word32) -> Unit {
 
 		debug("lbu x%d, %d(x%d)\n", rd, imm, rs1)
 
-		let val = Nat32 ((core.bus).read8(adr))
+		let val = Nat32 core.bus.read8(adr)
 		if rd != 0 {
-			(core.reg)[rd] = Word32 val
+			core.reg[rd] = Word32 val
 		}
 
 	} else if funct3 == 5 {
@@ -570,28 +565,28 @@ func doOpL(core: *Core, instr: Word32) -> Unit {
 
 		debug("lhu x%d, %d(x%d)\n", rd, imm, rs1)
 
-		let val = Nat32 ((core.bus).read16(adr))
+		let val = Nat32 core.bus.read16(adr)
 		if rd != 0 {
-			(core.reg)[rd] = Word32 val
+			core.reg[rd] = Word32 val
 		}
 	}
 }
 
 
 func doOpS(core: *Core, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let funct3 = decode.extract_funct3(instr)
+	let funct7 = decode.extract_funct7(instr)
+	let rd = decode.extract_rd(instr)
+	let rs1 = decode.extract_rs1(instr)
+	let rs2 = decode.extract_rs2(instr)
 
 	let imm4to0 = Nat32 rd
 	let imm11to5 = Nat32 funct7
 	let _imm = Word32 imm11to5 << 5 or Word32 imm4to0
-	let imm = expand12(_imm)
+	let imm = decode.expand12(_imm)
 
-	let adr = Nat32 (Int32 ((core.reg)[rs1]) + imm)
-	let val = (core.reg)[rs2]
+	let adr = Nat32 Int32 core.reg[rs1] + imm
+	let val = core.reg[rs2]
 
 	if funct3 == 0 {
 		// SB (save 8-bit value)
@@ -600,7 +595,7 @@ func doOpS(core: *Core, instr: Word32) -> Unit {
 		debug("sb x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
-		(core.bus).write8(adr, Word8 val)
+		core.bus.write8(adr, Word8 val)
 
 	} else if funct3 == 1 {
 		// SH (save 16-bit value)
@@ -609,7 +604,7 @@ func doOpS(core: *Core, instr: Word32) -> Unit {
 		debug("sh x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
-		(core.bus).write16(adr, Word16 val)
+		core.bus.write16(adr, Word16 val)
 
 	} else if funct3 == 2 {
 		// SW (save 32-bit value)
@@ -618,18 +613,18 @@ func doOpS(core: *Core, instr: Word32) -> Unit {
 		debug("sw x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
-		(core.bus).write32(adr, val)
+		core.bus.write32(adr, val)
 	}
 }
 
 
 func doOpSystem(core: *Core, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
+	let funct3 = decode.extract_funct3(instr)
+	let funct7 = decode.extract_funct7(instr)
+	let imm12 = decode.extract_imm12(instr)
+	let imm = decode.expand12(imm12)
+	let rd = decode.extract_rd(instr)
+	let rs1 = decode.extract_rs1(instr)
 
 	let csr = Nat16 imm12
 
@@ -643,7 +638,7 @@ func doOpSystem(core: *Core, instr: Word32) -> Unit {
 		debug("EBREAK\n")
 
 		//
-		printf("END.\n")
+		stdio.printf("END.\n")
 		core.end = true
 
 		// CSR instructions
@@ -721,7 +716,7 @@ const sip_adr = 0x144
 The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
 */
 func csr_rw(core: *Core, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
-	let nv = (core.reg)[rs1]
+	let nv = core.reg[rs1]
 	if csr == 0x340 {
 		// mscratch
 	} else if csr == 0x341 {
@@ -776,7 +771,7 @@ func debug(form: *Str8, ...) -> Unit {
 	var va: va_list
 	__va_start(va, form)
 	if debugMode {
-		vprintf(form, va)
+		stdio.vprintf(form, va)
 	}
 	__va_end(va)
 }
@@ -785,20 +780,20 @@ func debug(form: *Str8, ...) -> Unit {
 func notImplemented(form: *Str8, ...) -> Unit {
 	var va: va_list
 	__va_start(va, form)
-	printf("\n\nINSTRUCTION_NOT_IMPLEMENTED: \"")
-	vprintf(form, va)
+	stdio.printf("\n\nINSTRUCTION_NOT_IMPLEMENTED: \"")
+	stdio.vprintf(form, va)
 	__va_end(va)
-	puts("\"\n")
-	exit(-1)
+	stdio.puts("\"\n")
+	stdlib.exit(-1)
 }
 
 
 public func show_regs(core: *Core) -> Unit {
 	var i: Int32 = 0
 	while i < 16 {
-		printf("x%02d = 0x%08x", i, (core.reg)[i])
-		printf("    ")
-		printf("x%02d = 0x%08x\n", i + 16, (core.reg)[i + 16])
+		stdio.printf("x%02d = 0x%08x", i, core.reg[i])
+		stdio.printf("    ")
+		stdio.printf("x%02d = 0x%08x\n", i + 16, core.reg[i + 16])
 		i = i + 1
 	}
 }

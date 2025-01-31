@@ -6,23 +6,21 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+
+
+
 #include "mmio.h"
 
 
 
-
-
-
-
-
-
 // see mem.ld
-#define mem_ramSize  4096
+#define mem_ramSize  (1024 * 16)
 #define mem_ramStart  0x10000000
 #define mem_ramEnd  (mem_ramStart + mem_ramSize)
 
 
-#define mem_romSize  0x10000
+#define mem_romSize  0x100000
 #define mem_romStart  0x00000000
 #define mem_romEnd  (mem_romStart + mem_romSize)
 

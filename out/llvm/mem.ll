@@ -199,49 +199,53 @@ declare %Str* @secure_getenv(%Str* %name)
 declare i8* @malloc(%SizeT %size)
 declare %Int @system([0 x %ConstChar]* %string)
 ; -- end print includes --
-; -- print imports --
+; -- print imports 'mem' --
+; -- 1
+; ?? mmio ??
 ; from included ctypes
+; from import
 declare void @mmio_write8(%Int32 %adr, %Word8 %value)
 declare void @mmio_write16(%Int32 %adr, %Word16 %value)
 declare void @mmio_write32(%Int32 %adr, %Word32 %value)
 declare %Word8 @mmio_read8(%Int32 %adr)
 declare %Word16 @mmio_read16(%Int32 %adr)
 declare %Word32 @mmio_read32(%Int32 %adr)
-; -- end print imports --
+; end from import
+; -- end print imports 'mem' --
 ; -- strings --
 @str1 = private constant [38 x i8] [i8 42, i8 42, i8 42, i8 32, i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
 ; -- endstrings --
 
 
 ; see mem.ld
-@rom = internal global [1048576 x %Word8] zeroinitializer
-@ram = internal global [16384 x %Word8] zeroinitializer
+@mem_rom = internal global [1048576 x %Word8] zeroinitializer
+@mem_ram = internal global [16384 x %Word8] zeroinitializer
 define [0 x %Word8]* @mem_get_ram_ptr() {
-	ret [0 x %Word8]* bitcast ([16384 x %Word8]* @ram to [0 x %Word8]*)
+	ret [0 x %Word8]* bitcast ([16384 x %Word8]* @mem_ram to [0 x %Word8]*)
 }
 
 define [0 x %Word8]* @mem_get_rom_ptr() {
-	ret [0 x %Word8]* bitcast ([1048576 x %Word8]* @rom to [0 x %Word8]*)
+	ret [0 x %Word8]* bitcast ([1048576 x %Word8]* @mem_rom to [0 x %Word8]*)
 }
 
-@memviolationCnt = internal global %Int32 0
-define internal void @memoryViolation(%Char8 %rw, %Int32 %adr) {
+@mem_memviolationCnt = internal global %Int32 0
+define internal void @mem_memoryViolation(%Char8 %rw, %Int32 %adr) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str1 to [0 x i8]*), %Char8 %rw, %Int32 %adr)
-	%2 = load %Int32, %Int32* @memviolationCnt
+	%2 = load %Int32, %Int32* @mem_memviolationCnt
 	%3 = icmp ugt %Int32 %2, 10
 	br %Bool %3 , label %then_0, label %endif_0
 then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	%4 = load %Int32, %Int32* @memviolationCnt
+	%4 = load %Int32, %Int32* @mem_memviolationCnt
 	%5 = add %Int32 %4, 1
-	store %Int32 %5, %Int32* @memviolationCnt
+	store %Int32 %5, %Int32* @mem_memviolationCnt
 	;	memoryViolation_event(0x55) // !
 	ret void
 }
 
-define internal %Bool @isAdressInRange(%Int32 %x, %Int32 %a, %Int32 %b) {
+define internal %Bool @mem_isAdressInRange(%Int32 %x, %Int32 %a, %Int32 %b) {
 	%1 = icmp uge %Int32 %x, %a
 	%2 = icmp ult %Int32 %x, %b
 	%3 = and %Bool %1, %2
@@ -251,35 +255,35 @@ define internal %Bool @isAdressInRange(%Int32 %x, %Int32 %a, %Int32 %b) {
 define %Word8 @mem_read8(%Int32 %adr) {
 	%1 = alloca %Word8, align 1
 	store %Word8 0, %Word8* %1
-	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
+	%2 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %2 , label %then_0, label %else_0
 then_0:
 	%3 = sub %Int32 %adr, 268435456
-	%4 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %3
+	%4 = getelementptr [16384 x %Word8], [16384 x %Word8]* @mem_ram, %Int32 0, %Int32 %3
 	%5 = bitcast %Word8* %4 to i8*
 	%6 = bitcast i8* %5 to %Word8*
 	%7 = load %Word8, %Word8* %6
 	store %Word8 %7, %Word8* %1
 	br label %endif_0
 else_0:
-	%8 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
+	%8 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
 	br %Bool %8 , label %then_1, label %else_1
 then_1:
 	;
 	br label %endif_1
 else_1:
-	%9 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
+	%9 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
 	br %Bool %9 , label %then_2, label %else_2
 then_2:
 	%10 = sub %Int32 %adr, 0
-	%11 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @rom, %Int32 0, %Int32 %10
+	%11 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @mem_rom, %Int32 0, %Int32 %10
 	%12 = bitcast %Word8* %11 to i8*
 	%13 = bitcast i8* %12 to %Word8*
 	%14 = load %Word8, %Word8* %13
 	store %Word8 %14, %Word8* %1
 	br label %endif_2
 else_2:
-	call void @memoryViolation(%Char8 114, %Int32 %adr)
+	call void @mem_memoryViolation(%Char8 114, %Int32 %adr)
 	store %Word8 0, %Word8* %1
 	br label %endif_2
 endif_2:
@@ -296,35 +300,35 @@ endif_0:
 define %Word16 @mem_read16(%Int32 %adr) {
 	%1 = alloca %Word16, align 2
 	store %Word16 0, %Word16* %1
-	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
+	%2 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %2 , label %then_0, label %else_0
 then_0:
 	%3 = sub %Int32 %adr, 268435456
-	%4 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %3
+	%4 = getelementptr [16384 x %Word8], [16384 x %Word8]* @mem_ram, %Int32 0, %Int32 %3
 	%5 = bitcast %Word8* %4 to i8*
 	%6 = bitcast i8* %5 to %Word16*
 	%7 = load %Word16, %Word16* %6
 	store %Word16 %7, %Word16* %1
 	br label %endif_0
 else_0:
-	%8 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
+	%8 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
 	br %Bool %8 , label %then_1, label %else_1
 then_1:
 	;
 	br label %endif_1
 else_1:
-	%9 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
+	%9 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
 	br %Bool %9 , label %then_2, label %else_2
 then_2:
 	%10 = sub %Int32 %adr, 0
-	%11 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @rom, %Int32 0, %Int32 %10
+	%11 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @mem_rom, %Int32 0, %Int32 %10
 	%12 = bitcast %Word8* %11 to i8*
 	%13 = bitcast i8* %12 to %Word16*
 	%14 = load %Word16, %Word16* %13
 	store %Word16 %14, %Word16* %1
 	br label %endif_2
 else_2:
-	call void @memoryViolation(%Char8 114, %Int32 %adr)
+	call void @mem_memoryViolation(%Char8 114, %Int32 %adr)
 	br label %endif_2
 endif_2:
 	br label %endif_1
@@ -340,35 +344,35 @@ endif_0:
 define %Word32 @mem_read32(%Int32 %adr) {
 	%1 = alloca %Word32, align 4
 	store %Word32 0, %Word32* %1
-	%2 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
+	%2 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 0, %Int32 1048576)
 	br %Bool %2 , label %then_0, label %else_0
 then_0:
 	%3 = sub %Int32 %adr, 0
-	%4 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @rom, %Int32 0, %Int32 %3
+	%4 = getelementptr [1048576 x %Word8], [1048576 x %Word8]* @mem_rom, %Int32 0, %Int32 %3
 	%5 = bitcast %Word8* %4 to i8*
 	%6 = bitcast i8* %5 to %Word32*
 	%7 = load %Word32, %Word32* %6
 	store %Word32 %7, %Word32* %1
 	br label %endif_0
 else_0:
-	%8 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
+	%8 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %8 , label %then_1, label %else_1
 then_1:
 	%9 = sub %Int32 %adr, 268435456
-	%10 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %9
+	%10 = getelementptr [16384 x %Word8], [16384 x %Word8]* @mem_ram, %Int32 0, %Int32 %9
 	%11 = bitcast %Word8* %10 to i8*
 	%12 = bitcast i8* %11 to %Word32*
 	%13 = load %Word32, %Word32* %12
 	store %Word32 %13, %Word32* %1
 	br label %endif_1
 else_1:
-	%14 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
+	%14 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
 	br %Bool %14 , label %then_2, label %else_2
 then_2:
 	;TODO
 	br label %endif_2
 else_2:
-	call void @memoryViolation(%Char8 114, %Int32 %adr)
+	call void @mem_memoryViolation(%Char8 114, %Int32 %adr)
 	br label %endif_2
 endif_2:
 	br label %endif_1
@@ -382,24 +386,24 @@ endif_0:
 }
 
 define void @mem_write8(%Int32 %adr, %Word8 %value) {
-	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
+	%1 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
 	%2 = sub %Int32 %adr, 268435456
-	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %2
+	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @mem_ram, %Int32 0, %Int32 %2
 	%4 = bitcast %Word8* %3 to i8*
 	%5 = bitcast i8* %4 to %Word8*
 	store %Word8 %value, %Word8* %5
 	br label %endif_0
 else_0:
-	%6 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
+	%6 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
 	br %Bool %6 , label %then_1, label %else_1
 then_1:
 	%7 = sub %Int32 %adr, 4027318272
 	call void @mmio_write8(%Int32 %7, %Word8 %value)
 	br label %endif_1
 else_1:
-	call void @memoryViolation(%Char8 119, %Int32 %adr)
+	call void @mem_memoryViolation(%Char8 119, %Int32 %adr)
 	br label %endif_1
 endif_1:
 	br label %endif_0
@@ -408,24 +412,24 @@ endif_0:
 }
 
 define void @mem_write16(%Int32 %adr, %Word16 %value) {
-	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
+	%1 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
 	%2 = sub %Int32 %adr, 268435456
-	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %2
+	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @mem_ram, %Int32 0, %Int32 %2
 	%4 = bitcast %Word8* %3 to i8*
 	%5 = bitcast i8* %4 to %Word16*
 	store %Word16 %value, %Word16* %5
 	br label %endif_0
 else_0:
-	%6 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
+	%6 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
 	br %Bool %6 , label %then_1, label %else_1
 then_1:
 	%7 = sub %Int32 %adr, 4027318272
 	call void @mmio_write16(%Int32 %7, %Word16 %value)
 	br label %endif_1
 else_1:
-	call void @memoryViolation(%Char8 119, %Int32 %adr)
+	call void @mem_memoryViolation(%Char8 119, %Int32 %adr)
 	br label %endif_1
 endif_1:
 	br label %endif_0
@@ -434,24 +438,24 @@ endif_0:
 }
 
 define void @mem_write32(%Int32 %adr, %Word32 %value) {
-	%1 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
+	%1 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 268435456, %Int32 268451840)
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
 	%2 = sub %Int32 %adr, 268435456
-	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Int32 %2
+	%3 = getelementptr [16384 x %Word8], [16384 x %Word8]* @mem_ram, %Int32 0, %Int32 %2
 	%4 = bitcast %Word8* %3 to i8*
 	%5 = bitcast i8* %4 to %Word32*
 	store %Word32 %value, %Word32* %5
 	br label %endif_0
 else_0:
-	%6 = call %Bool @isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
+	%6 = call %Bool @mem_isAdressInRange(%Int32 %adr, %Int32 4027318272, %Int32 4027383807)
 	br %Bool %6 , label %then_1, label %else_1
 then_1:
 	%7 = sub %Int32 %adr, 4027318272
 	call void @mmio_write32(%Int32 %7, %Word32 %value)
 	br label %endif_1
 else_1:
-	call void @memoryViolation(%Char8 119, %Int32 %adr)
+	call void @mem_memoryViolation(%Char8 119, %Int32 %adr)
 	br label %endif_1
 endif_1:
 	br label %endif_0

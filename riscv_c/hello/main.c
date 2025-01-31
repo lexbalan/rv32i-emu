@@ -15,10 +15,8 @@ uint32_t b = 0xA5A5A5A5;
 char *str = "Hello world!";
 
 
-
 char k[8] = {1, 2, 3, 4, 5, 6, 7, 8};
 char j[8];
-
 
 
 char buf1[1024];
