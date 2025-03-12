@@ -3,17 +3,17 @@ include "libc/ctypes"
 include "libc/stdio"
 
 
-const consoleMMIOAdr = 0x10
+const consoleMMIOAdr = Nat32 0x10
 const consolePutAdr = consoleMMIOAdr + 0
 const consoleGetAdr = consoleMMIOAdr + 1
 
-const consolePrintInt32Adr = consoleMMIOAdr + 0x10
-const consolePrintUInt32Adr = consoleMMIOAdr + 0x14
-const consolePrintInt32HexAdr = consoleMMIOAdr + 0x18
-const consolePrintUInt32HexAdr = consoleMMIOAdr + 0x1C
+const consolePrintInt32Adr = consoleMMIOAdr + Nat32 0x10
+const consolePrintUInt32Adr = consoleMMIOAdr + Nat32 0x14
+const consolePrintInt32HexAdr = consoleMMIOAdr + Nat32 0x18
+const consolePrintUInt32HexAdr = consoleMMIOAdr + Nat32 0x1C
 
-const consolePrintInt64Adr = consoleMMIOAdr + 0x20
-const consolePrintUInt64Adr = consoleMMIOAdr + 0x28
+const consolePrintInt64Adr = consoleMMIOAdr + Nat32 0x20
+const consolePrintUInt64Adr = consoleMMIOAdr + Nat32 0x28
 
 
 

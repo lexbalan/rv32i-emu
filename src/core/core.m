@@ -9,7 +9,7 @@ include "libc/stdlib"
 include "decode"
 
 
-const debugMode = false
+const traceMode = false
 
 
 public type Core record {
@@ -18,7 +18,7 @@ public type Core record {
 
 	bus: *BusInterface
 
-	interrupt: Nat32
+	interrupt: Word32
 
 	public cnt: Nat32
 	public end: Bool
@@ -83,9 +83,9 @@ func fetch(core: *Core) -> Word32 {
 
 
 public func tick(core: *Core) {
-	if core.interrupt > 0 {
-		debug("\nINT #%02X\n", core.interrupt)
-		let vect_offset = core.interrupt * 4
+	if core.interrupt != 0 {
+		trace(core.pc, "\nINT #%02X\n", core.interrupt)
+		let vect_offset = Nat32 core.interrupt * 4
 		core.pc = vect_offset
 		core.interrupt = 0
 	}
@@ -117,7 +117,7 @@ public func tick(core: *Core) {
 	} else if op == opFENCE {
 		doOpFence(core, instr)
 	} else {
-		debug("UNKNOWN OPCODE: %08X\n", op)
+		trace(core.pc, "UNKNOWN OPCODE: %08X\n", op)
 	}
 
 	core.pc = core.nexpc
@@ -141,7 +141,7 @@ func doOpI(core: *Core, instr: Word32) {
 	if funct3 == 0 {
 		// Add immediate
 
-		debug("addi x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "addi x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = Word32 (Int32 core.reg[rs1] + imm)
@@ -151,7 +151,7 @@ func doOpI(core: *Core, instr: Word32) {
 		into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
 		is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). */
 
-		debug("slli x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "slli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = core.reg[rs1] << unsafe Nat8 imm
@@ -159,43 +159,43 @@ func doOpI(core: *Core, instr: Word32) {
 	} else if funct3 == 2 {
 		// SLTI - set [1 to rd if rs1] less than immediate
 
-		debug("slti x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "slti x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = Word32 (Int32 core.reg[rs1] < imm)
 
 	} else if funct3 == 3 {
-		debug("sltiu x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "sltiu x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = Word32 (Nat32 core.reg[rs1] < Nat32 imm)
 
 	} else if funct3 == 4 {
-		debug("xori x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "xori x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = core.reg[rs1] xor Word32 imm
 
 	} else if funct3 == 5 and funct7 == 0 {
-		debug("srli x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "srli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = (core.reg[rs1] >> unsafe Nat8 imm)
 
 	} else if funct3 == 5 and funct7 == 0x20 {
-		debug("srai x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "srai x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = core.reg[rs1] >> unsafe Nat8 imm
 
 	} else if funct3 == 6 {
-		debug("ori x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "ori x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = core.reg[rs1] or Word32 imm
 
 	} else if funct3 == 7 {
-		debug("andi x%d, x%d, %d\n", rd, rs1, imm)
+		trace(core.pc, "andi x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
 		core.reg[rd] = core.reg[rs1] and Word32 imm
@@ -232,7 +232,7 @@ func doOpR(core: *Core, instr: Word32) {
 
 		if funct3 == 0 {
 			// MUL rd, rs1, rs2
-			debug("mul x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "mul x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			core.reg[rd] = Word32 (Int32 v0 * Int32 v1)
 
@@ -240,46 +240,46 @@ func doOpR(core: *Core, instr: Word32) {
 			// MULH rd, rs1, rs2
 			// Записывает в целевой регистр старшие биты
 			// которые бы не поместились в него при обычном умножении
-			debug("mulh x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "mulh x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			core.reg[rd] = unsafe Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
 
 		} else if funct3 == 2 {
 			// MULHSU rd, rs1, rs2
 			// mul high signed unsigned
-			debug("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			// NOT IMPLEMENTED!
 			notImplemented("mulhsu x%d, x%d, x%d", rd, rs1, rs2)
 
 		} else if funct3 == 3 {
 			// MULHU rd, rs1, rs2
-			debug("mulhu x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "mulhu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			// NOT IMPLEMENTED!
 			notImplemented("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		} else if funct3 == 4 {
 			// DIV rd, rs1, rs2
-			debug("div x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "div x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			core.reg[rd] = Word32 (Int32 v0 / Int32 v1)
 
 		} else if funct3 == 5 {
 			// DIVU rd, rs1, rs2
-			debug("divu x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "divu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			core.reg[rd] = Word32 (Nat32 v0 / Nat32 v1)
 
 		} else if funct3 == 6 {
 			// REM rd, rs1, rs2
-			debug("rem x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "rem x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			core.reg[rd] = Word32 (Int32 v0 % Int32 v1)
 
 		} else if funct3 == 7 {
 			// REMU rd, rs1, rs2
-			debug("remu x%d, x%d, x%d\n", rd, rs1, rs2)
+			trace(core.pc, "remu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			core.reg[rd] = Word32 (Nat32 v0 % Nat32 v1)
 		}
@@ -289,13 +289,13 @@ func doOpR(core: *Core, instr: Word32) {
 
 
 	if funct3 == 0 and funct7 == 0x00 {
-		debug("add x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "add x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = Word32 (Int32 v0 + Int32 v1)
 
 	} else if funct3 == 0 and funct7 == 0x20 {
-		debug("sub x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "sub x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = Word32 (Int32 v0 - Int32 v1)
@@ -303,7 +303,7 @@ func doOpR(core: *Core, instr: Word32) {
 	} else if funct3 == 1 {
 		// shift left logical
 
-		debug("sll x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "sll x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = v0 << unsafe Nat8 v1
@@ -311,7 +311,7 @@ func doOpR(core: *Core, instr: Word32) {
 	} else if funct3 == 2 {
 		// set less than
 
-		debug("slt x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "slt x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = Word32 (Int32 v0 < Int32 v1)
@@ -319,14 +319,14 @@ func doOpR(core: *Core, instr: Word32) {
 	} else if funct3 == 3 {
 		// set less than unsigned
 
-		debug("sltu x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "sltu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = Word32 (Nat32 v0 < Nat32 v1)
 
 	} else if funct3 == 4 {
 
-		debug("xor x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "xor x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = v0 xor v1
@@ -334,26 +334,26 @@ func doOpR(core: *Core, instr: Word32) {
 	} else if funct3 == 5 and funct7 == 0 {
 		// shift right logical
 
-		debug("srl x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "srl x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		core.reg[rd] = v0 >> unsafe Nat8 v1
 
 	} else if funct3 == 5 and funct7 == 0x20 {
 		// shift right arithmetical
 
-		debug("sra x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "sra x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		// ERROR: не реализован арифм сдвиг!
 		//core.reg[rd] = v0 >> Int32 v1
 
 	} else if funct3 == 6 {
-		debug("or x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "or x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = v0 or v1
 
 	} else if funct3 == 7 {
-		debug("and x%d, x%d, x%d\n", rd, rs1, rs2)
+		trace(core.pc, "and x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		core.reg[rd] = v0 and v1
@@ -367,7 +367,7 @@ func doOpLUI(core: *Core, instr: Word32) {
 	let imm = expand12(extract_imm31_12(instr))
 	let rd = extract_rd(instr)
 
-	debug("lui x%d, 0x%X\n", rd, imm)
+	trace(core.pc, "lui x%d, 0x%X\n", rd, imm)
 
 	if rd != 0 {
 		core.reg[rd] = Word32 imm << 12
@@ -382,7 +382,7 @@ func doOpAUIPC(core: *Core, instr: Word32) {
 	let x = core.pc + Nat32 (Word32 imm << 12)
 	let rd = extract_rd(instr)
 
-	debug("auipc x%d, 0x%X\n", rd, imm)
+	trace(core.pc, "auipc x%d, 0x%X\n", rd, imm)
 
 	if rd != 0 {
 		core.reg[rd] = Word32 x
@@ -397,7 +397,7 @@ func doOpJAL(core: *Core, instr: Word32) {
 	let raw_imm = extract_jal_imm(instr)
 	let imm = expand20(raw_imm)
 
-	debug("jal x%d, %d\n", rd, imm)
+	trace(core.pc, "jal x%d, %d\n", rd, imm)
 
 	if rd != 0 {
 		core.reg[rd] = Word32 (core.pc + 4)
@@ -414,7 +414,7 @@ func doOpJALR(core: *Core, instr: Word32) {
 	let rd = extract_rd(instr)
 	let imm = expand12(extract_imm12(instr))
 
-	debug("jalr %d(x%d)\n", imm, rs1)
+	trace(core.pc, "jalr %d(x%d)\n", imm, rs1)
 
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
@@ -453,7 +453,7 @@ func doOpB(core: *Core, instr: Word32) {
 	if funct3 == 0 {
 		// BEQ - Branch if equal
 
-		debug("beq x%d, x%d, %d\n", rs1, rs2, imm)
+		trace(core.pc, "beq x%d, x%d, %d\n", rs1, rs2, imm)
 
 		// Branch if two registers are equal
 		if core.reg[rs1] == core.reg[rs2] {
@@ -463,7 +463,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 1 {
 		// BNE - Branch if not equal
 
-		debug("bne x%d, x%d, %d\n", rs1, rs2, imm)
+		trace(core.pc, "bne x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
 		if core.reg[rs1] != core.reg[rs2] {
@@ -473,7 +473,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 4 {
 		// BLT - Branch if less than (signed)
 
-		debug("blt x%d, x%d, %d\n", rs1, rs2, imm)
+		trace(core.pc, "blt x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
 		if Int32 core.reg[rs1] < Int32 core.reg[rs2] {
@@ -483,7 +483,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 5 {
 		// BGE - Branch if greater or equal (signed)
 
-		debug("bge x%d, x%d, %d\n", rs1, rs2, imm)
+		trace(core.pc, "bge x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
 		if Int32 core.reg[rs1] >= Int32 core.reg[rs2] {
@@ -493,7 +493,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 6 {
 		// BLTU - Branch if less than (unsigned)
 
-		debug("bltu x%d, x%d, %d\n", rs1, rs2, imm)
+		trace(core.pc, "bltu x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
 		if Nat32 core.reg[rs1] < Nat32 core.reg[rs2] {
@@ -503,7 +503,7 @@ func doOpB(core: *Core, instr: Word32) {
 	} else if funct3 == 7 {
 		// BGEU - Branch if greater or equal (unsigned)
 
-		debug("bgeu x%d, x%d, %d\n", rs1, rs2, imm)
+		trace(core.pc, "bgeu x%d, x%d, %d\n", rs1, rs2, imm)
 
 		//
 		if Nat32 core.reg[rs1] >= Nat32 core.reg[rs2] {
@@ -527,7 +527,7 @@ func doOpL(core: *Core, instr: Word32) {
 	if funct3 == 0 {
 		// LB (Load 8-bit signed integer value)
 
-		debug("lb x%d, %d(x%d)\n", rd, imm, rs1)
+		trace(core.pc, "lb x%d, %d(x%d)\n", rd, imm, rs1)
 
 		let val = Int32 core.bus.read8(adr)
 		if rd != 0 {
@@ -537,7 +537,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 1 {
 		// LH (Load 16-bit signed integer value)
 
-		debug("lh x%d, %d(x%d)\n", rd, imm, rs1)
+		trace(core.pc, "lh x%d, %d(x%d)\n", rd, imm, rs1)
 
 		let val = Int32 core.bus.read16(adr)
 		if rd != 0 {
@@ -547,7 +547,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 2 {
 		// LW (Load 32-bit signed integer value)
 
-		debug("lw x%d, %d(x%d)\n", rd, imm, rs1)
+		trace(core.pc, "lw x%d, %d(x%d)\n", rd, imm, rs1)
 
 		let val = core.bus.read32(adr)
 		if rd != 0 {
@@ -557,7 +557,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 4 {
 		// LBU (Load 8-bit unsigned integer value)
 
-		debug("lbu x%d, %d(x%d)\n", rd, imm, rs1)
+		trace(core.pc, "lbu x%d, %d(x%d)\n", rd, imm, rs1)
 
 		let val = Nat32 core.bus.read8(adr)
 		if rd != 0 {
@@ -567,7 +567,7 @@ func doOpL(core: *Core, instr: Word32) {
 	} else if funct3 == 5 {
 		// LHU (Load 16-bit unsigned integer value)
 
-		debug("lhu x%d, %d(x%d)\n", rd, imm, rs1)
+		trace(core.pc, "lhu x%d, %d(x%d)\n", rd, imm, rs1)
 
 		let val = Nat32 core.bus.read16(adr)
 		if rd != 0 {
@@ -589,14 +589,14 @@ func doOpS(core: *Core, instr: Word32) {
 	let _imm = (unsafe Word32 imm11to5 << 5) or unsafe Word32 imm4to0
 	let imm = expand12(_imm)
 
-	let adr = Nat32 (Int32 core.reg[rs1] + imm)
+	let adr = Nat32 Word32 (Int32 core.reg[rs1] + imm)
 	let val = core.reg[rs2]
 
 	if funct3 == 0 {
 		// SB (save 8-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 		
-		debug("sb x%d, %d(x%d)\n", rs2, imm, rs1)
+		trace(core.pc, "sb x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
 		core.bus.write8(adr, unsafe Word8 val)
@@ -605,7 +605,7 @@ func doOpS(core: *Core, instr: Word32) {
 		// SH (save 16-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 
-		debug("sh x%d, %d(x%d)\n", rs2, imm, rs1)
+		trace(core.pc, "sh x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
 		core.bus.write16(adr, unsafe Word16 val)
@@ -614,7 +614,7 @@ func doOpS(core: *Core, instr: Word32) {
 		// SW (save 32-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 
-		debug("sw x%d, %d(x%d)\n", rs2, imm, rs1)
+		trace(core.pc, "sw x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
 		core.bus.write32(adr, val)
@@ -633,13 +633,13 @@ func doOpSystem(core: *Core, instr: Word32) {
 	let csr = unsafe Nat16 imm12
 
 	if instr == instrECALL {
-		debug("ECALL\n")
+		trace(core.pc, "ECALL\n")
 
 		//
 		irq(core, intSysCall)
 
 	} else if instr == instrEBREAK {
-		debug("EBREAK\n")
+		trace(core.pc, "EBREAK\n")
 
 		//
 		printf("END.\n")
@@ -667,7 +667,7 @@ func doOpSystem(core: *Core, instr: Word32) {
 		let imm = rs1
 		csr_rci(core, csr, rd, imm)
 	} else {
-		debug("UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
+		trace(core.pc, "UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
 		core.end = true
 	}
 }
@@ -675,12 +675,12 @@ func doOpSystem(core: *Core, instr: Word32) {
 
 func doOpFence(core: *Core, instr: Word32) {
 	if instr == instrPAUSE {
-		debug("PAUSE\n")
+		trace(core.pc, "PAUSE\n")
 	}
 }
 
 
-public func irq(core: *Core, irq: Nat32) {
+public func irq(core: *Core, irq: Word32) {
 	if core.interrupt == 0 {
 		core.interrupt = irq
 	}
@@ -721,15 +721,15 @@ The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSR
 */
 func csr_rw(core: *Core, csr: Nat16, rd: Nat8, rs1: Nat8) {
 	let nv = core.reg[rs1]
-	if csr == 0x340 {
+	if csr == Nat16 0x340 {
 		// mscratch
-	} else if csr == 0x341 {
+	} else if csr == Nat16 0x341 {
 		// mepc
-	} else if csr == 0x342 {
+	} else if csr == Nat16 0x342 {
 		// mcause
-	} else if csr == 0x343 {
+	} else if csr == Nat16 0x343 {
 		// mbadaddr
-	} else if csr == 0x344 {
+	} else if csr == Nat16 0x344 {
 		// mip (machine interrupt pending)
 	}
 }
@@ -771,10 +771,11 @@ func csr_rci(core: *Core, csr: Nat16, rd: Nat8, imm: Nat8) {
 
 
 
-func debug(form: *Str8, ...) -> Unit {
+func trace(pc: Nat32, form: *Str8, ...) -> Unit {
 	var va: __VA_List
 	__va_start(va, form)
-	if debugMode {
+	if traceMode {
+		printf("[%08X] ", pc)
 		vprintf(form, va)
 	}
 	__va_end(va)

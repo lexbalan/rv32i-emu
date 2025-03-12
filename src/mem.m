@@ -8,18 +8,18 @@ import "mmio"
 
 
 // see mem.ld
-public const ramSize = 1024 * 16
-public const ramStart = 0x10000000
+public const ramSize = Nat32 1024 * 16
+public const ramStart = Nat32 0x10000000
 public const ramEnd = ramStart + ramSize
 
 
-public const romSize = 0x100000
-public const romStart = 0x00000000
+public const romSize = Nat32 0x100000
+public const romStart = Nat32 0x00000000
 public const romEnd = romStart + romSize
 
 
-const mmioSize = 0xFFFF
-const mmioStart = 0xF00C0000
+const mmioSize = Nat32 0xFFFF
+const mmioStart = Nat32 0xF00C0000
 const mmioEnd = mmioStart + mmioSize
 
 

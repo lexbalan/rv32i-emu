@@ -2,33 +2,27 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #include "main.h"
 
-#include <stdlib.h>
-
-#include <stdio.h>
 
 
 
+#define text_filename  "./image.bin"
 
+#define showText  false
 
-#define main_text_filename  "./image.bin"
-
-#define main_showText  false
-
-
-static core_Core main_core;
-
+static core_Core core;
 
 //public func mem_violation_event(reason: Nat32) {
 //	core.irq(&core, riscvCore.intMemViolation)
 //}
 
 
-
-static uint32_t main_loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
-static void main_show_mem();
+static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
+static void show_mem();
 int main()
 {
 	printf("RISC-V VM\n");
@@ -42,50 +36,49 @@ int main()
 		.write32 = &mem_write32
 	};
 
-	uint8_t *romptr = mem_get_rom_ptr();
-	uint32_t nbytes = main_loader(main_text_filename, romptr, mem_romSize);
+	uint8_t *const romptr = mem_get_rom_ptr();
+	const uint32_t nbytes = loader(text_filename, romptr, mem_romSize);
 
 	if (nbytes <= 0) {
 		exit(1);
 	}
 
-	core_init(&main_core, &memctl);
+	core_init(&core, (core_BusInterface *)&memctl);
 
 	printf("~~~ START ~~~\n");
 
-	while (!main_core.end) {
-		core_tick(&main_core);
+	while (!core.end) {
+		core_tick(&core);
 	}
 
-	printf("core.cnt = %u\n", main_core.cnt);
+	printf("core.cnt = %u\n", core.cnt);
 
 	printf("\nCore dump:\n");
-	core_show_regs(&main_core);
+	core_show_regs(&core);
 	printf("\n");
-	main_show_mem();
+	show_mem();
 
 	return 0;
 }
 
-
-static uint32_t main_loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
+static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 {
 	printf("LOAD: %s\n", filename);
 
-	FILE *fp = fopen(filename, "rb");
+	FILE *const fp = fopen(filename, "rb");
 
 	if (fp == NULL) {
 		printf("error: cannot open file '%s'", filename);
 		return 0;
 	}
 
-	size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
+	const size_t n = fread(bufptr, 1, buf_size, fp);
 
 	printf("LOADED: %zu bytes\n", n);
 
-	if (main_showText) {
+	if (showText) {
 		size_t i = 0;
-		while (i < n / 4) {
+		while (i < (n / 4)) {
 			printf("%08zx: 0x%08x\n", i, ((uint32_t *)bufptr)[i]);
 			i = i + 4;
 		}
@@ -95,14 +88,13 @@ static uint32_t main_loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 
 	fclose(fp);
 
-	return (uint32_t)n;
+	return n;
 }
 
-
-static void main_show_mem()
+static void show_mem()
 {
 	int32_t i = 0;
-	uint8_t *ramptr = mem_get_ram_ptr();
+	uint8_t *const ramptr = mem_get_ram_ptr();
 	while (i < 256) {
 		printf("%08X", i * 16);
 

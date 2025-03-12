@@ -2,65 +2,58 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "mmio.h"
 
-#include <stdio.h>
 
+#define consoleMMIOAdr  (0x10)
+#define consolePutAdr  (consoleMMIOAdr + 0)
+#define consoleGetAdr  (consoleMMIOAdr + 1)
 
+#define consolePrintInt32Adr  (consoleMMIOAdr + 0x10)
+#define consolePrintUInt32Adr  (consoleMMIOAdr + 0x14)
+#define consolePrintInt32HexAdr  (consoleMMIOAdr + 0x18)
+#define consolePrintUInt32HexAdr  (consoleMMIOAdr + 0x1C)
 
-#define mmio_consoleMMIOAdr  0x10
-#define mmio_consolePutAdr  (mmio_consoleMMIOAdr + 0)
-#define mmio_consoleGetAdr  (mmio_consoleMMIOAdr + 1)
-
-#define mmio_consolePrintInt32Adr  (mmio_consoleMMIOAdr + 0x10)
-#define mmio_consolePrintUInt32Adr  (mmio_consoleMMIOAdr + 0x14)
-#define mmio_consolePrintInt32HexAdr  (mmio_consoleMMIOAdr + 0x18)
-#define mmio_consolePrintUInt32HexAdr  (mmio_consoleMMIOAdr + 0x1C)
-
-#define mmio_consolePrintInt64Adr  (mmio_consoleMMIOAdr + 0x20)
-#define mmio_consolePrintUInt64Adr  (mmio_consoleMMIOAdr + 0x28)
-
-
+#define consolePrintInt64Adr  (consoleMMIOAdr + 0x20)
+#define consolePrintUInt64Adr  (consoleMMIOAdr + 0x28)
 
 void mmio_write8(uint32_t adr, uint8_t value)
 {
-	if (adr == mmio_consolePutAdr) {
+	if (adr == consolePutAdr) {
 		putchar((int)value);
 		return;
 	}
 }
-
 
 void mmio_write16(uint32_t adr, uint16_t value)
 {
-	if (adr == mmio_consolePutAdr) {
+	if (adr == consolePutAdr) {
 		putchar((int)value);
 		return;
 	}
 }
 
-
 void mmio_write32(uint32_t adr, uint32_t value)
 {
-	if (adr == mmio_consolePutAdr) {
+	if (adr == consolePutAdr) {
 		putchar((int)value);
 		return;
-	} else if (adr == mmio_consolePrintInt32Adr) {
+	} else if (adr == consolePrintInt32Adr) {
 		printf("%u", value);
 		return;
-	} else if (adr == mmio_consolePrintUInt32Adr) {
+	} else if (adr == consolePrintUInt32Adr) {
 		printf("%u", value);
 		return;
-	} else if (adr == mmio_consolePrintInt32HexAdr) {
+	} else if (adr == consolePrintInt32HexAdr) {
 		printf("%x", value);
 		return;
-	} else if (adr == mmio_consolePrintUInt32HexAdr) {
+	} else if (adr == consolePrintUInt32HexAdr) {
 		printf("%ux", value);
 		return;
 	}
 }
-
 
 uint8_t mmio_read8(uint32_t adr)
 {

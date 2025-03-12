@@ -195,6 +195,7 @@ declare void @perror(%ConstCharStr* %str)
 @str4 = private constant [4 x i8] [i8 37, i8 117, i8 120, i8 0]
 ; -- endstrings --
 define void @mmio_write8(%Int32 %adr, %Word8 %value) {
+; if_0
 	%1 = icmp eq %Int32 %adr, 16
 	br %Bool %1 , label %then_0, label %endif_0
 then_0:
@@ -207,6 +208,7 @@ endif_0:
 }
 
 define void @mmio_write16(%Int32 %adr, %Word16 %value) {
+; if_0
 	%1 = icmp eq %Int32 %adr, 16
 	br %Bool %1 , label %then_0, label %endif_0
 then_0:
@@ -219,6 +221,7 @@ endif_0:
 }
 
 define void @mmio_write32(%Int32 %adr, %Word32 %value) {
+; if_0
 	%1 = icmp eq %Int32 %adr, 16
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
@@ -227,6 +230,7 @@ then_0:
 	ret void
 	br label %endif_0
 else_0:
+; if_1
 	%5 = icmp eq %Int32 %adr, 32
 	br %Bool %5 , label %then_1, label %else_1
 then_1:
@@ -234,6 +238,7 @@ then_1:
 	ret void
 	br label %endif_1
 else_1:
+; if_2
 	%8 = icmp eq %Int32 %adr, 36
 	br %Bool %8 , label %then_2, label %else_2
 then_2:
@@ -241,6 +246,7 @@ then_2:
 	ret void
 	br label %endif_2
 else_2:
+; if_3
 	%11 = icmp eq %Int32 %adr, 40
 	br %Bool %11 , label %then_3, label %else_3
 then_3:
@@ -248,6 +254,7 @@ then_3:
 	ret void
 	br label %endif_3
 else_3:
+; if_4
 	%14 = icmp eq %Int32 %adr, 44
 	br %Bool %14 , label %then_4, label %endif_4
 then_4:
@@ -267,15 +274,18 @@ endif_0:
 }
 
 define %Word8 @mmio_read8(%Int32 %adr) {
-	ret %Word8 0
+	%1 = bitcast i8 0 to %Word8
+	ret %Word8 %1
 }
 
 define %Word16 @mmio_read16(%Int32 %adr) {
-	ret %Word16 0
+	%1 = zext i8 0 to %Word16
+	ret %Word16 %1
 }
 
 define %Word32 @mmio_read32(%Int32 %adr) {
-	ret %Word32 0
+	%1 = zext i8 0 to %Word32
+	ret %Word32 %1
 }
 
 

@@ -329,7 +329,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 	%Int32,
 	%Int32,
 	%core_BusInterface*,
-	%Int32,
+	%Word32,
 	%Int32,
 	%Bool
 };
@@ -345,7 +345,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 
 declare void @core_init(%core_Core* %core, %core_BusInterface* %bus)
 declare void @core_tick(%core_Core* %core)
-declare void @core_irq(%core_Core* %core, %Int32 %irq)
+declare void @core_irq(%core_Core* %core, %Word32 %irq)
 declare void @core_show_regs(%core_Core* %core)
 ; end from import
 ; -- end print imports 'main' --
@@ -366,7 +366,7 @@ declare void @core_show_regs(%core_Core* %core)
 @str14 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
 @str15 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
-@main_core = internal global %core_Core zeroinitializer
+@core = internal global %core_Core zeroinitializer
 
 
 ;public func mem_violation_event(reason: Nat32) {
@@ -383,38 +383,42 @@ define %Int @main() {
 	%8 = insertvalue %core_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
 	store %core_BusInterface %8, %core_BusInterface* %2
 	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
-	%10 = call %Int32 @main_loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 1048576)
+	%10 = call %Int32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 1048576)
+; if_0
 	%11 = icmp ule %Int32 %10, 0
 	br %Bool %11 , label %then_0, label %endif_0
 then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	call void @core_init(%core_Core* @main_core, %core_BusInterface* %2)
-	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+	%12 = bitcast %core_BusInterface* %2 to %core_BusInterface*
+	call void @core_init(%core_Core* @core, %core_BusInterface* %12)
+	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+; while_1
 	br label %again_1
 again_1:
-	%13 = getelementptr %core_Core, %core_Core* @main_core, %Int32 0, %Int32 6
-	%14 = load %Bool, %Bool* %13
-	%15 = xor %Bool %14, 1
-	br %Bool %15 , label %body_1, label %break_1
+	%14 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 6
+	%15 = load %Bool, %Bool* %14
+	%16 = xor %Bool %15, 1
+	br %Bool %16 , label %body_1, label %break_1
 body_1:
-	call void @core_tick(%core_Core* @main_core)
+	call void @core_tick(%core_Core* @core)
 	br label %again_1
 break_1:
-	%16 = getelementptr %core_Core, %core_Core* @main_core, %Int32 0, %Int32 5
-	%17 = load %Int32, %Int32* %16
-	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %17)
-	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
-	call void @core_show_regs(%core_Core* @main_core)
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
-	call void @main_show_mem()
+	%17 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 5
+	%18 = load %Int32, %Int32* %17
+	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %18)
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
+	call void @core_show_regs(%core_Core* @core)
+	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
+	call void @show_mem()
 	ret %Int 0
 }
 
-define internal %Int32 @main_loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
+define internal %Int32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str7 to [0 x i8]*), %Str8* %filename)
 	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str8 to [0 x i8]*))
+; if_0
 	%3 = icmp eq %File* %2, null
 	br %Bool %3 , label %then_0, label %endif_0
 then_0:
@@ -426,10 +430,12 @@ endif_0:
 	%7 = zext %Int32 %buf_size to %SizeT
 	%8 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %2)
 	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str10 to [0 x i8]*), %SizeT %8)
+; if_1
 	br %Bool 0 , label %then_1, label %endif_1
 then_1:
 	%10 = alloca %SizeT, align 8
 	store %SizeT 0, %SizeT* %10
+; while_1
 	br label %again_1
 again_1:
 	%11 = udiv %SizeT %8, 4
@@ -440,26 +446,28 @@ body_1:
 	%14 = load %SizeT, %SizeT* %10
 	%15 = load %SizeT, %SizeT* %10
 	%16 = bitcast [0 x %Word8]* %bufptr to [0 x %Int32]*
-	%17 = getelementptr [0 x %Int32], [0 x %Int32]* %16, %Int32 0, %SizeT %15
-	%18 = load %Int32, %Int32* %17
-	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %14, %Int32 %18)
-	%20 = load %SizeT, %SizeT* %10
-	%21 = add %SizeT %20, 4
-	store %SizeT %21, %SizeT* %10
+	%17 = trunc %SizeT %15 to %Int32
+	%18 = getelementptr [0 x %Int32], [0 x %Int32]* %16, %Int32 0, %Int32 %17
+	%19 = load %Int32, %Int32* %18
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %14, %Int32 %19)
+	%21 = load %SizeT, %SizeT* %10
+	%22 = add %SizeT %21, 4
+	store %SizeT %22, %SizeT* %10
 	br label %again_1
 break_1:
-	%22 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str12 to [0 x i8]*))
+	%23 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str12 to [0 x i8]*))
 	br label %endif_1
 endif_1:
-	%23 = call %Int @fclose(%File* %2)
-	%24 = trunc %SizeT %8 to %Int32
-	ret %Int32 %24
+	%24 = call %Int @fclose(%File* %2)
+	%25 = trunc %SizeT %8 to %Int32
+	ret %Int32 %25
 }
 
-define internal void @main_show_mem() {
+define internal void @show_mem() {
 	%1 = alloca %Int32, align 4
 	store %Int32 0, %Int32* %1
 	%2 = call [0 x %Word8]* @mem_get_ram_ptr()
+; while_1
 	br label %again_1
 again_1:
 	%3 = load %Int32, %Int32* %1
@@ -471,6 +479,7 @@ body_1:
 	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str13 to [0 x i8]*), %Int32 %6)
 	%8 = alloca %Int32, align 4
 	store %Int32 0, %Int32* %8
+; while_2
 	br label %again_2
 again_2:
 	%9 = load %Int32, %Int32* %8
