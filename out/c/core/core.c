@@ -87,7 +87,7 @@ void core_tick(core_Core *core)
 {
 	if (core->interrupt != 0) {
 		trace(core->pc, "\nINT #%02X\n", core->interrupt);
-		const uint32_t vect_offset = (uint32_t)core->interrupt * 4;
+		const uint32_t vect_offset = core->interrupt * 4;
 		core->pc = vect_offset;
 		core->interrupt = 0;
 	}
@@ -170,7 +170,7 @@ static void doOpI(core_Core *core, uint32_t instr)
 		trace(core->pc, "sltiu x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
-		core->reg[rd] = (uint32_t)((uint32_t)core->reg[rs1] < ABS(imm));
+		core->reg[rd] = (uint32_t)(core->reg[rs1] < ABS(imm));
 
 	} else if (funct3 == 4) {
 		trace(core->pc, "xori x%d, x%d, %d\n", rd, rs1, imm);
@@ -273,7 +273,7 @@ static void doOpR(core_Core *core, uint32_t instr)
 			// DIVU rd, rs1, rs2
 			trace(core->pc, "divu x%d, x%d, x%d\n", rd, rs1, rs2);
 
-			core->reg[rd] = ((uint32_t)v0 / (uint32_t)v1);
+			core->reg[rd] = (v0 / v1);
 
 		} else if (funct3 == 6) {
 			// REM rd, rs1, rs2
@@ -285,7 +285,7 @@ static void doOpR(core_Core *core, uint32_t instr)
 			// REMU rd, rs1, rs2
 			trace(core->pc, "remu x%d, x%d, x%d\n", rd, rs1, rs2);
 
-			core->reg[rd] = ((uint32_t)v0 % (uint32_t)v1);
+			core->reg[rd] = (v0 % v1);
 		}
 
 		return;
@@ -326,7 +326,7 @@ static void doOpR(core_Core *core, uint32_t instr)
 		trace(core->pc, "sltu x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
-		core->reg[rd] = (uint32_t)((uint32_t)v0 < (uint32_t)v1);
+		core->reg[rd] = (uint32_t)(v0 < v1);
 
 	} else if (funct3 == 4) {
 
@@ -383,7 +383,7 @@ static void doOpAUIPC(core_Core *core, uint32_t instr)
 	// Add upper immediate to PC
 
 	const int32_t imm = decode_expand12(decode_extract_imm31_12(instr));
-	const uint32_t x = core->pc + (uint32_t)((uint32_t)imm << 12);
+	const uint32_t x = core->pc + ((uint32_t)imm << 12);
 	const uint8_t rd = decode_extract_rd(instr);
 
 	trace(core->pc, "auipc x%d, 0x%X\n", rd, imm);
@@ -429,14 +429,14 @@ static void doOpJALR(core_Core *core, uint32_t instr)
 		core->reg[rd] = (uint32_t)next_instr_ptr;
 	}
 
-	core->nexpc = (uint32_t)jump_to;
+	core->nexpc = jump_to;
 }
 
 static void doOpB(core_Core *core, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t imm12_10to5 = decode_extract_funct7(instr);
-	const uint16_t imm4to1_11 = decode_extract_rd(instr);
+	const uint16_t imm4to1_11 = (uint16_t)decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
 	const uint8_t rs2 = decode_extract_rs2(instr);
 
@@ -500,7 +500,7 @@ static void doOpB(core_Core *core, uint32_t instr)
 		trace(core->pc, "bltu x%d, x%d, %d\n", rs1, rs2, imm);
 
 		//
-		if ((uint32_t)core->reg[rs1] < (uint32_t)core->reg[rs2]) {
+		if (core->reg[rs1] < core->reg[rs2]) {
 			core->nexpc = ABS(((int32_t)core->pc + (int32_t)imm));
 		}
 
@@ -510,7 +510,7 @@ static void doOpB(core_Core *core, uint32_t instr)
 		trace(core->pc, "bgeu x%d, x%d, %d\n", rs1, rs2, imm);
 
 		//
-		if ((uint32_t)core->reg[rs1] >= (uint32_t)core->reg[rs2]) {
+		if (core->reg[rs1] >= core->reg[rs2]) {
 			core->nexpc = ABS(((int32_t)core->pc + (int32_t)imm));
 		}
 	}
@@ -588,12 +588,12 @@ static void doOpS(core_Core *core, uint32_t instr)
 	const uint8_t rs1 = decode_extract_rs1(instr);
 	const uint8_t rs2 = decode_extract_rs2(instr);
 
-	const uint32_t imm4to0 = rd;
+	const uint32_t imm4to0 = (uint32_t)rd;
 	const uint32_t imm11to5 = (uint32_t)funct7;
 	const uint32_t _imm = (imm11to5 << 5) | imm4to0;
 	const int32_t imm = decode_expand12(_imm);
 
-	const uint32_t adr = (uint32_t)(uint32_t)((int32_t)core->reg[rs1] + imm);
+	const uint32_t adr = (uint32_t)((int32_t)core->reg[rs1] + imm);
 	const uint32_t val = core->reg[rs2];
 
 	if (funct3 == 0) {

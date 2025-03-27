@@ -27,7 +27,7 @@ int main()
 {
 	printf("RISC-V VM\n");
 
-	core_BusInterface memctl = (core_BusInterface){
+	core_BusInterface memctl = {
 		.read8 = &mem_read8,
 		.read16 = &mem_read16,
 		.read32 = &mem_read32,
@@ -72,7 +72,7 @@ static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 		return 0;
 	}
 
-	const size_t n = fread(bufptr, 1, buf_size, fp);
+	const size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
 
 	printf("LOADED: %zu bytes\n", n);
 
@@ -88,7 +88,7 @@ static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 
 	fclose(fp);
 
-	return n;
+	return (uint32_t)n;
 }
 
 static void show_mem()
