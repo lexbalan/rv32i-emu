@@ -8,16 +8,14 @@
 #include "main.h"
 
 
-
-
 #define text_filename  "./image.bin"
 
 #define showText  false
 
-static core_Core core;
+static hart_Hart hart;
 
 //public func mem_violation_event(reason: Nat32) {
-//	core.irq(&core, riscvCore.intMemViolation)
+//	hart.irq(&hart, rvHart.intMemViolation)
 //}
 
 
@@ -27,7 +25,7 @@ int main()
 {
 	printf("RISC-V VM\n");
 
-	core_BusInterface memctl = {
+	hart_BusInterface memctl = (hart_BusInterface){
 		.read8 = &mem_read8,
 		.read16 = &mem_read16,
 		.read32 = &mem_read32,
@@ -43,18 +41,18 @@ int main()
 		exit(1);
 	}
 
-	core_init(&core, (core_BusInterface *)&memctl);
+	hart_init(&hart, (hart_BusInterface *)&memctl);
 
 	printf("~~~ START ~~~\n");
 
-	while (!core.end) {
-		core_tick(&core);
+	while (!hart.end) {
+		hart_tick(&hart);
 	}
 
-	printf("core.cnt = %u\n", core.cnt);
+	printf("hart.cnt = %u\n", hart.cnt);
 
 	printf("\nCore dump:\n");
-	core_show_regs(&core);
+	hart_show_regs(&hart);
 	printf("\n");
 	show_mem();
 

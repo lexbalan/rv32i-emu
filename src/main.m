@@ -4,7 +4,7 @@ include "libc/stdlib"
 include "libc/stdio"
 
 import "mem"
-import "core/core" as riscvCore
+import "hart/hart" as rvHart
 
 
 const text_filename = "./image.bin"
@@ -12,18 +12,18 @@ const text_filename = "./image.bin"
 const showText = false
 
 
-var core: riscvCore.Core
+var hart: rvHart.Hart
 
 
 //public func mem_violation_event(reason: Nat32) {
-//	core.irq(&core, riscvCore.intMemViolation)
+//	hart.irq(&hart, rvHart.intMemViolation)
 //}
 
 
 public func main() -> Int {
 	printf("RISC-V VM\n")
 
-	var memctl = riscvCore.BusInterface {
+	var memctl = rvHart.BusInterface {
 		read8 = &mem.read8
 		read16 = &mem.read16
 		read32 = &mem.read32
@@ -39,18 +39,18 @@ public func main() -> Int {
 		exit(1)
 	}
 
-	riscvCore.init(&core, &memctl)
+	rvHart.init(&hart, &memctl)
 
 	printf("~~~ START ~~~\n")
 
-	while not core.end {
-		riscvCore.tick(&core)
+	while not hart.end {
+		rvHart.tick(&hart)
 	}
 
-	printf("core.cnt = %u\n", core.cnt)
+	printf("hart.cnt = %u\n", hart.cnt)
 
 	printf("\nCore dump:\n")
-	riscvCore.show_regs(&core)
+	rvHart.show_regs(&hart)
 	printf("\n")
 	show_mem()
 

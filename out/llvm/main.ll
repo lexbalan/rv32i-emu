@@ -222,7 +222,7 @@ declare void @mem_write8(%Int32 %adr, %Word8 %value)
 declare void @mem_write16(%Int32 %adr, %Word16 %value)
 declare void @mem_write32(%Int32 %adr, %Word32 %value)
 ; end from import
-; ?? riscvCore ??
+; ?? rvHart ??
 ; from included unistd
 declare %Int @access([0 x %ConstChar]* %path, %Int %amode)
 declare %UnsignedInt @alarm(%UnsignedInt %seconds)
@@ -324,17 +324,17 @@ declare %Word32 @decode_extract_jal_imm(%Word32 %instr)
 declare %Int32 @decode_expand12(%Word32 %val_12bit)
 declare %Int32 @decode_expand20(%Word32 %val_20bit)
 ; from import
-%core_Core = type {
+%hart_Hart = type {
 	[32 x %Word32],
 	%Int32,
 	%Int32,
-	%core_BusInterface*,
+	%hart_BusInterface*,
 	%Word32,
 	%Int32,
 	%Bool
 };
 
-%core_BusInterface = type {
+%hart_BusInterface = type {
 	%Word8 (%Int32)*,
 	%Word16 (%Int32)*,
 	%Word32 (%Int32)*,
@@ -343,17 +343,17 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 	void (%Int32, %Word32)*
 };
 
-declare void @core_init(%core_Core* %core, %core_BusInterface* %bus)
-declare void @core_tick(%core_Core* %core)
-declare void @core_irq(%core_Core* %core, %Word32 %irq)
-declare void @core_show_regs(%core_Core* %core)
+declare void @hart_init(%hart_Hart* %hart, %hart_BusInterface* %bus)
+declare void @hart_tick(%hart_Hart* %hart)
+declare void @hart_irq(%hart_Hart* %hart, %Word32 %irq)
+declare void @hart_show_regs(%hart_Hart* %hart)
 ; end from import
 ; -- end print imports 'main' --
 ; -- strings --
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
 @str2 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]
 @str3 = private constant [15 x i8] [i8 126, i8 126, i8 126, i8 32, i8 83, i8 84, i8 65, i8 82, i8 84, i8 32, i8 126, i8 126, i8 126, i8 10, i8 0]
-@str4 = private constant [15 x i8] [i8 99, i8 111, i8 114, i8 101, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
+@str4 = private constant [15 x i8] [i8 104, i8 97, i8 114, i8 116, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
 @str5 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 @str6 = private constant [2 x i8] [i8 10, i8 0]
 @str7 = private constant [10 x i8] [i8 76, i8 79, i8 65, i8 68, i8 58, i8 32, i8 37, i8 115, i8 10, i8 0]
@@ -366,22 +366,22 @@ declare void @core_show_regs(%core_Core* %core)
 @str14 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
 @str15 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
-@core = internal global %core_Core zeroinitializer
+@hart = internal global %hart_Hart zeroinitializer
 
 
 ;public func mem_violation_event(reason: Nat32) {
-;	core.irq(&core, riscvCore.intMemViolation)
+;	hart.irq(&hart, rvHart.intMemViolation)
 ;}
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
-	%2 = alloca %core_BusInterface, align 64
-	%3 = insertvalue %core_BusInterface zeroinitializer, %Word8 (%Int32)* @mem_read8, 0
-	%4 = insertvalue %core_BusInterface %3, %Word16 (%Int32)* @mem_read16, 1
-	%5 = insertvalue %core_BusInterface %4, %Word32 (%Int32)* @mem_read32, 2
-	%6 = insertvalue %core_BusInterface %5, void (%Int32, %Word8)* @mem_write8, 3
-	%7 = insertvalue %core_BusInterface %6, void (%Int32, %Word16)* @mem_write16, 4
-	%8 = insertvalue %core_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
-	store %core_BusInterface %8, %core_BusInterface* %2
+	%2 = alloca %hart_BusInterface, align 64
+	%3 = insertvalue %hart_BusInterface zeroinitializer, %Word8 (%Int32)* @mem_read8, 0
+	%4 = insertvalue %hart_BusInterface %3, %Word16 (%Int32)* @mem_read16, 1
+	%5 = insertvalue %hart_BusInterface %4, %Word32 (%Int32)* @mem_read32, 2
+	%6 = insertvalue %hart_BusInterface %5, void (%Int32, %Word8)* @mem_write8, 3
+	%7 = insertvalue %hart_BusInterface %6, void (%Int32, %Word16)* @mem_write16, 4
+	%8 = insertvalue %hart_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
+	store %hart_BusInterface %8, %hart_BusInterface* %2
 	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
 	%10 = call %Int32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 1048576)
 ; if_0
@@ -391,25 +391,25 @@ then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	%12 = bitcast %core_BusInterface* %2 to %core_BusInterface*
-	call void @core_init(%core_Core* @core, %core_BusInterface* %12)
+	%12 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
+	call void @hart_init(%hart_Hart* @hart, %hart_BusInterface* %12)
 	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 ; while_1
 	br label %again_1
 again_1:
-	%14 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 6
+	%14 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 6
 	%15 = load %Bool, %Bool* %14
 	%16 = xor %Bool %15, 1
 	br %Bool %16 , label %body_1, label %break_1
 body_1:
-	call void @core_tick(%core_Core* @core)
+	call void @hart_tick(%hart_Hart* @hart)
 	br label %again_1
 break_1:
-	%17 = getelementptr %core_Core, %core_Core* @core, %Int32 0, %Int32 5
+	%17 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
 	%18 = load %Int32, %Int32* %17
 	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %18)
 	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
-	call void @core_show_regs(%core_Core* @core)
+	call void @hart_show_regs(%hart_Hart* @hart)
 	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
 	call void @show_mem()
 	ret %Int 0

@@ -111,7 +111,8 @@ break_2:
 ; -- 0
 ; -- end print imports 'decode' --
 ; -- strings --
-; -- endstrings --
+; -- endstrings --;
+;
 define %Word8 @decode_extract_op(%Word32 %instr) {
 	%1 = and %Word32 %instr, 127
 	%2 = trunc %Word32 %1 to %Word8

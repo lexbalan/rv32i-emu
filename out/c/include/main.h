@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #include "mem.h"
-#include "core.h"
+#include "hart.h"
 
 int main();
 

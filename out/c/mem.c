@@ -1,3 +1,5 @@
+//
+//
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -8,15 +10,7 @@
 #include "mem.h"
 
 
-
 // see mem.ld
-
-
-
-
-
-
-
 
 #define mmioSize  (0xFFFF)
 #define mmioStart  (0xF00C0000)
