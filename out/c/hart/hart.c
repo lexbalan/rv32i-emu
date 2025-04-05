@@ -56,17 +56,7 @@ static uint32_t fetch(hart_Hart *hart)
 
 
 static void trace(uint32_t pc, char *form, ...);
-static void doOpI(hart_Hart *hart, uint32_t instr);
-static void doOpR(hart_Hart *hart, uint32_t instr);
-static void doOpLUI(hart_Hart *hart, uint32_t instr);
-static void doOpAUIPC(hart_Hart *hart, uint32_t instr);
-static void doOpJAL(hart_Hart *hart, uint32_t instr);
-static void doOpJALR(hart_Hart *hart, uint32_t instr);
-static void doOpB(hart_Hart *hart, uint32_t instr);
-static void doOpL(hart_Hart *hart, uint32_t instr);
-static void doOpS(hart_Hart *hart, uint32_t instr);
-static void doOpSystem(hart_Hart *hart, uint32_t instr);
-static void doOpFence(hart_Hart *hart, uint32_t instr);
+static void exec(hart_Hart *hart, uint32_t instr);
 void hart_tick(hart_Hart *hart)
 {
 	if (hart->interrupt != 0) {
@@ -77,41 +67,58 @@ void hart_tick(hart_Hart *hart)
 	}
 
 	const uint32_t instr = fetch(hart);
-	const uint8_t op = decode_extract_op(instr);
-	const uint8_t funct3 = decode_extract_funct3(instr);
-
-	if (op == opI) {
-		doOpI(hart, instr);
-	} else if (op == opR) {
-		doOpR(hart, instr);
-	} else if (op == opLUI) {
-		doOpLUI(hart, instr);
-	} else if (op == opAUIPC) {
-		doOpAUIPC(hart, instr);
-	} else if (op == opJAL) {
-		doOpJAL(hart, instr);
-	} else if (op == opJALR && funct3 == 0) {
-		doOpJALR(hart, instr);
-	} else if (op == opB) {
-		doOpB(hart, instr);
-	} else if (op == opL) {
-		doOpL(hart, instr);
-	} else if (op == opS) {
-		doOpS(hart, instr);
-	} else if (op == opSYSTEM) {
-		doOpSystem(hart, instr);
-	} else if (op == opFENCE) {
-		doOpFence(hart, instr);
-	} else {
-		trace(hart->pc, "UNKNOWN OPCODE: %08X\n", op);
-	}
+	exec(hart, instr);
 
 	hart->pc = hart->nexpc;
 	hart->nexpc = hart->pc + 4;
 	hart->cnt = hart->cnt + 1;
 }
 
-static void doOpI(hart_Hart *hart, uint32_t instr)
+
+static void execI(hart_Hart *hart, uint32_t instr);
+static void execR(hart_Hart *hart, uint32_t instr);
+static void execLUI(hart_Hart *hart, uint32_t instr);
+static void execAUIPC(hart_Hart *hart, uint32_t instr);
+static void execJAL(hart_Hart *hart, uint32_t instr);
+static void execJALR(hart_Hart *hart, uint32_t instr);
+static void execB(hart_Hart *hart, uint32_t instr);
+static void execL(hart_Hart *hart, uint32_t instr);
+static void execS(hart_Hart *hart, uint32_t instr);
+static void execSystem(hart_Hart *hart, uint32_t instr);
+static void execFence(hart_Hart *hart, uint32_t instr);
+static void exec(hart_Hart *hart, uint32_t instr)
+{
+	const uint8_t op = decode_extract_op(instr);
+	const uint8_t funct3 = decode_extract_funct3(instr);
+
+	if (op == opI) {
+		execI(hart, instr);
+	} else if (op == opR) {
+		execR(hart, instr);
+	} else if (op == opLUI) {
+		execLUI(hart, instr);
+	} else if (op == opAUIPC) {
+		execAUIPC(hart, instr);
+	} else if (op == opJAL) {
+		execJAL(hart, instr);
+	} else if (op == opJALR && funct3 == 0) {
+		execJALR(hart, instr);
+	} else if (op == opB) {
+		execB(hart, instr);
+	} else if (op == opL) {
+		execL(hart, instr);
+	} else if (op == opS) {
+		execS(hart, instr);
+	} else if (op == opSYSTEM) {
+		execSystem(hart, instr);
+	} else if (op == opFENCE) {
+		execFence(hart, instr);
+	} else {
+		trace(hart->pc, "UNKNOWN OPCODE: %08X\n", op);
+	}
+}
+
+static void execI(hart_Hart *hart, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -139,7 +146,7 @@ static void doOpI(hart_Hart *hart, uint32_t instr)
 		trace(hart->pc, "slli x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
-		hart->reg[rd] = hart->reg[rs1] << (ABS(imm));
+		hart->reg[rd] = hart->reg[rs1] << ABS(imm);
 	} else if (funct3 == 2) {
 		// SLTI - set [1 to rd if rs1] less than immediate
 
@@ -161,12 +168,12 @@ static void doOpI(hart_Hart *hart, uint32_t instr)
 		trace(hart->pc, "srli x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
-		hart->reg[rd] = (hart->reg[rs1] >> (ABS(imm)));
+		hart->reg[rd] = (hart->reg[rs1] >> ABS(imm));
 	} else if (funct3 == 5 && funct7 == 0x20) {
 		trace(hart->pc, "srai x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
-		hart->reg[rd] = hart->reg[rs1] >> (ABS(imm));
+		hart->reg[rd] = hart->reg[rs1] >> ABS(imm);
 	} else if (funct3 == 6) {
 		trace(hart->pc, "ori x%d, x%d, %d\n", rd, rs1, imm);
 
@@ -182,7 +189,7 @@ static void doOpI(hart_Hart *hart, uint32_t instr)
 
 
 static void notImplemented(char *form, ...);
-static void doOpR(hart_Hart *hart, uint32_t instr)
+static void execR(hart_Hart *hart, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -277,7 +284,7 @@ static void doOpR(hart_Hart *hart, uint32_t instr)
 		trace(hart->pc, "sll x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
-		hart->reg[rd] = v0 << ((uint8_t)v1);
+		hart->reg[rd] = v0 << (uint8_t)v1;
 	} else if (funct3 == 2) {
 		// set less than
 
@@ -303,7 +310,7 @@ static void doOpR(hart_Hart *hart, uint32_t instr)
 
 		trace(hart->pc, "srl x%d, x%d, x%d\n", rd, rs1, rs2);
 
-		hart->reg[rd] = v0 >> ((uint8_t)v1);
+		hart->reg[rd] = v0 >> (uint8_t)v1;
 	} else if (funct3 == 5 && funct7 == 0x20) {
 		// shift right arithmetical
 
@@ -324,7 +331,7 @@ static void doOpR(hart_Hart *hart, uint32_t instr)
 	}
 }
 
-static void doOpLUI(hart_Hart *hart, uint32_t instr)
+static void execLUI(hart_Hart *hart, uint32_t instr)
 {
 	// load upper immediate
 
@@ -338,7 +345,7 @@ static void doOpLUI(hart_Hart *hart, uint32_t instr)
 	}
 }
 
-static void doOpAUIPC(hart_Hart *hart, uint32_t instr)
+static void execAUIPC(hart_Hart *hart, uint32_t instr)
 {
 	// Add upper immediate to PC
 
@@ -353,7 +360,7 @@ static void doOpAUIPC(hart_Hart *hart, uint32_t instr)
 	}
 }
 
-static void doOpJAL(hart_Hart *hart, uint32_t instr)
+static void execJAL(hart_Hart *hart, uint32_t instr)
 {
 	// Jump and link
 
@@ -370,7 +377,7 @@ static void doOpJAL(hart_Hart *hart, uint32_t instr)
 	hart->nexpc = ABS(((int32_t)hart->pc + imm));
 }
 
-static void doOpJALR(hart_Hart *hart, uint32_t instr)
+static void execJALR(hart_Hart *hart, uint32_t instr)
 {
 	// Jump and link (by register)
 
@@ -392,7 +399,7 @@ static void doOpJALR(hart_Hart *hart, uint32_t instr)
 	hart->nexpc = jump_to;
 }
 
-static void doOpB(hart_Hart *hart, uint32_t instr)
+static void execB(hart_Hart *hart, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t imm12_10to5 = decode_extract_funct7(instr);
@@ -471,7 +478,7 @@ static void doOpB(hart_Hart *hart, uint32_t instr)
 	}
 }
 
-static void doOpL(hart_Hart *hart, uint32_t instr)
+static void execL(hart_Hart *hart, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -531,7 +538,7 @@ static void doOpL(hart_Hart *hart, uint32_t instr)
 	}
 }
 
-static void doOpS(hart_Hart *hart, uint32_t instr)
+static void execS(hart_Hart *hart, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -582,7 +589,7 @@ static void csr_rc(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1);
 static void csr_rwi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm);
 static void csr_rsi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm);
 static void csr_rci(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm);
-static void doOpSystem(hart_Hart *hart, uint32_t instr)
+static void execSystem(hart_Hart *hart, uint32_t instr)
 {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -632,7 +639,7 @@ static void doOpSystem(hart_Hart *hart, uint32_t instr)
 	}
 }
 
-static void doOpFence(hart_Hart *hart, uint32_t instr)
+static void execFence(hart_Hart *hart, uint32_t instr)
 {
 	if (instr == instrPAUSE) {
 		trace(hart->pc, "PAUSE\n");

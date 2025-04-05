@@ -91,34 +91,7 @@ public func tick(hart: *Hart) {
 	}
 
 	let instr = fetch(hart)
-	let op = extract_op(instr)
-	let funct3 = extract_funct3(instr)
-
-	if op == opI {
-		doOpI(hart, instr)
-	} else if op == opR {
-		doOpR(hart, instr)
-	} else if op == opLUI {
-		doOpLUI(hart, instr)
-	} else if op == opAUIPC {
-		doOpAUIPC(hart, instr)
-	} else if op == opJAL {
-		doOpJAL(hart, instr)
-	} else if op == opJALR and funct3 == 0 {
-		doOpJALR(hart, instr)
-	} else if op == opB {
-		doOpB(hart, instr)
-	} else if op == opL {
-		doOpL(hart, instr)
-	} else if op == opS {
-		doOpS(hart, instr)
-	} else if op == opSYSTEM {
-		doOpSystem(hart, instr)
-	} else if op == opFENCE {
-		doOpFence(hart, instr)
-	} else {
-		trace(hart.pc, "UNKNOWN OPCODE: %08X\n", op)
-	}
+	exec(hart, instr)
 
 	hart.pc = hart.nexpc
 	hart.nexpc = hart.pc + 4
@@ -126,7 +99,39 @@ public func tick(hart: *Hart) {
 }
 
 
-func doOpI(hart: *Hart, instr: Word32) {
+func exec(hart: *Hart, instr: Word32) {
+	let op = extract_op(instr)
+	let funct3 = extract_funct3(instr)
+
+	if op == opI {
+		execI(hart, instr)
+	} else if op == opR {
+		execR(hart, instr)
+	} else if op == opLUI {
+		execLUI(hart, instr)
+	} else if op == opAUIPC {
+		execAUIPC(hart, instr)
+	} else if op == opJAL {
+		execJAL(hart, instr)
+	} else if op == opJALR and funct3 == 0 {
+		execJALR(hart, instr)
+	} else if op == opB {
+		execB(hart, instr)
+	} else if op == opL {
+		execL(hart, instr)
+	} else if op == opS {
+		execS(hart, instr)
+	} else if op == opSYSTEM {
+		execSystem(hart, instr)
+	} else if op == opFENCE {
+		execFence(hart, instr)
+	} else {
+		trace(hart.pc, "UNKNOWN OPCODE: %08X\n", op)
+	}
+}
+
+
+func execI(hart: *Hart, instr: Word32) {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
 	let imm12 = extract_imm12(instr)
@@ -203,7 +208,7 @@ func doOpI(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpR(hart: *Hart, instr: Word32) {
+func execR(hart: *Hart, instr: Word32) {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
 	let imm = expand12(extract_imm12(instr))
@@ -361,7 +366,7 @@ func doOpR(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpLUI(hart: *Hart, instr: Word32) {
+func execLUI(hart: *Hart, instr: Word32) {
 	// load upper immediate
 
 	let imm = expand12(extract_imm31_12(instr))
@@ -375,7 +380,7 @@ func doOpLUI(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpAUIPC(hart: *Hart, instr: Word32) {
+func execAUIPC(hart: *Hart, instr: Word32) {
 	// Add upper immediate to PC
 
 	let imm = expand12(extract_imm31_12(instr))
@@ -390,7 +395,7 @@ func doOpAUIPC(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpJAL(hart: *Hart, instr: Word32) {
+func execJAL(hart: *Hart, instr: Word32) {
 	// Jump and link
 
 	let rd = extract_rd(instr)
@@ -407,7 +412,7 @@ func doOpJAL(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpJALR(hart: *Hart, instr: Word32) {
+func execJALR(hart: *Hart, instr: Word32) {
 	// Jump and link (by register)
 
 	let rs1 = extract_rs1(instr)
@@ -429,7 +434,7 @@ func doOpJALR(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpB(hart: *Hart, instr: Word32) {
+func execB(hart: *Hart, instr: Word32) {
 	let funct3 = extract_funct3(instr)
 	let imm12_10to5 = extract_funct7(instr)
 	let imm4to1_11 = Word16 extract_rd(instr)
@@ -513,7 +518,7 @@ func doOpB(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpL(hart: *Hart, instr: Word32) {
+func execL(hart: *Hart, instr: Word32) {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
 	let imm12 = extract_imm12(instr)
@@ -577,7 +582,7 @@ func doOpL(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpS(hart: *Hart, instr: Word32) {
+func execS(hart: *Hart, instr: Word32) {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
 	let rd = extract_rd(instr)
@@ -622,7 +627,7 @@ func doOpS(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpSystem(hart: *Hart, instr: Word32) {
+func execSystem(hart: *Hart, instr: Word32) {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
 	let imm12 = extract_imm12(instr)
@@ -673,7 +678,7 @@ func doOpSystem(hart: *Hart, instr: Word32) {
 }
 
 
-func doOpFence(hart: *Hart, instr: Word32) {
+func execFence(hart: *Hart, instr: Word32) {
 	if instr == instrPAUSE {
 		trace(hart.pc, "PAUSE\n")
 	}

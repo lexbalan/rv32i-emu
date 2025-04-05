@@ -245,7 +245,6 @@ declare %LongInt @pathconf([0 x %ConstChar]* %path, %Int %name)
 declare %Int @pause()
 declare %Int @pipe([2 x %Int]* %fildes)
 declare %SSizeT @pread(%Int %fildes, i8* %buf, %SizeT %nbyte, %OffT %offset)
-declare %Int @pthread_atfork(void ()* %prepare, void ()* %parent, void ()* %child)
 declare %SSizeT @pwrite(%Int %fildes, i8* %buf, %SizeT %nbyte, %OffT %offset)
 declare %SSizeT @read(%Int %fildes, i8* %buf, %SizeT %nbyte)
 declare %Int @readlink([0 x %ConstChar]* %path, [0 x %Char]* %buf, %SizeT %bufsize)
@@ -433,93 +432,110 @@ then_0:
 	br label %endif_0
 endif_0:
 	%16 = call %Word32 @fetch(%hart_Hart* %hart)
-	%17 = call %Word8 @decode_extract_op(%Word32 %16)
-	%18 = call %Word8 @decode_extract_funct3(%Word32 %16)
+	call void @exec(%hart_Hart* %hart, %Word32 %16)
+	%17 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%18 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%19 = load %Int32, %Int32* %18
+	store %Int32 %19, %Int32* %17
+	%20 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%21 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%22 = load %Int32, %Int32* %21
+	%23 = add %Int32 %22, 4
+	store %Int32 %23, %Int32* %20
+	%24 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%25 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%26 = load %Int32, %Int32* %25
+	%27 = add %Int32 %26, 1
+	store %Int32 %27, %Int32* %24
+	ret void
+}
+
+define internal void @exec(%hart_Hart* %hart, %Word32 %instr) {
+	%1 = call %Word8 @decode_extract_op(%Word32 %instr)
+	%2 = call %Word8 @decode_extract_funct3(%Word32 %instr)
+; if_0
+	%3 = icmp eq %Word8 %1, 19
+	br %Bool %3 , label %then_0, label %else_0
+then_0:
+	call void @execI(%hart_Hart* %hart, %Word32 %instr)
+	br label %endif_0
+else_0:
 ; if_1
-	%19 = icmp eq %Word8 %17, 19
-	br %Bool %19 , label %then_1, label %else_1
+	%4 = icmp eq %Word8 %1, 51
+	br %Bool %4 , label %then_1, label %else_1
 then_1:
-	call void @doOpI(%hart_Hart* %hart, %Word32 %16)
+	call void @execR(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_1
 else_1:
 ; if_2
-	%20 = icmp eq %Word8 %17, 51
-	br %Bool %20 , label %then_2, label %else_2
+	%5 = icmp eq %Word8 %1, 55
+	br %Bool %5 , label %then_2, label %else_2
 then_2:
-	call void @doOpR(%hart_Hart* %hart, %Word32 %16)
+	call void @execLUI(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_2
 else_2:
 ; if_3
-	%21 = icmp eq %Word8 %17, 55
-	br %Bool %21 , label %then_3, label %else_3
+	%6 = icmp eq %Word8 %1, 23
+	br %Bool %6 , label %then_3, label %else_3
 then_3:
-	call void @doOpLUI(%hart_Hart* %hart, %Word32 %16)
+	call void @execAUIPC(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_3
 else_3:
 ; if_4
-	%22 = icmp eq %Word8 %17, 23
-	br %Bool %22 , label %then_4, label %else_4
+	%7 = icmp eq %Word8 %1, 111
+	br %Bool %7 , label %then_4, label %else_4
 then_4:
-	call void @doOpAUIPC(%hart_Hart* %hart, %Word32 %16)
+	call void @execJAL(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_4
 else_4:
 ; if_5
-	%23 = icmp eq %Word8 %17, 111
-	br %Bool %23 , label %then_5, label %else_5
+	%8 = icmp eq %Word8 %1, 103
+	%9 = bitcast i8 0 to %Word8
+	%10 = icmp eq %Word8 %2, %9
+	%11 = and %Bool %8, %10
+	br %Bool %11 , label %then_5, label %else_5
 then_5:
-	call void @doOpJAL(%hart_Hart* %hart, %Word32 %16)
+	call void @execJALR(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_5
 else_5:
 ; if_6
-	%24 = icmp eq %Word8 %17, 103
-	%25 = bitcast i8 0 to %Word8
-	%26 = icmp eq %Word8 %18, %25
-	%27 = and %Bool %24, %26
-	br %Bool %27 , label %then_6, label %else_6
+	%12 = icmp eq %Word8 %1, 99
+	br %Bool %12 , label %then_6, label %else_6
 then_6:
-	call void @doOpJALR(%hart_Hart* %hart, %Word32 %16)
+	call void @execB(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_6
 else_6:
 ; if_7
-	%28 = icmp eq %Word8 %17, 99
-	br %Bool %28 , label %then_7, label %else_7
+	%13 = icmp eq %Word8 %1, 3
+	br %Bool %13 , label %then_7, label %else_7
 then_7:
-	call void @doOpB(%hart_Hart* %hart, %Word32 %16)
+	call void @execL(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_7
 else_7:
 ; if_8
-	%29 = icmp eq %Word8 %17, 3
-	br %Bool %29 , label %then_8, label %else_8
+	%14 = icmp eq %Word8 %1, 35
+	br %Bool %14 , label %then_8, label %else_8
 then_8:
-	call void @doOpL(%hart_Hart* %hart, %Word32 %16)
+	call void @execS(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_8
 else_8:
 ; if_9
-	%30 = icmp eq %Word8 %17, 35
-	br %Bool %30 , label %then_9, label %else_9
+	%15 = icmp eq %Word8 %1, 115
+	br %Bool %15 , label %then_9, label %else_9
 then_9:
-	call void @doOpS(%hart_Hart* %hart, %Word32 %16)
+	call void @execSystem(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_9
 else_9:
 ; if_10
-	%31 = icmp eq %Word8 %17, 115
-	br %Bool %31 , label %then_10, label %else_10
+	%16 = icmp eq %Word8 %1, 15
+	br %Bool %16 , label %then_10, label %else_10
 then_10:
-	call void @doOpSystem(%hart_Hart* %hart, %Word32 %16)
+	call void @execFence(%hart_Hart* %hart, %Word32 %instr)
 	br label %endif_10
 else_10:
-; if_11
-	%32 = icmp eq %Word8 %17, 15
-	br %Bool %32 , label %then_11, label %else_11
-then_11:
-	call void @doOpFence(%hart_Hart* %hart, %Word32 %16)
-	br label %endif_11
-else_11:
-	%33 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
-	%34 = load %Int32, %Int32* %33
-	call void (%Int32, %Str8*, ...) @trace(%Int32 %34, %Str8* bitcast ([22 x i8]* @str2 to [0 x i8]*), %Word8 %17)
-	br label %endif_11
-endif_11:
+	%17 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%18 = load %Int32, %Int32* %17
+	call void (%Int32, %Str8*, ...) @trace(%Int32 %18, %Str8* bitcast ([22 x i8]* @str2 to [0 x i8]*), %Word8 %1)
 	br label %endif_10
 endif_10:
 	br label %endif_9
@@ -540,24 +556,12 @@ endif_3:
 endif_2:
 	br label %endif_1
 endif_1:
-	%35 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
-	%36 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%37 = load %Int32, %Int32* %36
-	store %Int32 %37, %Int32* %35
-	%38 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%39 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
-	%40 = load %Int32, %Int32* %39
-	%41 = add %Int32 %40, 4
-	store %Int32 %41, %Int32* %38
-	%42 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
-	%43 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
-	%44 = load %Int32, %Int32* %43
-	%45 = add %Int32 %44, 1
-	store %Int32 %45, %Int32* %42
+	br label %endif_0
+endif_0:
 	ret void
 }
 
-define internal void @doOpI(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execI(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -808,7 +812,7 @@ endif_1:
 	ret void
 }
 
-define internal void @doOpR(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execR(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -1225,7 +1229,7 @@ endif_10:
 	ret void
 }
 
-define internal void @doOpLUI(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execLUI(%hart_Hart* %hart, %Word32 %instr) {
 	; load upper immediate
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = call %Int32 @decode_expand12(%Word32 %1)
@@ -1249,7 +1253,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpAUIPC(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execAUIPC(%hart_Hart* %hart, %Word32 %instr) {
 	; Add upper immediate to PC
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = call %Int32 @decode_expand12(%Word32 %1)
@@ -1278,7 +1282,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpJAL(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execJAL(%hart_Hart* %hart, %Word32 %instr) {
 	; Jump and link
 	%1 = call %Int8 @decode_extract_rd(%Word32 %instr)
 	%2 = call %Word32 @decode_extract_jal_imm(%Word32 %instr)
@@ -1310,7 +1314,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpJALR(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execJALR(%hart_Hart* %hart, %Word32 %instr) {
 	; Jump and link (by register)
 	%1 = call %Int8 @decode_extract_rs1(%Word32 %instr)
 	%2 = call %Int8 @decode_extract_rd(%Word32 %instr)
@@ -1351,7 +1355,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpB(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execB(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Int8 @decode_extract_rd(%Word32 %instr)
@@ -1622,7 +1626,7 @@ endif_1:
 	ret void
 }
 
-define internal void @doOpL(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execL(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -1786,7 +1790,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpS(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execS(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Int8 @decode_extract_rd(%Word32 %instr)
@@ -1878,7 +1882,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpSystem(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execSystem(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_funct3(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct7(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
@@ -1989,7 +1993,7 @@ endif_0:
 	ret void
 }
 
-define internal void @doOpFence(%hart_Hart* %hart, %Word32 %instr) {
+define internal void @execFence(%hart_Hart* %hart, %Word32 %instr) {
 ; if_0
 	%1 = icmp eq %Word32 %instr, 16777231
 	br %Bool %1 , label %then_0, label %endif_0
