@@ -143,28 +143,28 @@ define %Word8 @decode_extract_funct5(%Word32 %instr) {
 	ret %Word8 %4
 }
 
-define %Int8 @decode_extract_rd(%Word32 %instr) {
+define %Nat8 @decode_extract_rd(%Word32 %instr) {
 	%1 = zext i8 7 to %Word32
 	%2 = lshr %Word32 %instr, %1
 	%3 = and %Word32 %2, 31
-	%4 = trunc %Word32 %3 to %Int8
-	ret %Int8 %4
+	%4 = trunc %Word32 %3 to %Nat8
+	ret %Nat8 %4
 }
 
-define %Int8 @decode_extract_rs1(%Word32 %instr) {
+define %Nat8 @decode_extract_rs1(%Word32 %instr) {
 	%1 = zext i8 15 to %Word32
 	%2 = lshr %Word32 %instr, %1
 	%3 = and %Word32 %2, 31
-	%4 = trunc %Word32 %3 to %Int8
-	ret %Int8 %4
+	%4 = trunc %Word32 %3 to %Nat8
+	ret %Nat8 %4
 }
 
-define %Int8 @decode_extract_rs2(%Word32 %instr) {
+define %Nat8 @decode_extract_rs2(%Word32 %instr) {
 	%1 = zext i8 20 to %Word32
 	%2 = lshr %Word32 %instr, %1
 	%3 = and %Word32 %2, 31
-	%4 = trunc %Word32 %3 to %Int8
-	ret %Int8 %4
+	%4 = trunc %Word32 %3 to %Nat8
+	ret %Nat8 %4
 }
 
 define %Word8 @decode_extract_funct7(%Word32 %instr) {

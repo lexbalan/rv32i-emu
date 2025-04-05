@@ -111,35 +111,35 @@ break_2:
 %Char = type %Char8;
 %ConstChar = type %Char;
 %SignedChar = type %Int8;
-%UnsignedChar = type %Int8;
+%UnsignedChar = type %Nat8;
 %Short = type %Int16;
-%UnsignedShort = type %Int16;
+%UnsignedShort = type %Nat16;
 %Int = type %Int32;
-%UnsignedInt = type %Int32;
+%UnsignedInt = type %Nat32;
 %LongInt = type %Int64;
-%UnsignedLongInt = type %Int64;
+%UnsignedLongInt = type %Nat64;
 %Long = type %Int64;
-%UnsignedLong = type %Int64;
+%UnsignedLong = type %Nat64;
 %LongLong = type %Int64;
-%UnsignedLongLong = type %Int64;
+%UnsignedLongLong = type %Nat64;
 %LongLongInt = type %Int64;
-%UnsignedLongLongInt = type %Int64;
-%Float = type double;
-%Double = type double;
-%LongDouble = type double;
+%UnsignedLongLongInt = type %Nat64;
+%Float = type %Float64;
+%Double = type %Float64;
+%LongDouble = type %Float64;
 %SizeT = type %UnsignedLongInt;
 %SSizeT = type %LongInt;
-%IntPtrT = type %Int64;
+%IntPtrT = type %Nat64;
 %PtrDiffT = type i8*;
 %OffT = type %Int64;
-%USecondsT = type %Int32;
+%USecondsT = type %Nat32;
 %PIDT = type %Int32;
-%UIDT = type %Int32;
-%GIDT = type %Int32;
+%UIDT = type %Nat32;
+%GIDT = type %Nat32;
 ; from included ctypes
 ; from included stdio
-%File = type %Int8;
-%FposT = type %Int8;
+%File = type %Nat8;
+%FposT = type %Nat8;
 %CharStr = type %Str;
 %ConstCharStr = type %CharStr;
 declare %Int @fclose(%File* %f)
@@ -167,11 +167,11 @@ declare %Int @fprintf(%File* %f, %Str* %format, ...)
 declare %Int @fscanf(%File* %f, %ConstCharStr* %format, ...)
 declare %Int @sscanf(%ConstCharStr* %buf, %ConstCharStr* %format, ...)
 declare %Int @sprintf(%CharStr* %buf, %ConstCharStr* %format, ...)
-declare %Int @vfprintf(%File* %f, %ConstCharStr* %format, i8* %args)
-declare %Int @vprintf(%ConstCharStr* %format, i8* %args)
-declare %Int @vsprintf(%CharStr* %str, %ConstCharStr* %format, i8* %args)
-declare %Int @vsnprintf(%CharStr* %str, %SizeT %n, %ConstCharStr* %format, i8* %args)
-declare %Int @__vsnprintf_chk(%CharStr* %dest, %SizeT %len, %Int %flags, %SizeT %dstlen, %ConstCharStr* %format, i8* %arg)
+declare %Int @vfprintf(%File* %f, %ConstCharStr* %format, %__VA_List %args)
+declare %Int @vprintf(%ConstCharStr* %format, %__VA_List %args)
+declare %Int @vsprintf(%CharStr* %str, %ConstCharStr* %format, %__VA_List %args)
+declare %Int @vsnprintf(%CharStr* %str, %SizeT %n, %ConstCharStr* %format, %__VA_List %args)
+declare %Int @__vsnprintf_chk(%CharStr* %dest, %SizeT %len, %Int %flags, %SizeT %dstlen, %ConstCharStr* %format, %__VA_List %arg)
 declare %Int @fgetc(%File* %f)
 declare %Int @fputc(%Int %char, %File* %f)
 declare %CharStr* @fgets(%CharStr* %str, %Int %n, %File* %f)
@@ -194,9 +194,9 @@ declare void @perror(%ConstCharStr* %str)
 @str3 = private constant [3 x i8] [i8 37, i8 120, i8 0]
 @str4 = private constant [4 x i8] [i8 37, i8 117, i8 120, i8 0]
 ; -- endstrings --
-define void @mmio_write8(%Int32 %adr, %Word8 %value) {
+define void @mmio_write8(%Nat32 %adr, %Word8 %value) {
 ; if_0
-	%1 = icmp eq %Int32 %adr, 16
+	%1 = icmp eq %Nat32 %adr, 16
 	br %Bool %1 , label %then_0, label %endif_0
 then_0:
 	%2 = sext %Word8 %value to %Int
@@ -207,9 +207,9 @@ endif_0:
 	ret void
 }
 
-define void @mmio_write16(%Int32 %adr, %Word16 %value) {
+define void @mmio_write16(%Nat32 %adr, %Word16 %value) {
 ; if_0
-	%1 = icmp eq %Int32 %adr, 16
+	%1 = icmp eq %Nat32 %adr, 16
 	br %Bool %1 , label %then_0, label %endif_0
 then_0:
 	%2 = sext %Word16 %value to %Int
@@ -220,9 +220,9 @@ endif_0:
 	ret void
 }
 
-define void @mmio_write32(%Int32 %adr, %Word32 %value) {
+define void @mmio_write32(%Nat32 %adr, %Word32 %value) {
 ; if_0
-	%1 = icmp eq %Int32 %adr, 16
+	%1 = icmp eq %Nat32 %adr, 16
 	br %Bool %1 , label %then_0, label %else_0
 then_0:
 	%2 = bitcast %Word32 %value to %Int
@@ -231,7 +231,7 @@ then_0:
 	br label %endif_0
 else_0:
 ; if_1
-	%5 = icmp eq %Int32 %adr, 32
+	%5 = icmp eq %Nat32 %adr, 32
 	br %Bool %5 , label %then_1, label %else_1
 then_1:
 	%6 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str1 to [0 x i8]*), %Word32 %value)
@@ -239,7 +239,7 @@ then_1:
 	br label %endif_1
 else_1:
 ; if_2
-	%8 = icmp eq %Int32 %adr, 36
+	%8 = icmp eq %Nat32 %adr, 36
 	br %Bool %8 , label %then_2, label %else_2
 then_2:
 	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str2 to [0 x i8]*), %Word32 %value)
@@ -247,7 +247,7 @@ then_2:
 	br label %endif_2
 else_2:
 ; if_3
-	%11 = icmp eq %Int32 %adr, 40
+	%11 = icmp eq %Nat32 %adr, 40
 	br %Bool %11 , label %then_3, label %else_3
 then_3:
 	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([3 x i8]* @str3 to [0 x i8]*), %Word32 %value)
@@ -255,7 +255,7 @@ then_3:
 	br label %endif_3
 else_3:
 ; if_4
-	%14 = icmp eq %Int32 %adr, 44
+	%14 = icmp eq %Nat32 %adr, 44
 	br %Bool %14 , label %then_4, label %endif_4
 then_4:
 	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([4 x i8]* @str4 to [0 x i8]*), %Word32 %value)
@@ -273,17 +273,17 @@ endif_0:
 	ret void
 }
 
-define %Word8 @mmio_read8(%Int32 %adr) {
+define %Word8 @mmio_read8(%Nat32 %adr) {
 	%1 = bitcast i8 0 to %Word8
 	ret %Word8 %1
 }
 
-define %Word16 @mmio_read16(%Int32 %adr) {
+define %Word16 @mmio_read16(%Nat32 %adr) {
 	%1 = zext i8 0 to %Word16
 	ret %Word16 %1
 }
 
-define %Word32 @mmio_read32(%Int32 %adr) {
+define %Word32 @mmio_read32(%Nat32 %adr) {
 	%1 = zext i8 0 to %Word32
 	ret %Word32 %1
 }

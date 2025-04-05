@@ -111,31 +111,31 @@ break_2:
 %Char = type %Char8;
 %ConstChar = type %Char;
 %SignedChar = type %Int8;
-%UnsignedChar = type %Int8;
+%UnsignedChar = type %Nat8;
 %Short = type %Int16;
-%UnsignedShort = type %Int16;
+%UnsignedShort = type %Nat16;
 %Int = type %Int32;
-%UnsignedInt = type %Int32;
+%UnsignedInt = type %Nat32;
 %LongInt = type %Int64;
-%UnsignedLongInt = type %Int64;
+%UnsignedLongInt = type %Nat64;
 %Long = type %Int64;
-%UnsignedLong = type %Int64;
+%UnsignedLong = type %Nat64;
 %LongLong = type %Int64;
-%UnsignedLongLong = type %Int64;
+%UnsignedLongLong = type %Nat64;
 %LongLongInt = type %Int64;
-%UnsignedLongLongInt = type %Int64;
-%Float = type double;
-%Double = type double;
-%LongDouble = type double;
+%UnsignedLongLongInt = type %Nat64;
+%Float = type %Float64;
+%Double = type %Float64;
+%LongDouble = type %Float64;
 %SizeT = type %UnsignedLongInt;
 %SSizeT = type %LongInt;
-%IntPtrT = type %Int64;
+%IntPtrT = type %Nat64;
 %PtrDiffT = type i8*;
 %OffT = type %Int64;
-%USecondsT = type %Int32;
+%USecondsT = type %Nat32;
 %PIDT = type %Int32;
-%UIDT = type %Int32;
-%GIDT = type %Int32;
+%UIDT = type %Nat32;
+%GIDT = type %Nat32;
 ; from included ctypes
 ; from included stdlib
 declare void @abort()
@@ -153,8 +153,8 @@ declare %Str* @secure_getenv(%Str* %name)
 declare i8* @malloc(%SizeT %size)
 declare %Int @system([0 x %ConstChar]* %string)
 ; from included stdio
-%File = type %Int8;
-%FposT = type %Int8;
+%File = type %Nat8;
+%FposT = type %Nat8;
 %CharStr = type %Str;
 %ConstCharStr = type %CharStr;
 declare %Int @fclose(%File* %f)
@@ -182,11 +182,11 @@ declare %Int @fprintf(%File* %f, %Str* %format, ...)
 declare %Int @fscanf(%File* %f, %ConstCharStr* %format, ...)
 declare %Int @sscanf(%ConstCharStr* %buf, %ConstCharStr* %format, ...)
 declare %Int @sprintf(%CharStr* %buf, %ConstCharStr* %format, ...)
-declare %Int @vfprintf(%File* %f, %ConstCharStr* %format, i8* %args)
-declare %Int @vprintf(%ConstCharStr* %format, i8* %args)
-declare %Int @vsprintf(%CharStr* %str, %ConstCharStr* %format, i8* %args)
-declare %Int @vsnprintf(%CharStr* %str, %SizeT %n, %ConstCharStr* %format, i8* %args)
-declare %Int @__vsnprintf_chk(%CharStr* %dest, %SizeT %len, %Int %flags, %SizeT %dstlen, %ConstCharStr* %format, i8* %arg)
+declare %Int @vfprintf(%File* %f, %ConstCharStr* %format, %__VA_List %args)
+declare %Int @vprintf(%ConstCharStr* %format, %__VA_List %args)
+declare %Int @vsprintf(%CharStr* %str, %ConstCharStr* %format, %__VA_List %args)
+declare %Int @vsnprintf(%CharStr* %str, %SizeT %n, %ConstCharStr* %format, %__VA_List %args)
+declare %Int @__vsnprintf_chk(%CharStr* %dest, %SizeT %len, %Int %flags, %SizeT %dstlen, %ConstCharStr* %format, %__VA_List %arg)
 declare %Int @fgetc(%File* %f)
 declare %Int @fputc(%Int %char, %File* %f)
 declare %CharStr* @fgets(%CharStr* %str, %Int %n, %File* %f)
@@ -205,22 +205,22 @@ declare void @perror(%ConstCharStr* %str)
 ; ?? mem ??
 ; ?? mmio ??
 ; from import
-declare void @mmio_write8(%Int32 %adr, %Word8 %value)
-declare void @mmio_write16(%Int32 %adr, %Word16 %value)
-declare void @mmio_write32(%Int32 %adr, %Word32 %value)
-declare %Word8 @mmio_read8(%Int32 %adr)
-declare %Word16 @mmio_read16(%Int32 %adr)
-declare %Word32 @mmio_read32(%Int32 %adr)
+declare void @mmio_write8(%Nat32 %adr, %Word8 %value)
+declare void @mmio_write16(%Nat32 %adr, %Word16 %value)
+declare void @mmio_write32(%Nat32 %adr, %Word32 %value)
+declare %Word8 @mmio_read8(%Nat32 %adr)
+declare %Word16 @mmio_read16(%Nat32 %adr)
+declare %Word32 @mmio_read32(%Nat32 %adr)
 ; end from import
 ; from import
 declare [0 x %Word8]* @mem_get_ram_ptr()
 declare [0 x %Word8]* @mem_get_rom_ptr()
-declare %Word8 @mem_read8(%Int32 %adr)
-declare %Word16 @mem_read16(%Int32 %adr)
-declare %Word32 @mem_read32(%Int32 %adr)
-declare void @mem_write8(%Int32 %adr, %Word8 %value)
-declare void @mem_write16(%Int32 %adr, %Word16 %value)
-declare void @mem_write32(%Int32 %adr, %Word32 %value)
+declare %Word8 @mem_read8(%Nat32 %adr)
+declare %Word16 @mem_read16(%Nat32 %adr)
+declare %Word32 @mem_read32(%Nat32 %adr)
+declare void @mem_write8(%Nat32 %adr, %Word8 %value)
+declare void @mem_write16(%Nat32 %adr, %Word16 %value)
+declare void @mem_write32(%Nat32 %adr, %Word32 %value)
 ; end from import
 ; ?? rvHart ??
 ; from included unistd
@@ -313,9 +313,9 @@ declare %Word8 @decode_extract_op(%Word32 %instr)
 declare %Word8 @decode_extract_funct2(%Word32 %instr)
 declare %Word8 @decode_extract_funct3(%Word32 %instr)
 declare %Word8 @decode_extract_funct5(%Word32 %instr)
-declare %Int8 @decode_extract_rd(%Word32 %instr)
-declare %Int8 @decode_extract_rs1(%Word32 %instr)
-declare %Int8 @decode_extract_rs2(%Word32 %instr)
+declare %Nat8 @decode_extract_rd(%Word32 %instr)
+declare %Nat8 @decode_extract_rs1(%Word32 %instr)
+declare %Nat8 @decode_extract_rs2(%Word32 %instr)
 declare %Word8 @decode_extract_funct7(%Word32 %instr)
 declare %Word32 @decode_extract_imm12(%Word32 %instr)
 declare %Word32 @decode_extract_imm31_12(%Word32 %instr)
@@ -325,21 +325,21 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 ; from import
 %hart_Hart = type {
 	[32 x %Word32],
-	%Int32,
-	%Int32,
+	%Nat32,
+	%Nat32,
 	%hart_BusInterface*,
 	%Word32,
-	%Int32,
+	%Nat32,
 	%Bool
 };
 
 %hart_BusInterface = type {
-	%Word8 (%Int32)*,
-	%Word16 (%Int32)*,
-	%Word32 (%Int32)*,
-	void (%Int32, %Word8)*,
-	void (%Int32, %Word16)*,
-	void (%Int32, %Word32)*
+	%Word8 (%Nat32)*,
+	%Word16 (%Nat32)*,
+	%Word32 (%Nat32)*,
+	void (%Nat32, %Word8)*,
+	void (%Nat32, %Word16)*,
+	void (%Nat32, %Word32)*
 };
 
 declare void @hart_init(%hart_Hart* %hart, %hart_BusInterface* %bus)
@@ -374,17 +374,17 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
 	%2 = alloca %hart_BusInterface, align 64
-	%3 = insertvalue %hart_BusInterface zeroinitializer, %Word8 (%Int32)* @mem_read8, 0
-	%4 = insertvalue %hart_BusInterface %3, %Word16 (%Int32)* @mem_read16, 1
-	%5 = insertvalue %hart_BusInterface %4, %Word32 (%Int32)* @mem_read32, 2
-	%6 = insertvalue %hart_BusInterface %5, void (%Int32, %Word8)* @mem_write8, 3
-	%7 = insertvalue %hart_BusInterface %6, void (%Int32, %Word16)* @mem_write16, 4
-	%8 = insertvalue %hart_BusInterface %7, void (%Int32, %Word32)* @mem_write32, 5
+	%3 = insertvalue %hart_BusInterface zeroinitializer, %Word8 (%Nat32)* @mem_read8, 0
+	%4 = insertvalue %hart_BusInterface %3, %Word16 (%Nat32)* @mem_read16, 1
+	%5 = insertvalue %hart_BusInterface %4, %Word32 (%Nat32)* @mem_read32, 2
+	%6 = insertvalue %hart_BusInterface %5, void (%Nat32, %Word8)* @mem_write8, 3
+	%7 = insertvalue %hart_BusInterface %6, void (%Nat32, %Word16)* @mem_write16, 4
+	%8 = insertvalue %hart_BusInterface %7, void (%Nat32, %Word32)* @mem_write32, 5
 	store %hart_BusInterface %8, %hart_BusInterface* %2
 	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
-	%10 = call %Int32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Int32 1048576)
+	%10 = call %Nat32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Nat32 1048576)
 ; if_0
-	%11 = icmp ule %Int32 %10, 0
+	%11 = icmp ule %Nat32 %10, 0
 	br %Bool %11 , label %then_0, label %endif_0
 then_0:
 	call void @exit(%Int 1)
@@ -405,8 +405,8 @@ body_1:
 	br label %again_1
 break_1:
 	%17 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
-	%18 = load %Int32, %Int32* %17
-	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Int32 %18)
+	%18 = load %Nat32, %Nat32* %17
+	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Nat32 %18)
 	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
 	call void @hart_show_regs(%hart_Hart* @hart)
 	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
@@ -414,7 +414,7 @@ break_1:
 	ret %Int 0
 }
 
-define internal %Int32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %buf_size) {
+define internal %Nat32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Nat32 %buf_size) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str7 to [0 x i8]*), %Str8* %filename)
 	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str8 to [0 x i8]*))
 ; if_0
@@ -422,11 +422,11 @@ define internal %Int32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Int32 %
 	br %Bool %3 , label %then_0, label %endif_0
 then_0:
 	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str9 to [0 x i8]*), %Str8* %filename)
-	ret %Int32 0
+	ret %Nat32 0
 	br label %endif_0
 endif_0:
 	%6 = bitcast [0 x %Word8]* %bufptr to i8*
-	%7 = zext %Int32 %buf_size to %SizeT
+	%7 = zext %Nat32 %buf_size to %SizeT
 	%8 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %2)
 	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str10 to [0 x i8]*), %SizeT %8)
 ; if_1
@@ -444,11 +444,11 @@ again_1:
 body_1:
 	%14 = load %SizeT, %SizeT* %10
 	%15 = load %SizeT, %SizeT* %10
-	%16 = bitcast [0 x %Word8]* %bufptr to [0 x %Int32]*
-	%17 = trunc %SizeT %15 to %Int32
-	%18 = getelementptr [0 x %Int32], [0 x %Int32]* %16, %Int32 0, %Int32 %17
-	%19 = load %Int32, %Int32* %18
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %14, %Int32 %19)
+	%16 = bitcast [0 x %Word8]* %bufptr to [0 x %Nat32]*
+	%17 = trunc %SizeT %15 to %Nat32
+	%18 = getelementptr [0 x %Nat32], [0 x %Nat32]* %16, %Int32 0, %Nat32 %17
+	%19 = load %Nat32, %Nat32* %18
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %14, %Nat32 %19)
 	%21 = load %SizeT, %SizeT* %10
 	%22 = add %SizeT %21, 4
 	store %SizeT %22, %SizeT* %10
@@ -458,8 +458,8 @@ break_1:
 	br label %endif_1
 endif_1:
 	%24 = call %Int @fclose(%File* %2)
-	%25 = trunc %SizeT %8 to %Int32
-	ret %Int32 %25
+	%25 = trunc %SizeT %8 to %Nat32
+	ret %Nat32 %25
 }
 
 define internal void @show_mem() {
