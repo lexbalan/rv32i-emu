@@ -41,7 +41,7 @@ int main()
 		exit(1);
 	}
 
-	hart_init(&hart, (hart_BusInterface *)&memctl);
+	hart_init(&hart, &memctl);
 
 	printf("~~~ START ~~~\n");
 

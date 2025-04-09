@@ -391,7 +391,7 @@ then_0:
 	br label %endif_0
 endif_0:
 	%12 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
-	call void @hart_init(%hart_Hart* @hart, %hart_BusInterface* %12)
+	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %hart_BusInterface* %12)
 	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 ; while_1
 	br label %again_1
@@ -401,14 +401,14 @@ again_1:
 	%16 = xor %Bool %15, 1
 	br %Bool %16 , label %body_1, label %break_1
 body_1:
-	call void @hart_tick(%hart_Hart* @hart)
+	call void @hart_tick(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	br label %again_1
 break_1:
 	%17 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
 	%18 = load %Nat32, %Nat32* %17
 	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Nat32 %18)
 	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
-	call void @hart_show_regs(%hart_Hart* @hart)
+	call void @hart_show_regs(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
 	call void @show_mem()
 	ret %Int 0
