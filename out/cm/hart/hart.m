@@ -9,12 +9,29 @@ include "decode"
 const traceMode: Bool = false
 
 
-public type Hart record {reg: [32]Word32, pc: Nat32,
-	nexpc: Nat32bus: *BusInterface, interrupt: Word32, public cnt: Nat32, public end: Bool
+public type Hart record {
+	reg: [32]Word32
+	pc: Nat32
+	nexpc: Nat32
+
+	bus: *BusInterface
+
+	interrupt: Word32
+
+	public cnt: Nat32
+	public end: Bool
 }
 
 
-public type BusInterface record {public read8: *(adr: Nat32) -> Word8, public read16: *(adr: Nat32) -> Word16, public read32: *(adr: Nat32) -> Word32, public write8: *(adr: Nat32, value: Word8) -> Unit, public write16: *(adr: Nat32, value: Word16) -> Unit, public write32: *(adr: Nat32, value: Word32) -> Unit}
+public type BusInterface record {
+	public read8: *(adr: Nat32) -> Word8
+	public read16: *(adr: Nat32) -> Word16
+	public read32: *(adr: Nat32) -> Word32
+
+	public write8: *(adr: Nat32, value: Word8) -> Unit
+	public write16: *(adr: Nat32, value: Word16) -> Unit
+	public write32: *(adr: Nat32, value: Word32) -> Unit
+}
 
 
 const opL = 0x03

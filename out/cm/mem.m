@@ -41,6 +41,9 @@ func memoryViolation(rw: Char8, adr: Nat32) -> Unit {
 	memviolationCnt = memviolationCnt + 1
 	//	memoryViolation_event(0x55) // !
 }
+
+
+
 func isAdressInRange(x: Nat32, a: Nat32, b: Nat32) -> Bool {
 	return x >= a and x < b
 }
