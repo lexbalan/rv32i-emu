@@ -1,5 +1,3 @@
-//
-//
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -16,25 +14,23 @@
 
 #define traceMode  false
 
-#define opL  0x03// load
-#define opI  0x13// immediate
-#define opS  0x23// store
-#define opR  0x33// reg
-#define opB  0x63// branch
+#define opL  0x03
+#define opI  0x13
+#define opS  0x23
+#define opR  0x33
+#define opB  0x63
 
-#define opLUI  0x37// load upper immediate
-#define opAUIPC  0x17// add upper immediate to PC
-#define opJAL  0x6F// jump and link
-#define opJALR  0x67// jump and link by register
+#define opLUI  0x37
+#define opAUIPC  0x17
+#define opJAL  0x6F
+#define opJALR  0x67
 
-#define opSYSTEM  0x73//
-#define opFENCE  0x0F//
+#define opSYSTEM  0x73
+#define opFENCE  0x0F
 
 #define instrECALL  (opSYSTEM | 0x00000000)
 #define instrEBREAK  (opSYSTEM | 0x00100000)
 #define instrPAUSE  (opFENCE | 0x01000000)
-
-// funct3 for CSR
 #define funct3_CSRRW  1
 #define funct3_CSRRS  2
 #define funct3_CSRRC  3
@@ -655,11 +651,6 @@ void hart_irq(hart_Hart *hart, uint32_t irq)
 	}
 }
 
-//
-// CSR's
-//https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
-//
-
 #define mstatus_adr  0x300
 #define misa_adr  0x301
 #define mie_adr  0x304
@@ -676,10 +667,6 @@ void hart_irq(hart_Hart *hart, uint32_t irq)
 #define scause_adr  0x142
 #define stval_adr  0x143
 #define sip_adr  0x144
-
-/*
-The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
-*/
 static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	const uint32_t nv = hart->reg[rs1];
@@ -695,37 +682,23 @@ static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 		// mip (machine interrupt pending)
 	}
 }
-
-/*
-The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
-*/
 static void csr_rs(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	//TODO
 }
-
-/*
-The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
-*/
 static void csr_rc(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	//TODO
 }
 
-// -
-
 static void csr_rwi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm)
 {
 	//TODO
 }
-
-// read+clear immediate(5-bit)
 static void csr_rsi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm)
 {
 	//TODO
 }
-
-// read+clear immediate(5-bit)
 static void csr_rci(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm)
 {
 	//TODO

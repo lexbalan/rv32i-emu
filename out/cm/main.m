@@ -10,15 +10,10 @@ import "hart/hart" as rvHart
 
 const text_filename = "./image.bin"
 
-const showText = false
+const showText: Bool = false
 
 
 var hart: Hart
-
-
-//public func mem_violation_event(reason: Nat32) {
-//	hart.irq(&hart, rvHart.intMemViolation)
-//}
 
 
 public func main() -> Int {
@@ -33,8 +28,8 @@ public func main() -> Int {
 		write32 = &mem.write32
 	}
 
-	let romptr = mem.get_rom_ptr()
-	let nbytes = loader(text_filename, romptr, mem.romSize)
+	let romptr: *[]Word8 = mem.get_rom_ptr()
+	let nbytes: Nat32 = loader(text_filename, romptr, mem.romSize)
 
 	if nbytes <= 0 {
 		exit(1)
@@ -62,19 +57,19 @@ public func main() -> Int {
 func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	printf("LOAD: %s\n", filename)
 
-	let fp = fopen(filename, "rb")
+	let fp: *File = fopen(filename, "rb")
 
 	if fp == nil {
 		printf("error: cannot open file '%s'", filename)
 		return 0
 	}
 
-	let n = fread(bufptr, 1, SizeT buf_size, fp)
+	let n: SizeT = fread(bufptr, 1, SizeT buf_size, fp)
 
 	printf("LOADED: %zu bytes\n", n)
 
 	if showText {
-		var i: SizeT = SizeT 0
+		var i = SizeT 0
 		while i < (n / 4) {
 			printf("%08zx: 0x%08x\n", i, (*[]Nat32 bufptr)[i])
 			i = i + 4
@@ -91,7 +86,7 @@ func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 
 func show_mem() -> Unit {
 	var i: Int32 = 0
-	let ramptr = mem.get_ram_ptr()
+	let ramptr: *[]Word8 = mem.get_ram_ptr()
 	while i < 256 {
 		printf("%08X", i * 16)
 

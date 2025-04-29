@@ -1,5 +1,3 @@
-//
-//
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -9,8 +7,6 @@
 
 #include "mem.h"
 
-
-// see mem.ld
 
 #define mmioSize  (0xFFFF)
 #define mmioStart  (0xF00C0000)
@@ -39,8 +35,7 @@ static void memoryViolation(char rw, uint32_t adr)
 	memviolationCnt = memviolationCnt + 1;
 	//	memoryViolation_event(0x55) // !
 }
-
-static bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b)
+static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b)
 {
 	return x >= a && x < b;
 }

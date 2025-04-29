@@ -366,11 +366,6 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 @str15 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
 @hart = internal global %hart_Hart zeroinitializer
-
-
-;public func mem_violation_event(reason: Nat32) {
-;	hart.irq(&hart, rvHart.intMemViolation)
-;}
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
 	%2 = alloca %hart_BusInterface, align 64

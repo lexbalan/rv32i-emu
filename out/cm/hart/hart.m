@@ -3,59 +3,38 @@ include "stdio"
 include "unistd"
 include "stdlib"
 include "decode"
-//
-//
 
 
-const traceMode = false
+
+const traceMode: Bool = false
 
 
-public type Hart record {
-	reg: [32]Word32
-	pc: Nat32
-	nexpc: Nat32
-
-	bus: *BusInterface
-
-	interrupt: Word32
-
-	public cnt: Nat32
-	public end: Bool
+public type Hart record {reg: [32]Word32, pc: Nat32,
+	nexpc: Nat32bus: *BusInterface, interrupt: Word32, public cnt: Nat32, public end: Bool
 }
 
 
-public type BusInterface record {
-	public read8: *(adr: Nat32) -> Word8
-	public read16: *(adr: Nat32) -> Word16
-	public read32: *(adr: Nat32) -> Word32
-
-	public write8: *(adr: Nat32, value: Word8) -> Unit
-	public write16: *(adr: Nat32, value: Word16) -> Unit
-	public write32: *(adr: Nat32, value: Word32) -> Unit
-}
+public type BusInterface record {public read8: *(adr: Nat32) -> Word8, public read16: *(adr: Nat32) -> Word16, public read32: *(adr: Nat32) -> Word32, public write8: *(adr: Nat32, value: Word8) -> Unit, public write16: *(adr: Nat32, value: Word16) -> Unit, public write32: *(adr: Nat32, value: Word32) -> Unit}
 
 
-const opL = 0x03// load
-const opI = 0x13// immediate
-const opS = 0x23// store
-const opR = 0x33// reg
-const opB = 0x63// branch
+const opL = 0x03
+const opI = 0x13
+const opS = 0x23
+const opR = 0x33
+const opB = 0x63
 
-const opLUI = 0x37// load upper immediate
-const opAUIPC = 0x17// add upper immediate to PC
-const opJAL = 0x6F// jump and link
-const opJALR = 0x67// jump and link by register
+const opLUI = 0x37
+const opAUIPC = 0x17
+const opJAL = 0x6F
+const opJALR = 0x67
 
-const opSYSTEM = 0x73//
-const opFENCE = 0x0F//
+const opSYSTEM = 0x73
+const opFENCE = 0x0F
 
 
 const instrECALL = opSYSTEM or 0x00000000
 const instrEBREAK = opSYSTEM or 0x00100000
 const instrPAUSE = opFENCE or 0x01000000
-
-
-// funct3 for CSR
 const funct3_CSRRW = 1
 const funct3_CSRRS = 2
 const funct3_CSRRC = 3
@@ -84,12 +63,12 @@ func fetch(hart: *Hart) -> Word32 {
 public func tick(hart: *Hart) -> Unit {
 	if hart.interrupt != 0 {
 		trace(hart.pc, "\nINT #%02X\n", hart.interrupt)
-		let vect_offset = Nat32 hart.interrupt * 4
+		let vect_offset: Nat32 = Nat32 hart.interrupt * 4
 		hart.pc = vect_offset
 		hart.interrupt = 0
 	}
 
-	let instr = fetch(hart)
+	let instr: Word32 = fetch(hart)
 	exec(hart, instr)
 
 	hart.pc = hart.nexpc
@@ -99,8 +78,8 @@ public func tick(hart: *Hart) -> Unit {
 
 
 func exec(hart: *Hart, instr: Word32) -> Unit {
-	let op = extract_op(instr)
-	let funct3 = extract_funct3(instr)
+	let op: Word8 = extract_op(instr)
+	let funct3: Word8 = extract_funct3(instr)
 
 	if op == opI {
 		execI(hart, instr)
@@ -131,12 +110,12 @@ func exec(hart: *Hart, instr: Word32) -> Unit {
 
 
 func execI(hart: *Hart, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
+	let funct3: Word8 = extract_funct3(instr)
+	let funct7: Word8 = extract_funct7(instr)
+	let imm12: Word32 = extract_imm12(instr)
+	let imm: Int32 = expand12(imm12)
+	let rd: Nat8 = extract_rd(instr)
+	let rs1: Nat8 = extract_rs1(instr)
 
 	if rd == 0 {
 		return
@@ -200,22 +179,22 @@ func execI(hart: *Hart, instr: Word32) -> Unit {
 
 
 func execR(hart: *Hart, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm = expand12(extract_imm12(instr))
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let funct3: Word8 = extract_funct3(instr)
+	let funct7: Word8 = extract_funct7(instr)
+	let imm: Int32 = expand12(extract_imm12(instr))
+	let rd: Nat8 = extract_rd(instr)
+	let rs1: Nat8 = extract_rs1(instr)
+	let rs2: Nat8 = extract_rs2(instr)
 
 	if rd == 0 {
 		return
 	}
 
-	let v0 = hart.reg[rs1]
-	let v1 = hart.reg[rs2]
+	let v0: Word32 = hart.reg[rs1]
+	let v1: Word32 = hart.reg[rs2]
 
 
-	let f7 = extract_funct7(instr)
+	let f7: Word8 = extract_funct7(instr)
 	//let f5 = extract_funct5(instr)
 	//let f2 = extract_funct2(instr)
 	//if f5 == 0 and f2 == 1 {
@@ -245,12 +224,14 @@ func execR(hart: *Hart, instr: Word32) -> Unit {
 
 			// NOT IMPLEMENTED!
 			notImplemented("mulhsu x%d, x%d, x%d", rd, rs1, rs2)
+			//hart.reg[rd] = unsafe Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
 		} else if funct3 == 3 {
 			// MULHU rd, rs1, rs2
 			trace(hart.pc, "mulhu x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			// NOT IMPLEMENTED!
+			// multiply unsigned high
 			notImplemented("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
+			//hart.reg[rd] = unsafe Word32 (Word64 (Nat64 v0 * Nat64 v1) >> 32)
 		} else if funct3 == 4 {
 			// DIV rd, rs1, rs2
 			trace(hart.pc, "div x%d, x%d, x%d\n", rd, rs1, rs2)
@@ -344,8 +325,8 @@ func execR(hart: *Hart, instr: Word32) -> Unit {
 func execLUI(hart: *Hart, instr: Word32) -> Unit {
 	// load upper immediate
 
-	let imm = expand12(extract_imm31_12(instr))
-	let rd = extract_rd(instr)
+	let imm: Int32 = expand12(extract_imm31_12(instr))
+	let rd: Nat8 = extract_rd(instr)
 
 	trace(hart.pc, "lui x%d, 0x%X\n", rd, imm)
 
@@ -358,9 +339,9 @@ func execLUI(hart: *Hart, instr: Word32) -> Unit {
 func execAUIPC(hart: *Hart, instr: Word32) -> Unit {
 	// Add upper immediate to PC
 
-	let imm = expand12(extract_imm31_12(instr))
-	let x = hart.pc + Nat32 (Word32 imm << 12)
-	let rd = extract_rd(instr)
+	let imm: Int32 = expand12(extract_imm31_12(instr))
+	let x: Nat32 = hart.pc + Nat32 (Word32 imm << 12)
+	let rd: Nat8 = extract_rd(instr)
 
 	trace(hart.pc, "auipc x%d, 0x%X\n", rd, imm)
 
@@ -373,9 +354,9 @@ func execAUIPC(hart: *Hart, instr: Word32) -> Unit {
 func execJAL(hart: *Hart, instr: Word32) -> Unit {
 	// Jump and link
 
-	let rd = extract_rd(instr)
-	let raw_imm = extract_jal_imm(instr)
-	let imm = expand20(raw_imm)
+	let rd: Nat8 = extract_rd(instr)
+	let raw_imm: Word32 = extract_jal_imm(instr)
+	let imm: Int32 = expand20(raw_imm)
 
 	trace(hart.pc, "jal x%d, %d\n", rd, imm)
 
@@ -390,16 +371,16 @@ func execJAL(hart: *Hart, instr: Word32) -> Unit {
 func execJALR(hart: *Hart, instr: Word32) -> Unit {
 	// Jump and link (by register)
 
-	let rs1 = extract_rs1(instr)
-	let rd = extract_rd(instr)
-	let imm = expand12(extract_imm12(instr))
+	let rs1: Nat8 = extract_rs1(instr)
+	let rd: Nat8 = extract_rd(instr)
+	let imm: Int32 = expand12(extract_imm12(instr))
 
 	trace(hart.pc, "jalr %d(x%d)\n", imm, rs1)
 
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
 	let next_instr_ptr = Int32 (hart.pc + 4)
-	let jump_to = Word32 (Int32 hart.reg[rs1] + imm) and 0xFFFFFFFE
+	let jump_to: Word32 = Word32 (Int32 hart.reg[rs1] + imm) and 0xFFFFFFFE
 
 	if rd != 0 {
 		hart.reg[rd] = Word32 next_instr_ptr
@@ -410,16 +391,16 @@ func execJALR(hart: *Hart, instr: Word32) -> Unit {
 
 
 func execB(hart: *Hart, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let imm12_10to5 = extract_funct7(instr)
+	let funct3: Word8 = extract_funct3(instr)
+	let imm12_10to5: Word8 = extract_funct7(instr)
 	let imm4to1_11 = Word16 extract_rd(instr)
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let rs1: Nat8 = extract_rs1(instr)
+	let rs2: Nat8 = extract_rs2(instr)
 
-	let bit4to1 = imm4to1_11 and 0x1E
-	let bit10to5 = Word16 (imm12_10to5 and 0x3F) << 5
-	let bit11 = (imm4to1_11 and 0x1) << 11
-	let bit12 = Word16 (imm12_10to5 and 0x40) << 6
+	let bit4to1: Word16 = imm4to1_11 and 0x1E
+	let bit10to5: Word16 = Word16 (imm12_10to5 and 0x3F) << 5
+	let bit11: Word16 = (imm4to1_11 and 0x1) << 11
+	let bit12: Word16 = Word16 (imm12_10to5 and 0x40) << 6
 
 	var bits: Word16 = (bit12 or bit11 or bit10to5 or bit4to1)
 
@@ -489,13 +470,13 @@ func execB(hart: *Hart, instr: Word32) -> Unit {
 
 
 func execL(hart: *Hart, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let funct3: Word8 = extract_funct3(instr)
+	let funct7: Word8 = extract_funct7(instr)
+	let imm12: Word32 = extract_imm12(instr)
+	let imm: Int32 = expand12(imm12)
+	let rd: Nat8 = extract_rd(instr)
+	let rs1: Nat8 = extract_rs1(instr)
+	let rs2: Nat8 = extract_rs2(instr)
 
 	let adr = Nat32 (Int32 hart.reg[rs1] + imm)
 
@@ -522,7 +503,7 @@ func execL(hart: *Hart, instr: Word32) -> Unit {
 
 		trace(hart.pc, "lw x%d, %d(x%d)\n", rd, imm, rs1)
 
-		let val = hart.bus.read32(adr)
+		let val: Word32 = hart.bus.read32(adr)
 		if rd != 0 {
 			hart.reg[rd] = val
 		}
@@ -549,19 +530,19 @@ func execL(hart: *Hart, instr: Word32) -> Unit {
 
 
 func execS(hart: *Hart, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
-	let rs2 = extract_rs2(instr)
+	let funct3: Word8 = extract_funct3(instr)
+	let funct7: Word8 = extract_funct7(instr)
+	let rd: Nat8 = extract_rd(instr)
+	let rs1: Nat8 = extract_rs1(instr)
+	let rs2: Nat8 = extract_rs2(instr)
 
 	let imm4to0 = Nat32 rd
 	let imm11to5 = Nat32 funct7
-	let _imm = (Word32 imm11to5 << 5) or Word32 imm4to0
-	let imm = expand12(_imm)
+	let _imm: Word32 = (Word32 imm11to5 << 5) or Word32 imm4to0
+	let imm: Int32 = expand12(_imm)
 
 	let adr = Nat32 Word32 (Int32 hart.reg[rs1] + imm)
-	let val = hart.reg[rs2]
+	let val: Word32 = hart.reg[rs2]
 
 	if funct3 == 0 {
 		// SB (save 8-bit value)
@@ -592,14 +573,14 @@ func execS(hart: *Hart, instr: Word32) -> Unit {
 
 
 func execSystem(hart: *Hart, instr: Word32) -> Unit {
-	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
-	let rd = extract_rd(instr)
-	let rs1 = extract_rs1(instr)
+	let funct3: Word8 = extract_funct3(instr)
+	let funct7: Word8 = extract_funct7(instr)
+	let imm12: Word32 = extract_imm12(instr)
+	let imm: Int32 = expand12(imm12)
+	let rd: Nat8 = extract_rd(instr)
+	let rs1: Nat8 = extract_rs1(instr)
 
-	let csr = Nat16 imm12
+	let csr: Nat16 = Nat16 imm12
 
 	if instr == instrECALL {
 		trace(hart.pc, "ECALL\n")
@@ -619,20 +600,20 @@ func execSystem(hart: *Hart, instr: Word32) -> Unit {
 		csr_rw(hart, csr, rd, rs1)
 	} else if funct3 == funct3_CSRRS {
 		// CSR read & set bit
-		let mask_reg = rs1
+		let mask_reg: Nat8 = rs1
 		csr_rs(hart, csr, rd, mask_reg)
 	} else if funct3 == funct3_CSRRC {
 		// CSR read & clear bit
-		let mask_reg = rs1
+		let mask_reg: Nat8 = rs1
 		csr_rc(hart, csr, rd, mask_reg)
 	} else if funct3 == funct3_CSRRWI {
-		let imm = rs1
+		let imm: Nat8 = rs1
 		csr_rwi(hart, csr, rd, imm)
 	} else if funct3 == funct3_CSRRSI {
-		let imm = rs1
+		let imm: Nat8 = rs1
 		csr_rsi(hart, csr, rd, imm)
 	} else if funct3 == funct3_CSRRCI {
-		let imm = rs1
+		let imm: Nat8 = rs1
 		csr_rci(hart, csr, rd, imm)
 	} else {
 		trace(hart.pc, "UNKNOWN SYSTEM INSTRUCTION: 0x%x\n", instr)
@@ -656,15 +637,6 @@ public func irq(hart: *Hart, irq: Word32) -> Unit {
 
 
 
-
-
-//
-// CSR's
-//https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
-//
-
-
-
 const mstatus_adr = 0x300
 const misa_adr = 0x301
 const mie_adr = 0x304
@@ -682,13 +654,8 @@ const stvec_adr = 0x105
 const scause_adr = 0x142
 const stval_adr = 0x143
 const sip_adr = 0x144
-
-
-/*
-The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
-*/
 func csr_rw(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
-	let nv = hart.reg[rs1]
+	let nv: Word32 = hart.reg[rs1]
 	if csr == Nat16 0x340 {
 		// mscratch
 	} else if csr == Nat16 0x341 {
@@ -701,38 +668,20 @@ func csr_rw(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 		// mip (machine interrupt pending)
 	}
 }
-
-
-/*
-The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
-*/
 func csr_rs(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
-
-/*
-The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
-*/
 func csr_rc(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
 
 
-// -
-
-
 func csr_rwi(hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
-
-
-// read+clear immediate(5-bit)
 func csr_rsi(hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
-
-
-// read+clear immediate(5-bit)
 func csr_rci(hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }

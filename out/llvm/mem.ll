@@ -214,11 +214,7 @@ declare %Word32 @mmio_read32(%Nat32 %adr)
 ; -- end print imports 'mem' --
 ; -- strings --
 @str1 = private constant [38 x i8] [i8 42, i8 42, i8 42, i8 32, i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
-; -- endstrings --;
-;
-
-
-; see mem.ld
+; -- endstrings --
 @rom = internal global [1048576 x %Word8] zeroinitializer
 @ram = internal global [16384 x %Word8] zeroinitializer
 define [0 x %Word8]* @mem_get_ram_ptr() {

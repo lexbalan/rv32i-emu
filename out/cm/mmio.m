@@ -4,16 +4,16 @@ include "stdio"
 
 
 const consoleMMIOAdr = Nat32 0x10
-const consolePutAdr = consoleMMIOAdr + 0
-const consoleGetAdr = consoleMMIOAdr + 1
+const consolePutAdr: Nat32 = consoleMMIOAdr + 0
+const consoleGetAdr: Nat32 = consoleMMIOAdr + 1
 
-const consolePrintInt32Adr = consoleMMIOAdr + Nat32 0x10
-const consolePrintUInt32Adr = consoleMMIOAdr + Nat32 0x14
-const consolePrintInt32HexAdr = consoleMMIOAdr + Nat32 0x18
-const consolePrintUInt32HexAdr = consoleMMIOAdr + Nat32 0x1C
+const consolePrintInt32Adr: Nat32 = consoleMMIOAdr + Nat32 0x10
+const consolePrintUInt32Adr: Nat32 = consoleMMIOAdr + Nat32 0x14
+const consolePrintInt32HexAdr: Nat32 = consoleMMIOAdr + Nat32 0x18
+const consolePrintUInt32HexAdr: Nat32 = consoleMMIOAdr + Nat32 0x1C
 
-const consolePrintInt64Adr = consoleMMIOAdr + Nat32 0x20
-const consolePrintUInt64Adr = consoleMMIOAdr + Nat32 0x28
+const consolePrintInt64Adr: Nat32 = consoleMMIOAdr + Nat32 0x20
+const consolePrintUInt64Adr: Nat32 = consoleMMIOAdr + Nat32 0x28
 
 
 

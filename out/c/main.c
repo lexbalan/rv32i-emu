@@ -14,10 +14,6 @@
 
 static hart_Hart hart;
 
-//public func mem_violation_event(reason: Nat32) {
-//	hart.irq(&hart, rvHart.intMemViolation)
-//}
-
 
 static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
 static void show_mem();

@@ -38,7 +38,7 @@ public func get_rom_ptr() -> *[]Word8 {
 
 
 var memviolationCnt = Nat32 0
-func memoryViolation(rw: Char8, adr: Nat32) {
+func memoryViolation (rw: Char8, adr: Nat32) -> Unit {
 	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
 	if memviolationCnt > 10 {
 		exit(1)
@@ -48,13 +48,13 @@ func memoryViolation(rw: Char8, adr: Nat32) {
 }
 
 
-@inlinehint
-func isAdressInRange(x: Nat32, a: Nat32, b: Nat32) -> Bool {
+@inline
+func isAdressInRange (x: Nat32, a: Nat32, b: Nat32) -> Bool {
 	return x >= a and x < b
 }
 
 
-public func read8(adr: Nat32) -> Word8 {
+public func read8 (adr: Nat32) -> Word8 {
 	var x = Word8 0
 
 	if isAdressInRange(adr, ramStart, ramEnd) {
@@ -76,7 +76,7 @@ public func read8(adr: Nat32) -> Word8 {
 }
 
 
-public func read16(adr: Nat32) -> Word16 {
+public func read16 (adr: Nat32) -> Word16 {
 	var x = Word16 0
 
 	if isAdressInRange(adr, ramStart, ramEnd) {
@@ -96,7 +96,7 @@ public func read16(adr: Nat32) -> Word16 {
 }
 
 
-public func read32(adr: Nat32) -> Word32 {
+public func read32 (adr: Nat32) -> Word32 {
 	var x = Word32 0
 
 	if isAdressInRange(adr, romStart, romEnd) {
@@ -118,7 +118,7 @@ public func read32(adr: Nat32) -> Word32 {
 
 
 
-public func write8(adr: Nat32, value: Word8) {
+public func write8 (adr: Nat32, value: Word8) -> Unit {
 	if isAdressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word8 Ptr &ram[adr - ramStart]
 		*ptr = value
@@ -130,7 +130,7 @@ public func write8(adr: Nat32, value: Word8) {
 }
 
 
-public func write16(adr: Nat32, value: Word16) {
+public func write16 (adr: Nat32, value: Word16) -> Unit {
 	if isAdressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word16 Ptr &ram[adr - ramStart]
 		*ptr = value
@@ -142,7 +142,7 @@ public func write16(adr: Nat32, value: Word16) {
 }
 
 
-public func write32(adr: Nat32, value: Word32) {
+public func write32 (adr: Nat32, value: Word32) -> Unit {
 	if isAdressInRange(adr, ramStart, ramEnd) {
 		let ptr = *Word32 Ptr &ram[adr - ramStart]
 		*ptr = value

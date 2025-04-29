@@ -20,7 +20,7 @@ var hart: rvHart.Hart
 //}
 
 
-public func main() -> Int {
+public func main () -> Int {
 	printf("RISC-V VM\n")
 
 	var memctl = rvHart.BusInterface {
@@ -58,7 +58,7 @@ public func main() -> Int {
 }
 
 
-func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
+func loader (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	printf("LOAD: %s\n", filename)
 
 	let fp = fopen(filename, "rb")
@@ -88,7 +88,7 @@ func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 }
 
 
-func show_mem() {
+func show_mem () -> Unit {
 	var i = 0
 	let ramptr = mem.get_ram_ptr()
 	while i < 256 {

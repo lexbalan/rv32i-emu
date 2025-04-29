@@ -366,8 +366,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 @str58 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
 @str59 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
 @str60 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
-; -- endstrings --;
-;
+; -- endstrings --
 %hart_Hart = type {
 	[32 x %Word32],
 	%Nat32,
@@ -386,10 +385,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 	void (%Nat32, %Word16)*,
 	void (%Nat32, %Word32)*
 };
-; load; immediate; store; reg; branch; load upper immediate; add upper immediate to PC; jump and link; jump and link by register;;
 
-
-; funct3 for CSR
 define void @hart_init(%hart_Hart* %hart, %hart_BusInterface* %bus) {
 	%1 = bitcast %hart_BusInterface* %bus to %hart_BusInterface*
 	%2 = insertvalue %hart_Hart zeroinitializer, %hart_BusInterface* %1, 3
@@ -2044,20 +2040,6 @@ endif_0:
 	ret void
 }
 
-
-
-
-
-
-;
-; CSR's
-;https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
-;
-
-
-;
-;The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
-;
 define internal void @csr_rw(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
 	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%2 = zext %Nat8 %rs1 to %Nat32
@@ -2109,44 +2091,26 @@ endif_0:
 	ret void
 }
 
-
-
-;
-;The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
-;
 define internal void @csr_rs(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
 	;TODO
 	ret void
 }
 
-
-;
-;The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
-;
 define internal void @csr_rc(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
 	;TODO
 	ret void
 }
 
-
-
-; -
 define internal void @csr_rwi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
 	ret void
 }
 
-
-
-; read+clear immediate(5-bit)
 define internal void @csr_rsi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
 	ret void
 }
 
-
-
-; read+clear immediate(5-bit)
 define internal void @csr_rci(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
 	ret void

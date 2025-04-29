@@ -17,7 +17,7 @@ const consolePrintUInt64Adr = consoleMMIOAdr + Nat32 0x28
 
 
 
-public func write8(adr: Nat32, value: Word8) {
+public func write8 (adr: Nat32, value: Word8) -> Unit {
 	if adr == consolePutAdr {
 		putchar(Int value)
 		return
@@ -25,7 +25,7 @@ public func write8(adr: Nat32, value: Word8) {
 }
 
 
-public func write16(adr: Nat32, value: Word16) {
+public func write16 (adr: Nat32, value: Word16) -> Unit {
 	if adr == consolePutAdr {
 		putchar(Int value)
 		return
@@ -33,7 +33,7 @@ public func write16(adr: Nat32, value: Word16) {
 }
 
 
-public func write32(adr: Nat32, value: Word32) {
+public func write32 (adr: Nat32, value: Word32) -> Unit {
 	if adr == consolePutAdr {
 		putchar(Int value)
 		return
