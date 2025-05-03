@@ -263,7 +263,7 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 			trace(hart.pc, "mulhu x%d, x%d, x%d\n", rd, rs1, rs2)
 
 			// multiply unsigned high
-			notImplemented("mulhsu x%d, x%d, x%d\n", rd, rs1, rs2)
+			notImplemented("mulhu x%d, x%d, x%d\n", rd, rs1, rs2)
 			//hart.reg[rd] = unsafe Word32 (Word64 (Nat64 v0 * Nat64 v1) >> 32)
 
 		} else if funct3 == 4 {

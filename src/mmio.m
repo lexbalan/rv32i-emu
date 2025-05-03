@@ -53,15 +53,15 @@ public func write32 (adr: Nat32, value: Word32) -> Unit {
 }
 
 
-public func read8(adr: Nat32) -> Word8 {
+public func read8 (adr: Nat32) -> Word8 {
 	return 0
 }
 
-public func read16(adr: Nat32) -> Word16 {
+public func read16 (adr: Nat32) -> Word16 {
 	return 0
 }
 
-public func read32(adr: Nat32) -> Word32 {
+public func read32 (adr: Nat32) -> Word32 {
 	return 0
 }
 

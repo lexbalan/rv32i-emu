@@ -35,6 +35,7 @@ static void memoryViolation(char rw, uint32_t adr)
 	memviolationCnt = memviolationCnt + 1;
 	//	memoryViolation_event(0x55) // !
 }
+
 static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b)
 {
 	return x >= a && x < b;

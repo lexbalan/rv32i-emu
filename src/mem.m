@@ -27,12 +27,12 @@ var rom: [romSize]Word8
 var ram: [ramSize]Word8
 
 
-public func get_ram_ptr() -> *[]Word8 {
+public func get_ram_ptr () -> *[]Word8 {
 	return &ram
 }
 
 
-public func get_rom_ptr() -> *[]Word8 {
+public func get_rom_ptr () -> *[]Word8 {
 	return &rom
 }
 
