@@ -16,7 +16,7 @@ public type Hart record {
 
 	bus: *BusInterface
 
-	interrupt: Word32
+	irq: Word32
 
 	public cnt: Nat32
 	public end: Bool
@@ -65,24 +65,25 @@ public const intMemViolation = 0x0B
 
 
 
-public func init(hart: *Hart, bus: *BusInterface) -> Unit {
+public func init (hart: *Hart, bus: *BusInterface) -> Unit {
 	*hart = Hart {
 		bus = bus
 	}
 }
 
 
-func fetch(hart: *Hart) -> Word32 {
+
+func fetch (hart: *Hart) -> Word32 {
 	return hart.bus.read32(hart.pc)
 }
 
 
-public func tick(hart: *Hart) -> Unit {
-	if hart.interrupt != 0 {
-		trace(hart.pc, "\nINT #%02X\n", hart.interrupt)
-		let vect_offset: Nat32 = Nat32 hart.interrupt * 4
+public func tick (hart: *Hart) -> Unit {
+	if hart.irq != 0 {
+		trace(hart.pc, "\nINT #%02X\n", hart.irq)
+		let vect_offset: Nat32 = Nat32 hart.irq * 4
 		hart.pc = vect_offset
-		hart.interrupt = 0
+		hart.irq = 0
 	}
 
 	let instr: Word32 = fetch(hart)
@@ -94,7 +95,7 @@ public func tick(hart: *Hart) -> Unit {
 }
 
 
-func exec(hart: *Hart, instr: Word32) -> Unit {
+func exec (hart: *Hart, instr: Word32) -> Unit {
 	let op: Word8 = extract_op(instr)
 	let funct3: Word8 = extract_funct3(instr)
 
@@ -126,7 +127,7 @@ func exec(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execI(hart: *Hart, instr: Word32) -> Unit {
+func execI (hart: *Hart, instr: Word32) -> Unit {
 	let funct3: Word8 = extract_funct3(instr)
 	let funct7: Word8 = extract_funct7(instr)
 	let imm12: Word32 = extract_imm12(instr)
@@ -195,7 +196,7 @@ func execI(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execR(hart: *Hart, instr: Word32) -> Unit {
+func execR (hart: *Hart, instr: Word32) -> Unit {
 	let funct3: Word8 = extract_funct3(instr)
 	let funct7: Word8 = extract_funct7(instr)
 	let imm: Int32 = expand12(extract_imm12(instr))
@@ -339,7 +340,7 @@ func execR(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execLUI(hart: *Hart, instr: Word32) -> Unit {
+func execLUI (hart: *Hart, instr: Word32) -> Unit {
 	// load upper immediate
 
 	let imm: Int32 = expand12(extract_imm31_12(instr))
@@ -353,7 +354,7 @@ func execLUI(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execAUIPC(hart: *Hart, instr: Word32) -> Unit {
+func execAUIPC (hart: *Hart, instr: Word32) -> Unit {
 	// Add upper immediate to PC
 
 	let imm: Int32 = expand12(extract_imm31_12(instr))
@@ -368,7 +369,7 @@ func execAUIPC(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execJAL(hart: *Hart, instr: Word32) -> Unit {
+func execJAL (hart: *Hart, instr: Word32) -> Unit {
 	// Jump and link
 
 	let rd: Nat8 = extract_rd(instr)
@@ -385,7 +386,7 @@ func execJAL(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execJALR(hart: *Hart, instr: Word32) -> Unit {
+func execJALR (hart: *Hart, instr: Word32) -> Unit {
 	// Jump and link (by register)
 
 	let rs1: Nat8 = extract_rs1(instr)
@@ -407,7 +408,7 @@ func execJALR(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execB(hart: *Hart, instr: Word32) -> Unit {
+func execB (hart: *Hart, instr: Word32) -> Unit {
 	let funct3: Word8 = extract_funct3(instr)
 	let imm12_10to5: Word8 = extract_funct7(instr)
 	let imm4to1_11 = Word16 extract_rd(instr)
@@ -486,7 +487,7 @@ func execB(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execL(hart: *Hart, instr: Word32) -> Unit {
+func execL (hart: *Hart, instr: Word32) -> Unit {
 	let funct3: Word8 = extract_funct3(instr)
 	let funct7: Word8 = extract_funct7(instr)
 	let imm12: Word32 = extract_imm12(instr)
@@ -546,7 +547,7 @@ func execL(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execS(hart: *Hart, instr: Word32) -> Unit {
+func execS (hart: *Hart, instr: Word32) -> Unit {
 	let funct3: Word8 = extract_funct3(instr)
 	let funct7: Word8 = extract_funct7(instr)
 	let rd: Nat8 = extract_rd(instr)
@@ -589,7 +590,7 @@ func execS(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execSystem(hart: *Hart, instr: Word32) -> Unit {
+func execSystem (hart: *Hart, instr: Word32) -> Unit {
 	let funct3: Word8 = extract_funct3(instr)
 	let funct7: Word8 = extract_funct7(instr)
 	let imm12: Word32 = extract_imm12(instr)
@@ -600,12 +601,12 @@ func execSystem(hart: *Hart, instr: Word32) -> Unit {
 	let csr: Nat16 = Nat16 imm12
 
 	if instr == instrECALL {
-		trace(hart.pc, "ECALL\n")
+		trace(hart.pc, "ecall\n")
 
 		//
-		irq(hart, intSysCall)
+		hart.irq = hart.irq or intSysCall
 	} else if instr == instrEBREAK {
-		trace(hart.pc, "EBREAK\n")
+		trace(hart.pc, "ebreak\n")
 
 		//
 		printf("END.\n")
@@ -639,16 +640,9 @@ func execSystem(hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-func execFence(hart: *Hart, instr: Word32) -> Unit {
+func execFence (hart: *Hart, instr: Word32) -> Unit {
 	if instr == instrPAUSE {
 		trace(hart.pc, "PAUSE\n")
-	}
-}
-
-
-public func irq(hart: *Hart, irq: Word32) -> Unit {
-	if hart.interrupt == 0 {
-		hart.interrupt = irq
 	}
 }
 
@@ -671,9 +665,26 @@ const stvec_adr = 0x105
 const scause_adr = 0x142
 const stval_adr = 0x143
 const sip_adr = 0x144
-func csr_rw(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
+func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	let nv: Word32 = hart.reg[rs1]
-	if csr == Nat16 0x340 {
+	// Machine Trap Setup
+	if csr == Nat16 0x300 {
+		// mstatus (Machine status register)
+	} else if csr == Nat16 0x301 {
+		// misa (ISA and extensions)
+	} else if csr == Nat16 0x302 {
+		// medeleg (Machine exception delegation register)
+	} else if csr == Nat16 0x303 {
+		// mideleg (Machine interrupt delegation register)
+	} else if csr == Nat16 0x304 {
+		// mie (Machine interrupt-enable register)
+	} else if csr == Nat16 0x305 {
+		// mtvec (Machine trap-handler base address)
+	} else if csr == Nat16 0x306 {
+		// mcounteren (Machine counter enable)
+
+		// Machine Trap Handling
+	} else if csr == Nat16 0x340 {
 		// mscratch
 	} else if csr == Nat16 0x341 {
 		// mepc
@@ -685,27 +696,27 @@ func csr_rw(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 		// mip (machine interrupt pending)
 	}
 }
-func csr_rs(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
+func csr_rs (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
-func csr_rc(hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
-	//TODO
-}
-
-
-func csr_rwi(hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
-	//TODO
-}
-func csr_rsi(hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
-	//TODO
-}
-func csr_rci(hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
+func csr_rc (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
 
 
+func csr_rwi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
+	//TODO
+}
+func csr_rsi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
+	//TODO
+}
+func csr_rci (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
+	//TODO
+}
 
-func trace(pc: Nat32, form: *Str8, ...) -> Unit {
+
+
+func trace (pc: Nat32, form: *Str8, ...) -> Unit {
 	var va: va_list
 	__va_start(va, form)
 	if traceMode {
@@ -716,7 +727,7 @@ func trace(pc: Nat32, form: *Str8, ...) -> Unit {
 }
 
 
-func notImplemented(form: *Str8, ...) -> Unit {
+func notImplemented (form: *Str8, ...) -> Unit {
 	var va: va_list
 	__va_start(va, form)
 	printf("\n\nINSTRUCTION_NOT_IMPLEMENTED: \"")
@@ -727,7 +738,7 @@ func notImplemented(form: *Str8, ...) -> Unit {
 }
 
 
-public func show_regs(hart: *Hart) -> Unit {
+public func show_regs (hart: *Hart) -> Unit {
 	var i: Int32 = 0
 	while i < 16 {
 		printf("x%02d = 0x%08x", i, hart.reg[i])

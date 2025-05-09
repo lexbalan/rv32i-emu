@@ -10,6 +10,7 @@ target triple = "arm64-apple-macosx12.0.0"
 %Word32 = type i32
 %Word64 = type i64
 %Word128 = type i128
+%Word256 = type i256
 %Char8 = type i8
 %Char16 = type i16
 %Char32 = type i32
@@ -18,11 +19,13 @@ target triple = "arm64-apple-macosx12.0.0"
 %Int32 = type i32
 %Int64 = type i64
 %Int128 = type i128
+%Int256 = type i256
 %Nat8 = type i8
 %Nat16 = type i16
 %Nat32 = type i32
 %Nat64 = type i64
 %Nat128 = type i128
+%Nat256 = type i256
 %Float32 = type float
 %Float64 = type double
 %Pointer = type i8*
@@ -202,17 +205,18 @@ declare void @perror(%ConstCharStr* %str)
 ; -- end print includes --
 ; -- print imports 'main' --
 ; -- 2
-; ?? mem ??
-; ?? mmio ??
-; from import
+
+; from import "mmio"
 declare void @mmio_write8(%Nat32 %adr, %Word8 %value)
 declare void @mmio_write16(%Nat32 %adr, %Word16 %value)
 declare void @mmio_write32(%Nat32 %adr, %Word32 %value)
 declare %Word8 @mmio_read8(%Nat32 %adr)
 declare %Word16 @mmio_read16(%Nat32 %adr)
 declare %Word32 @mmio_read32(%Nat32 %adr)
-; end from import
-; from import
+
+; end from import "mmio"
+
+; from import "mem"
 declare [0 x %Word8]* @mem_get_ram_ptr()
 declare [0 x %Word8]* @mem_get_rom_ptr()
 declare %Word8 @mem_read8(%Nat32 %adr)
@@ -221,8 +225,8 @@ declare %Word32 @mem_read32(%Nat32 %adr)
 declare void @mem_write8(%Nat32 %adr, %Word8 %value)
 declare void @mem_write16(%Nat32 %adr, %Word16 %value)
 declare void @mem_write32(%Nat32 %adr, %Word32 %value)
-; end from import
-; ?? rvHart ??
+
+; end from import "mem"
 ; from included unistd
 declare %Int @access([0 x %ConstChar]* %path, %Int %amode)
 declare %UnsignedInt @alarm(%UnsignedInt %seconds)
@@ -322,7 +326,8 @@ declare %Word32 @decode_extract_imm31_12(%Word32 %instr)
 declare %Word32 @decode_extract_jal_imm(%Word32 %instr)
 declare %Int32 @decode_expand12(%Word32 %val_12bit)
 declare %Int32 @decode_expand20(%Word32 %val_20bit)
-; from import
+
+; from import "rvHart"
 %hart_Hart = type {
 	[32 x %Word32],
 	%Nat32,
@@ -344,9 +349,9 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 
 declare void @hart_init(%hart_Hart* %hart, %hart_BusInterface* %bus)
 declare void @hart_tick(%hart_Hart* %hart)
-declare void @hart_irq(%hart_Hart* %hart, %Word32 %irq)
 declare void @hart_show_regs(%hart_Hart* %hart)
-; end from import
+
+; end from import "rvHart"
 ; -- end print imports 'main' --
 ; -- strings --
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]

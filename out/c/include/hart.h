@@ -22,7 +22,7 @@ struct hart_Hart {
 
 	hart_BusInterface *bus;
 
-	uint32_t interrupt;
+	uint32_t irq;
 
 	uint32_t cnt;
 	bool end;
@@ -45,8 +45,6 @@ struct hart_BusInterface {
 void hart_init(hart_Hart *hart, hart_BusInterface *bus);
 
 void hart_tick(hart_Hart *hart);
-
-void hart_irq(hart_Hart *hart, uint32_t irq);
 
 void hart_show_regs(hart_Hart *hart);
 

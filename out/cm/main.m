@@ -16,7 +16,7 @@ const showText: Bool = false
 var hart: Hart
 
 
-public func main() -> Int {
+public func main () -> Int {
 	printf("RISC-V VM\n")
 
 	var memctl: BusInterface = BusInterface {
@@ -54,7 +54,7 @@ public func main() -> Int {
 }
 
 
-func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
+func loader (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	printf("LOAD: %s\n", filename)
 
 	let fp: *File = fopen(filename, "rb")
@@ -84,7 +84,7 @@ func loader(filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 }
 
 
-func show_mem() -> Unit {
+func show_mem () -> Unit {
 	var i: Int32 = 0
 	let ramptr: *[]Word8 = mem.get_ram_ptr()
 	while i < 256 {

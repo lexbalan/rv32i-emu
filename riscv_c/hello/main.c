@@ -61,6 +61,8 @@ int main()
 	
 
 	//asm("csrrw	%0, misa, %1");
+	asm("ecall");
+
 	asm("ebreak");
 
 	uint32_t prev_value;

@@ -18,7 +18,7 @@ public type Hart record {
 
 	bus: *BusInterface
 
-	interrupt: Word32
+	irq: Word32
 
 	public cnt: Nat32
 	public end: Bool
@@ -77,17 +77,18 @@ public func init (hart: *Hart, bus: *BusInterface) -> Unit {
 }
 
 
+@inline
 func fetch (hart: *Hart) -> Word32 {
 	return hart.bus.read32(hart.pc)
 }
 
 
 public func tick (hart: *Hart) -> Unit {
-	if hart.interrupt != 0 {
-		trace(hart.pc, "\nINT #%02X\n", hart.interrupt)
-		let vect_offset = Nat32 hart.interrupt * 4
+	if hart.irq != 0 {
+		trace(hart.pc, "\nINT #%02X\n", hart.irq)
+		let vect_offset = Nat32 hart.irq * 4
 		hart.pc = vect_offset
-		hart.interrupt = 0
+		hart.irq = 0
 	}
 
 	let instr = fetch(hart)
@@ -640,13 +641,13 @@ func execSystem (hart: *Hart, instr: Word32) -> Unit {
 	let csr = unsafe Nat16 imm12
 
 	if instr == instrECALL {
-		trace(hart.pc, "ECALL\n")
+		trace(hart.pc, "ecall\n")
 
 		//
-		irq(hart, intSysCall)
+		hart.irq = hart.irq or intSysCall
 
 	} else if instr == instrEBREAK {
-		trace(hart.pc, "EBREAK\n")
+		trace(hart.pc, "ebreak\n")
 
 		//
 		printf("END.\n")
@@ -687,15 +688,6 @@ func execFence (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-public func irq (hart: *Hart, irq: Word32) -> Unit {
-	if hart.interrupt == 0 {
-		hart.interrupt = irq
-	}
-}
-
-
-
-
 
 //
 // CSR's
@@ -728,7 +720,24 @@ The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSR
 */
 func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	let nv = hart.reg[rs1]
-	if csr == Nat16 0x340 {
+	// Machine Trap Setup
+	if csr == Nat16 0x300 {
+		// mstatus (Machine status register)
+	} else if csr == Nat16 0x301 {
+		// misa (ISA and extensions)
+	} else if csr == Nat16 0x302 {
+		// medeleg (Machine exception delegation register)
+	} else if csr == Nat16 0x303 {
+		// mideleg (Machine interrupt delegation register)
+	} else if csr == Nat16 0x304 {
+		// mie (Machine interrupt-enable register)
+	} else if csr == Nat16 0x305 {
+		// mtvec (Machine trap-handler base address)
+	} else if csr == Nat16 0x306 {
+		// mcounteren (Machine counter enable)
+
+	// Machine Trap Handling
+	} else if csr == Nat16 0x340 {
 		// mscratch
 	} else if csr == Nat16 0x341 {
 		// mepc

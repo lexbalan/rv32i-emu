@@ -10,6 +10,7 @@ target triple = "arm64-apple-macosx12.0.0"
 %Word32 = type i32
 %Word64 = type i64
 %Word128 = type i128
+%Word256 = type i256
 %Char8 = type i8
 %Char16 = type i16
 %Char32 = type i32
@@ -18,11 +19,13 @@ target triple = "arm64-apple-macosx12.0.0"
 %Int32 = type i32
 %Int64 = type i64
 %Int128 = type i128
+%Int256 = type i256
 %Nat8 = type i8
 %Nat16 = type i16
 %Nat32 = type i32
 %Nat64 = type i64
 %Nat128 = type i128
+%Nat256 = type i256
 %Float32 = type float
 %Float64 = type double
 %Pointer = type i8*
@@ -201,16 +204,17 @@ declare %Int @system([0 x %ConstChar]* %string)
 ; -- end print includes --
 ; -- print imports 'mem' --
 ; -- 1
-; ?? mmio ??
 ; from included ctypes
-; from import
+
+; from import "mmio"
 declare void @mmio_write8(%Nat32 %adr, %Word8 %value)
 declare void @mmio_write16(%Nat32 %adr, %Word16 %value)
 declare void @mmio_write32(%Nat32 %adr, %Word32 %value)
 declare %Word8 @mmio_read8(%Nat32 %adr)
 declare %Word16 @mmio_read16(%Nat32 %adr)
 declare %Word32 @mmio_read32(%Nat32 %adr)
-; end from import
+
+; end from import "mmio"
 ; -- end print imports 'mem' --
 ; -- strings --
 @str1 = private constant [38 x i8] [i8 42, i8 42, i8 42, i8 32, i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]

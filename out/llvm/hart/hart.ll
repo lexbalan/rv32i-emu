@@ -10,6 +10,7 @@ target triple = "arm64-apple-macosx12.0.0"
 %Word32 = type i32
 %Word64 = type i64
 %Word128 = type i128
+%Word256 = type i256
 %Char8 = type i8
 %Char16 = type i16
 %Char32 = type i32
@@ -18,11 +19,13 @@ target triple = "arm64-apple-macosx12.0.0"
 %Int32 = type i32
 %Int64 = type i64
 %Int128 = type i128
+%Int256 = type i256
 %Nat8 = type i8
 %Nat16 = type i16
 %Nat32 = type i32
 %Nat64 = type i64
 %Nat128 = type i128
+%Nat256 = type i256
 %Float32 = type float
 %Float64 = type double
 %Pointer = type i8*
@@ -355,8 +358,8 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 @str47 = private constant [17 x i8] [i8 115, i8 98, i8 32, i8 120, i8 37, i8 100, i8 44, i8 32, i8 37, i8 100, i8 40, i8 120, i8 37, i8 100, i8 41, i8 10, i8 0]
 @str48 = private constant [17 x i8] [i8 115, i8 104, i8 32, i8 120, i8 37, i8 100, i8 44, i8 32, i8 37, i8 100, i8 40, i8 120, i8 37, i8 100, i8 41, i8 10, i8 0]
 @str49 = private constant [17 x i8] [i8 115, i8 119, i8 32, i8 120, i8 37, i8 100, i8 44, i8 32, i8 37, i8 100, i8 40, i8 120, i8 37, i8 100, i8 41, i8 10, i8 0]
-@str50 = private constant [7 x i8] [i8 69, i8 67, i8 65, i8 76, i8 76, i8 10, i8 0]
-@str51 = private constant [8 x i8] [i8 69, i8 66, i8 82, i8 69, i8 65, i8 75, i8 10, i8 0]
+@str50 = private constant [7 x i8] [i8 101, i8 99, i8 97, i8 108, i8 108, i8 10, i8 0]
+@str51 = private constant [8 x i8] [i8 101, i8 98, i8 114, i8 101, i8 97, i8 107, i8 10, i8 0]
 @str52 = private constant [6 x i8] [i8 69, i8 78, i8 68, i8 46, i8 10, i8 0]
 @str53 = private constant [34 x i8] [i8 85, i8 78, i8 75, i8 78, i8 79, i8 87, i8 78, i8 32, i8 83, i8 89, i8 83, i8 84, i8 69, i8 77, i8 32, i8 73, i8 78, i8 83, i8 84, i8 82, i8 85, i8 67, i8 84, i8 73, i8 79, i8 78, i8 58, i8 32, i8 48, i8 120, i8 37, i8 120, i8 10, i8 0]
 @str54 = private constant [7 x i8] [i8 80, i8 65, i8 85, i8 83, i8 69, i8 10, i8 0]
@@ -1911,88 +1914,91 @@ then_0:
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %10, %Str8* bitcast ([7 x i8]* @str50 to [0 x i8]*))
 
 	;
-	%11 = bitcast %hart_Hart* %hart to %hart_Hart*
-	call void @hart_irq(%hart_Hart* %11, %Word32 8)
+	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	%12 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	%13 = load %Word32, %Word32* %12
+	%14 = or %Word32 %13, 8
+	store %Word32 %14, %Word32* %11
 	br label %endif_0
 else_0:
 ; if_1
-	%12 = icmp eq %Word32 %instr, 1048691
-	br %Bool %12 , label %then_1, label %else_1
+	%15 = icmp eq %Word32 %instr, 1048691
+	br %Bool %15 , label %then_1, label %else_1
 then_1:
-	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
-	%14 = load %Nat32, %Nat32* %13
-	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %14, %Str8* bitcast ([8 x i8]* @str51 to [0 x i8]*))
+	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%17 = load %Nat32, %Nat32* %16
+	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %17, %Str8* bitcast ([8 x i8]* @str51 to [0 x i8]*))
 
 	;
-	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str52 to [0 x i8]*))
-	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
-	store %Bool 1, %Bool* %16
+	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str52 to [0 x i8]*))
+	%19 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
+	store %Bool 1, %Bool* %19
 
 	; CSR instructions
 	br label %endif_1
 else_1:
 ; if_2
-	%17 = bitcast i8 1 to %Word8
-	%18 = icmp eq %Word8 %1, %17
-	br %Bool %18 , label %then_2, label %else_2
+	%20 = bitcast i8 1 to %Word8
+	%21 = icmp eq %Word8 %1, %20
+	br %Bool %21 , label %then_2, label %else_2
 then_2:
 	; CSR read & write
-	%19 = bitcast %hart_Hart* %hart to %hart_Hart*
-	call void @csr_rw(%hart_Hart* %19, %Nat16 %7, %Nat8 %5, %Nat8 %6)
+	%22 = bitcast %hart_Hart* %hart to %hart_Hart*
+	call void @csr_rw(%hart_Hart* %22, %Nat16 %7, %Nat8 %5, %Nat8 %6)
 	br label %endif_2
 else_2:
 ; if_3
-	%20 = bitcast i8 2 to %Word8
-	%21 = icmp eq %Word8 %1, %20
-	br %Bool %21 , label %then_3, label %else_3
+	%23 = bitcast i8 2 to %Word8
+	%24 = icmp eq %Word8 %1, %23
+	br %Bool %24 , label %then_3, label %else_3
 then_3:
 	; CSR read & set bit
-	%22 = bitcast %hart_Hart* %hart to %hart_Hart*
-	call void @csr_rs(%hart_Hart* %22, %Nat16 %7, %Nat8 %5, %Nat8 %6)
+	%25 = bitcast %hart_Hart* %hart to %hart_Hart*
+	call void @csr_rs(%hart_Hart* %25, %Nat16 %7, %Nat8 %5, %Nat8 %6)
 	br label %endif_3
 else_3:
 ; if_4
-	%23 = bitcast i8 3 to %Word8
-	%24 = icmp eq %Word8 %1, %23
-	br %Bool %24 , label %then_4, label %else_4
+	%26 = bitcast i8 3 to %Word8
+	%27 = icmp eq %Word8 %1, %26
+	br %Bool %27 , label %then_4, label %else_4
 then_4:
 	; CSR read & clear bit
-	%25 = bitcast %hart_Hart* %hart to %hart_Hart*
-	call void @csr_rc(%hart_Hart* %25, %Nat16 %7, %Nat8 %5, %Nat8 %6)
+	%28 = bitcast %hart_Hart* %hart to %hart_Hart*
+	call void @csr_rc(%hart_Hart* %28, %Nat16 %7, %Nat8 %5, %Nat8 %6)
 	br label %endif_4
 else_4:
 ; if_5
-	%26 = bitcast i8 4 to %Word8
-	%27 = icmp eq %Word8 %1, %26
-	br %Bool %27 , label %then_5, label %else_5
+	%29 = bitcast i8 4 to %Word8
+	%30 = icmp eq %Word8 %1, %29
+	br %Bool %30 , label %then_5, label %else_5
 then_5:
-	%28 = bitcast %hart_Hart* %hart to %hart_Hart*
-	call void @csr_rwi(%hart_Hart* %28, %Nat16 %7, %Nat8 %5, %Nat8 %6)
+	%31 = bitcast %hart_Hart* %hart to %hart_Hart*
+	call void @csr_rwi(%hart_Hart* %31, %Nat16 %7, %Nat8 %5, %Nat8 %6)
 	br label %endif_5
 else_5:
 ; if_6
-	%29 = bitcast i8 5 to %Word8
-	%30 = icmp eq %Word8 %1, %29
-	br %Bool %30 , label %then_6, label %else_6
+	%32 = bitcast i8 5 to %Word8
+	%33 = icmp eq %Word8 %1, %32
+	br %Bool %33 , label %then_6, label %else_6
 then_6:
-	%31 = bitcast %hart_Hart* %hart to %hart_Hart*
-	call void @csr_rsi(%hart_Hart* %31, %Nat16 %7, %Nat8 %5, %Nat8 %6)
+	%34 = bitcast %hart_Hart* %hart to %hart_Hart*
+	call void @csr_rsi(%hart_Hart* %34, %Nat16 %7, %Nat8 %5, %Nat8 %6)
 	br label %endif_6
 else_6:
 ; if_7
-	%32 = bitcast i8 6 to %Word8
-	%33 = icmp eq %Word8 %1, %32
-	br %Bool %33 , label %then_7, label %else_7
+	%35 = bitcast i8 6 to %Word8
+	%36 = icmp eq %Word8 %1, %35
+	br %Bool %36 , label %then_7, label %else_7
 then_7:
-	%34 = bitcast %hart_Hart* %hart to %hart_Hart*
-	call void @csr_rci(%hart_Hart* %34, %Nat16 %7, %Nat8 %5, %Nat8 %6)
+	%37 = bitcast %hart_Hart* %hart to %hart_Hart*
+	call void @csr_rci(%hart_Hart* %37, %Nat16 %7, %Nat8 %5, %Nat8 %6)
 	br label %endif_7
 else_7:
-	%35 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
-	%36 = load %Nat32, %Nat32* %35
-	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %36, %Str8* bitcast ([34 x i8]* @str53 to [0 x i8]*), %Word32 %instr)
-	%37 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
-	store %Bool 1, %Bool* %37
+	%38 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%39 = load %Nat32, %Nat32* %38
+	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %39, %Str8* bitcast ([34 x i8]* @str53 to [0 x i8]*), %Word32 %instr)
+	%40 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
+	store %Bool 1, %Bool* %40
 	br label %endif_7
 endif_7:
 	br label %endif_6
@@ -2025,59 +2031,110 @@ endif_0:
 	ret void
 }
 
-define void @hart_irq(%hart_Hart* %hart, %Word32 %irq) {
-; if_0
-	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
-	%2 = zext i8 0 to %Word32
-	%3 = load %Word32, %Word32* %1
-	%4 = icmp eq %Word32 %3, %2
-	br %Bool %4 , label %then_0, label %endif_0
-then_0:
-	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
-	store %Word32 %irq, %Word32* %5
-	br label %endif_0
-endif_0:
-	ret void
-}
-
 define internal void @csr_rw(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
 	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%2 = zext %Nat8 %rs1 to %Nat32
 	%3 = getelementptr [32 x %Word32], [32 x %Word32]* %1, %Int32 0, %Nat32 %2
 	%4 = load %Word32, %Word32* %3
+	; Machine Trap Setup
 ; if_0
-	%5 = icmp eq %Nat16 %csr, 832
+	%5 = icmp eq %Nat16 %csr, 768
 	br %Bool %5 , label %then_0, label %else_0
 then_0:
-	; mscratch
+	; mstatus (Machine status register)
 	br label %endif_0
 else_0:
 ; if_1
-	%6 = icmp eq %Nat16 %csr, 833
+	%6 = icmp eq %Nat16 %csr, 769
 	br %Bool %6 , label %then_1, label %else_1
 then_1:
-	; mepc
+	; misa (ISA and extensions)
 	br label %endif_1
 else_1:
 ; if_2
-	%7 = icmp eq %Nat16 %csr, 834
+	%7 = icmp eq %Nat16 %csr, 770
 	br %Bool %7 , label %then_2, label %else_2
 then_2:
-	; mcause
+	; medeleg (Machine exception delegation register)
 	br label %endif_2
 else_2:
 ; if_3
-	%8 = icmp eq %Nat16 %csr, 835
+	%8 = icmp eq %Nat16 %csr, 771
 	br %Bool %8 , label %then_3, label %else_3
 then_3:
-	; mbadaddr
+	; mideleg (Machine interrupt delegation register)
 	br label %endif_3
 else_3:
 ; if_4
-	%9 = icmp eq %Nat16 %csr, 836
-	br %Bool %9 , label %then_4, label %endif_4
+	%9 = icmp eq %Nat16 %csr, 772
+	br %Bool %9 , label %then_4, label %else_4
 then_4:
+	; mie (Machine interrupt-enable register)
+	br label %endif_4
+else_4:
+; if_5
+	%10 = icmp eq %Nat16 %csr, 773
+	br %Bool %10 , label %then_5, label %else_5
+then_5:
+	; mtvec (Machine trap-handler base address)
+	br label %endif_5
+else_5:
+; if_6
+	%11 = icmp eq %Nat16 %csr, 774
+	br %Bool %11 , label %then_6, label %else_6
+then_6:
+	; mcounteren (Machine counter enable)
+
+	; Machine Trap Handling
+	br label %endif_6
+else_6:
+; if_7
+	%12 = icmp eq %Nat16 %csr, 832
+	br %Bool %12 , label %then_7, label %else_7
+then_7:
+	; mscratch
+	br label %endif_7
+else_7:
+; if_8
+	%13 = icmp eq %Nat16 %csr, 833
+	br %Bool %13 , label %then_8, label %else_8
+then_8:
+	; mepc
+	br label %endif_8
+else_8:
+; if_9
+	%14 = icmp eq %Nat16 %csr, 834
+	br %Bool %14 , label %then_9, label %else_9
+then_9:
+	; mcause
+	br label %endif_9
+else_9:
+; if_10
+	%15 = icmp eq %Nat16 %csr, 835
+	br %Bool %15 , label %then_10, label %else_10
+then_10:
+	; mbadaddr
+	br label %endif_10
+else_10:
+; if_11
+	%16 = icmp eq %Nat16 %csr, 836
+	br %Bool %16 , label %then_11, label %endif_11
+then_11:
 	; mip (machine interrupt pending)
+	br label %endif_11
+endif_11:
+	br label %endif_10
+endif_10:
+	br label %endif_9
+endif_9:
+	br label %endif_8
+endif_8:
+	br label %endif_7
+endif_7:
+	br label %endif_6
+endif_6:
+	br label %endif_5
+endif_5:
 	br label %endif_4
 endif_4:
 	br label %endif_3

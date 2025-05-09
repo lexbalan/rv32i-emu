@@ -45,7 +45,7 @@ void hart_init(hart_Hart *hart, hart_BusInterface *bus)
 	};
 }
 
-static uint32_t fetch(hart_Hart *hart)
+static inline uint32_t fetch(hart_Hart *hart)
 {
 	return hart->bus->read32(hart->pc);
 }
@@ -55,11 +55,11 @@ static void trace(uint32_t pc, char *form, ...);
 static void exec(hart_Hart *hart, uint32_t instr);
 void hart_tick(hart_Hart *hart)
 {
-	if (hart->interrupt != 0) {
-		trace(hart->pc, "\nINT #%02X\n", hart->interrupt);
-		const uint32_t vect_offset = hart->interrupt * 4;
+	if (hart->irq != 0) {
+		trace(hart->pc, "\nINT #%02X\n", hart->irq);
+		const uint32_t vect_offset = hart->irq * 4;
 		hart->pc = vect_offset;
-		hart->interrupt = 0;
+		hart->irq = 0;
 	}
 
 	const uint32_t instr = fetch(hart);
@@ -580,7 +580,6 @@ static void execS(hart_Hart *hart, uint32_t instr)
 }
 
 
-void hart_irq(hart_Hart *hart, uint32_t irq);
 static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1);
 static void csr_rs(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1);
 static void csr_rc(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1);
@@ -599,12 +598,12 @@ static void execSystem(hart_Hart *hart, uint32_t instr)
 	const uint16_t csr = (uint16_t)imm12;
 
 	if (instr == instrECALL) {
-		trace(hart->pc, "ECALL\n");
+		trace(hart->pc, "ecall\n");
 
 		//
-		hart_irq(hart, hart_intSysCall);
+		hart->irq = hart->irq | hart_intSysCall;
 	} else if (instr == instrEBREAK) {
-		trace(hart->pc, "EBREAK\n");
+		trace(hart->pc, "ebreak\n");
 
 		//
 		printf("END.\n");
@@ -644,13 +643,6 @@ static void execFence(hart_Hart *hart, uint32_t instr)
 	}
 }
 
-void hart_irq(hart_Hart *hart, uint32_t irq)
-{
-	if (hart->interrupt == 0) {
-		hart->interrupt = irq;
-	}
-}
-
 #define mstatus_adr  0x300
 #define misa_adr  0x301
 #define mie_adr  0x304
@@ -670,7 +662,24 @@ void hart_irq(hart_Hart *hart, uint32_t irq)
 static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	const uint32_t nv = hart->reg[rs1];
-	if (csr == 0x340) {
+	// Machine Trap Setup
+	if (csr == 0x300) {
+		// mstatus (Machine status register)
+	} else if (csr == 0x301) {
+		// misa (ISA and extensions)
+	} else if (csr == 0x302) {
+		// medeleg (Machine exception delegation register)
+	} else if (csr == 0x303) {
+		// mideleg (Machine interrupt delegation register)
+	} else if (csr == 0x304) {
+		// mie (Machine interrupt-enable register)
+	} else if (csr == 0x305) {
+		// mtvec (Machine trap-handler base address)
+	} else if (csr == 0x306) {
+		// mcounteren (Machine counter enable)
+
+		// Machine Trap Handling
+	} else if (csr == 0x340) {
 		// mscratch
 	} else if (csr == 0x341) {
 		// mepc
