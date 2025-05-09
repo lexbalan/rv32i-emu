@@ -662,7 +662,7 @@ static void execFence(hart_Hart *hart, uint32_t instr)
 static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	const uint32_t nv = hart->reg[rs1];
-	// Machine Trap Setup
+
 	if (csr == 0x300) {
 		// mstatus (Machine status register)
 	} else if (csr == 0x301) {
@@ -677,8 +677,6 @@ static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 		// mtvec (Machine trap-handler base address)
 	} else if (csr == 0x306) {
 		// mcounteren (Machine counter enable)
-
-		// Machine Trap Handling
 	} else if (csr == 0x340) {
 		// mscratch
 	} else if (csr == 0x341) {
@@ -699,7 +697,6 @@ static void csr_rc(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1)
 {
 	//TODO
 }
-
 static void csr_rwi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm)
 {
 	//TODO

@@ -2036,7 +2036,6 @@ define internal void @csr_rw(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %r
 	%2 = zext %Nat8 %rs1 to %Nat32
 	%3 = getelementptr [32 x %Word32], [32 x %Word32]* %1, %Int32 0, %Nat32 %2
 	%4 = load %Word32, %Word32* %3
-	; Machine Trap Setup
 ; if_0
 	%5 = icmp eq %Nat16 %csr, 768
 	br %Bool %5 , label %then_0, label %else_0
@@ -2084,8 +2083,6 @@ else_5:
 	br %Bool %11 , label %then_6, label %else_6
 then_6:
 	; mcounteren (Machine counter enable)
-
-	; Machine Trap Handling
 	br label %endif_6
 else_6:
 ; if_7

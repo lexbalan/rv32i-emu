@@ -667,7 +667,7 @@ const stval_adr = 0x143
 const sip_adr = 0x144
 func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	let nv: Word32 = hart.reg[rs1]
-	// Machine Trap Setup
+
 	if csr == Nat16 0x300 {
 		// mstatus (Machine status register)
 	} else if csr == Nat16 0x301 {
@@ -682,8 +682,6 @@ func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 		// mtvec (Machine trap-handler base address)
 	} else if csr == Nat16 0x306 {
 		// mcounteren (Machine counter enable)
-
-		// Machine Trap Handling
 	} else if csr == Nat16 0x340 {
 		// mscratch
 	} else if csr == Nat16 0x341 {
@@ -702,8 +700,6 @@ func csr_rs (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 func csr_rc (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
-
-
 func csr_rwi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }

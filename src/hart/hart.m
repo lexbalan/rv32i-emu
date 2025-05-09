@@ -691,7 +691,7 @@ func execFence (hart: *Hart, instr: Word32) -> Unit {
 
 //
 // CSR's
-//https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
+// see: https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
 //
 
 
@@ -720,7 +720,7 @@ The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSR
 */
 func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	let nv = hart.reg[rs1]
-	// Machine Trap Setup
+
 	if csr == Nat16 0x300 {
 		// mstatus (Machine status register)
 	} else if csr == Nat16 0x301 {
@@ -736,7 +736,6 @@ func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	} else if csr == Nat16 0x306 {
 		// mcounteren (Machine counter enable)
 
-	// Machine Trap Handling
 	} else if csr == Nat16 0x340 {
 		// mscratch
 	} else if csr == Nat16 0x341 {
@@ -767,8 +766,6 @@ func csr_rc (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 
 
 // -
-
-
 func csr_rwi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
