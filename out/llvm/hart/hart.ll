@@ -144,7 +144,9 @@ break_2:
 %GIDT = type %Nat32;
 ; from included ctypes
 ; from included stdio
-%File = type %Nat8;
+%File = type {
+};
+
 %FposT = type %Nat8;
 %CharStr = type %Str;
 %ConstCharStr = type %CharStr;
@@ -369,7 +371,8 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 @str58 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
 @str59 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
 @str60 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
-; -- endstrings --
+; -- endstrings --;
+;
 %hart_Hart = type {
 	[32 x %Word32],
 	%Nat32,
@@ -388,7 +391,10 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 	void (%Nat32, %Word16)*,
 	void (%Nat32, %Word32)*
 };
+; load; immediate; store; reg; branch; load upper immediate; add upper immediate to PC; jump and link; jump and link by register;;
 
+
+; funct3 for CSR
 define void @hart_init(%hart_Hart* %hart, %hart_BusInterface* %bus) {
 	%1 = bitcast %hart_BusInterface* %bus to %hart_BusInterface*
 	%2 = insertvalue %hart_Hart zeroinitializer, %hart_BusInterface* %1, 3
@@ -2031,6 +2037,18 @@ endif_0:
 	ret void
 }
 
+
+
+
+;
+; CSR's
+; see: https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
+;
+
+
+;
+;The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
+;
 define internal void @csr_rw(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
 	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%2 = zext %Nat8 %rs1 to %Nat32
@@ -2145,26 +2163,44 @@ endif_0:
 	ret void
 }
 
+
+
+;
+;The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
+;
 define internal void @csr_rs(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
 	;TODO
 	ret void
 }
 
+
+;
+;The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
+;
 define internal void @csr_rc(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
 	;TODO
 	ret void
 }
 
+
+
+; -
 define internal void @csr_rwi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
 	ret void
 }
 
+
+
+; read+clear immediate(5-bit)
 define internal void @csr_rsi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
 	ret void
 }
 
+
+
+; read+clear immediate(5-bit)
 define internal void @csr_rci(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
 	ret void
@@ -2202,33 +2238,35 @@ define internal void @notImplemented(%Str8* %form, ...) {
 }
 
 define void @hart_show_regs(%hart_Hart* %hart) {
-	%1 = alloca %Int32, align 4
-	store %Int32 0, %Int32* %1
+	%1 = alloca %Nat16, align 2
+	store %Nat16 0, %Nat16* %1
 ; while_1
 	br label %again_1
 again_1:
-	%2 = load %Int32, %Int32* %1
-	%3 = icmp slt %Int32 %2, 16
+	%2 = load %Nat16, %Nat16* %1
+	%3 = icmp ult %Nat16 %2, 16
 	br %Bool %3 , label %body_1, label %break_1
 body_1:
-	%4 = load %Int32, %Int32* %1
-	%5 = load %Int32, %Int32* %1
+	%4 = load %Nat16, %Nat16* %1
+	%5 = load %Nat16, %Nat16* %1
 	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
-	%7 = getelementptr [32 x %Word32], [32 x %Word32]* %6, %Int32 0, %Int32 %5
-	%8 = load %Word32, %Word32* %7
-	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str58 to [0 x i8]*), %Int32 %4, %Word32 %8)
-	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str59 to [0 x i8]*))
-	%11 = load %Int32, %Int32* %1
-	%12 = add %Int32 %11, 16
-	%13 = load %Int32, %Int32* %1
-	%14 = add %Int32 %13, 16
-	%15 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
-	%16 = getelementptr [32 x %Word32], [32 x %Word32]* %15, %Int32 0, %Int32 %14
-	%17 = load %Word32, %Word32* %16
-	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([16 x i8]* @str60 to [0 x i8]*), %Int32 %12, %Word32 %17)
-	%19 = load %Int32, %Int32* %1
-	%20 = add %Int32 %19, 1
-	store %Int32 %20, %Int32* %1
+	%7 = zext %Nat16 %5 to %Nat32
+	%8 = getelementptr [32 x %Word32], [32 x %Word32]* %6, %Int32 0, %Nat32 %7
+	%9 = load %Word32, %Word32* %8
+	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str58 to [0 x i8]*), %Nat16 %4, %Word32 %9)
+	%11 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str59 to [0 x i8]*))
+	%12 = load %Nat16, %Nat16* %1
+	%13 = add %Nat16 %12, 16
+	%14 = load %Nat16, %Nat16* %1
+	%15 = add %Nat16 %14, 16
+	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%17 = zext %Nat16 %15 to %Nat32
+	%18 = getelementptr [32 x %Word32], [32 x %Word32]* %16, %Int32 0, %Nat32 %17
+	%19 = load %Word32, %Word32* %18
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([16 x i8]* @str60 to [0 x i8]*), %Nat16 %13, %Word32 %19)
+	%21 = load %Nat16, %Nat16* %1
+	%22 = add %Nat16 %21, 1
+	store %Nat16 %22, %Nat16* %1
 	br label %again_1
 break_1:
 	ret void

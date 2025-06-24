@@ -16,6 +16,11 @@ const showText: Bool = false
 var hart: Hart
 
 
+//public func mem_violation_event(reason: Nat32) {
+//	hart.irq(&hart, rvHart.intMemViolation)
+//}
+
+
 public func main () -> Int {
 	printf("RISC-V VM\n")
 
@@ -71,7 +76,7 @@ func loader (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 	if showText {
 		var i = SizeT 0
 		while i < (n / 4) {
-			printf("%08zx: 0x%08x\n", i, (*[]Nat32 bufptr)[i])
+			printf("%08zx: 0x%08x\n", i, (unsafe *[]Nat32 bufptr)[i])
 			i = i + 4
 		}
 
@@ -80,17 +85,17 @@ func loader (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 
 	fclose(fp)
 
-	return Nat32 n
+	return unsafe Nat32 n
 }
 
 
 func show_mem () -> Unit {
-	var i: Int32 = 0
+	var i = Nat32 0
 	let ramptr: *[]Word8 = mem.get_ram_ptr()
 	while i < 256 {
 		printf("%08X", i * 16)
 
-		var j: Int32 = 0
+		var j = Nat32 0
 		while j < 16 {
 			printf(" %02X", ramptr[i + j])
 			j = j + 1

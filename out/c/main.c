@@ -1,4 +1,5 @@
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -14,11 +15,14 @@
 
 static hart_Hart hart;
 
+//public func mem_violation_event(reason: Nat32) {
+//	hart.irq(&hart, rvHart.intMemViolation)
+//}
+
 
 static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
 static void show_mem();
-int main()
-{
+int main() {
 	printf("RISC-V VM\n");
 
 	hart_BusInterface memctl = (hart_BusInterface){
@@ -55,8 +59,7 @@ int main()
 	return 0;
 }
 
-static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
-{
+static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size) {
 	printf("LOAD: %s\n", filename);
 
 	FILE *const fp = fopen(filename, "rb");
@@ -85,14 +88,13 @@ static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size)
 	return (uint32_t)n;
 }
 
-static void show_mem()
-{
-	int32_t i = 0;
+static void show_mem() {
+	uint32_t i = 0;
 	uint8_t *const ramptr = mem_get_ram_ptr();
 	while (i < 256) {
 		printf("%08X", i * 16);
 
-		int32_t j = 0;
+		uint32_t j = 0;
 		while (j < 16) {
 			printf(" %02X", ramptr[i + j]);
 			j = j + 1;

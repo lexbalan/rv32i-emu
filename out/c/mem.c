@@ -1,4 +1,7 @@
+//
+//
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -8,6 +11,8 @@
 #include "mem.h"
 
 
+// see mem.ld
+
 #define mmioSize  (0xFFFF)
 #define mmioStart  (0xF00C0000)
 #define mmioEnd  (mmioStart + mmioSize)
@@ -15,19 +20,16 @@
 static uint8_t rom[mem_romSize];
 static uint8_t ram[mem_ramSize];
 
-uint8_t *mem_get_ram_ptr()
-{
+uint8_t *mem_get_ram_ptr() {
 	return (uint8_t *)&ram;
 }
 
-uint8_t *mem_get_rom_ptr()
-{
+uint8_t *mem_get_rom_ptr() {
 	return (uint8_t *)&rom;
 }
 
 static uint32_t memviolationCnt = 0;
-static void memoryViolation(char rw, uint32_t adr)
-{
+static void memoryViolation(char rw, uint32_t adr) {
 	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
 	if (memviolationCnt > 10) {
 		exit(1);
@@ -36,13 +38,11 @@ static void memoryViolation(char rw, uint32_t adr)
 	//	memoryViolation_event(0x55) // !
 }
 
-static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b)
-{
+static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b) {
 	return x >= a && x < b;
 }
 
-uint8_t mem_read8(uint32_t adr)
-{
+uint8_t mem_read8(uint32_t adr) {
 	uint8_t x = 0;
 
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
@@ -63,8 +63,7 @@ uint8_t mem_read8(uint32_t adr)
 	return x;
 }
 
-uint16_t mem_read16(uint32_t adr)
-{
+uint16_t mem_read16(uint32_t adr) {
 	uint16_t x = 0;
 
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
@@ -83,8 +82,7 @@ uint16_t mem_read16(uint32_t adr)
 	return x;
 }
 
-uint32_t mem_read32(uint32_t adr)
-{
+uint32_t mem_read32(uint32_t adr) {
 	uint32_t x = 0;
 
 	if (isAdressInRange(adr, mem_romStart, mem_romEnd)) {
@@ -104,8 +102,7 @@ uint32_t mem_read32(uint32_t adr)
 	return x;
 }
 
-void mem_write8(uint32_t adr, uint8_t value)
-{
+void mem_write8(uint32_t adr, uint8_t value) {
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint8_t *const ptr = (uint8_t *)&ram[adr - mem_ramStart];
 		*ptr = value;
@@ -116,8 +113,7 @@ void mem_write8(uint32_t adr, uint8_t value)
 	}
 }
 
-void mem_write16(uint32_t adr, uint16_t value)
-{
+void mem_write16(uint32_t adr, uint16_t value) {
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint16_t *const ptr = (uint16_t *)&ram[adr - mem_ramStart];
 		*ptr = value;
@@ -128,8 +124,7 @@ void mem_write16(uint32_t adr, uint16_t value)
 	}
 }
 
-void mem_write32(uint32_t adr, uint32_t value)
-{
+void mem_write32(uint32_t adr, uint32_t value) {
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint32_t *const ptr = (uint32_t *)&ram[adr - mem_ramStart];
 		*ptr = value;

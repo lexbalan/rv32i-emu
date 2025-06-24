@@ -1,8 +1,12 @@
 import "mmio"
 include "stdio"
 include "stdlib"
-
+//
+//
 import "mmio" as mmio
+
+
+// see mem.ld
 public const ramSize: Nat32 = Nat32 1024 * 16
 public const ramStart = Nat32 0x10000000
 public const ramEnd: Nat32 = ramStart + ramSize

@@ -156,7 +156,9 @@ declare %Str* @secure_getenv(%Str* %name)
 declare i8* @malloc(%SizeT %size)
 declare %Int @system([0 x %ConstChar]* %string)
 ; from included stdio
-%File = type %Nat8;
+%File = type {
+};
+
 %FposT = type %Nat8;
 %CharStr = type %Str;
 %ConstCharStr = type %CharStr;
@@ -371,6 +373,11 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 @str15 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
 @hart = internal global %hart_Hart zeroinitializer
+
+
+;public func mem_violation_event(reason: Nat32) {
+;	hart.irq(&hart, rvHart.intMemViolation)
+;}
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
 	%2 = alloca %hart_BusInterface, align 64
@@ -427,79 +434,82 @@ then_0:
 endif_0:
 	%6 = bitcast [0 x %Word8]* %bufptr to i8*
 	%7 = zext %Nat32 %buf_size to %SizeT
-	%8 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %2)
-	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str10 to [0 x i8]*), %SizeT %8)
+	%8 = bitcast %File* %2 to %File*
+	%9 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %8)
+	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str10 to [0 x i8]*), %SizeT %9)
 ; if_1
 	br %Bool 0 , label %then_1, label %endif_1
 then_1:
-	%10 = alloca %SizeT, align 8
-	store %SizeT 0, %SizeT* %10
+	%11 = alloca %SizeT, align 8
+	store %SizeT 0, %SizeT* %11
 ; while_1
 	br label %again_1
 again_1:
-	%11 = udiv %SizeT %8, 4
-	%12 = load %SizeT, %SizeT* %10
-	%13 = icmp ult %SizeT %12, %11
-	br %Bool %13 , label %body_1, label %break_1
+	%12 = udiv %SizeT %9, 4
+	%13 = load %SizeT, %SizeT* %11
+	%14 = icmp ult %SizeT %13, %12
+	br %Bool %14 , label %body_1, label %break_1
 body_1:
-	%14 = load %SizeT, %SizeT* %10
-	%15 = load %SizeT, %SizeT* %10
-	%16 = bitcast [0 x %Word8]* %bufptr to [0 x %Nat32]*
-	%17 = trunc %SizeT %15 to %Nat32
-	%18 = getelementptr [0 x %Nat32], [0 x %Nat32]* %16, %Int32 0, %Nat32 %17
-	%19 = load %Nat32, %Nat32* %18
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %14, %Nat32 %19)
-	%21 = load %SizeT, %SizeT* %10
-	%22 = add %SizeT %21, 4
-	store %SizeT %22, %SizeT* %10
+	%15 = load %SizeT, %SizeT* %11
+	%16 = load %SizeT, %SizeT* %11
+	%17 = bitcast [0 x %Word8]* %bufptr to [0 x %Nat32]*
+	%18 = trunc %SizeT %16 to %Nat32
+	%19 = getelementptr [0 x %Nat32], [0 x %Nat32]* %17, %Int32 0, %Nat32 %18
+	%20 = load %Nat32, %Nat32* %19
+	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %15, %Nat32 %20)
+	%22 = load %SizeT, %SizeT* %11
+	%23 = add %SizeT %22, 4
+	store %SizeT %23, %SizeT* %11
 	br label %again_1
 break_1:
-	%23 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str12 to [0 x i8]*))
+	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str12 to [0 x i8]*))
 	br label %endif_1
 endif_1:
-	%24 = call %Int @fclose(%File* %2)
-	%25 = trunc %SizeT %8 to %Nat32
-	ret %Nat32 %25
+	%25 = bitcast %File* %2 to %File*
+	%26 = call %Int @fclose(%File* %25)
+	%27 = trunc %SizeT %9 to %Nat32
+	ret %Nat32 %27
 }
 
 define internal void @show_mem() {
-	%1 = alloca %Int32, align 4
-	store %Int32 0, %Int32* %1
+	%1 = alloca %Nat32, align 4
+	store %Nat32 0, %Nat32* %1
 	%2 = call [0 x %Word8]* @mem_get_ram_ptr()
 ; while_1
 	br label %again_1
 again_1:
-	%3 = load %Int32, %Int32* %1
-	%4 = icmp slt %Int32 %3, 256
+	%3 = load %Nat32, %Nat32* %1
+	%4 = icmp ult %Nat32 %3, 256
 	br %Bool %4 , label %body_1, label %break_1
 body_1:
-	%5 = load %Int32, %Int32* %1
-	%6 = mul %Int32 %5, 16
-	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str13 to [0 x i8]*), %Int32 %6)
-	%8 = alloca %Int32, align 4
-	store %Int32 0, %Int32* %8
+	%5 = load %Nat32, %Nat32* %1
+	%6 = mul %Nat32 %5, 16
+	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str13 to [0 x i8]*), %Nat32 %6)
+	%8 = alloca %Nat32, align 4
+	store %Nat32 0, %Nat32* %8
 ; while_2
 	br label %again_2
 again_2:
-	%9 = load %Int32, %Int32* %8
-	%10 = icmp slt %Int32 %9, 16
+	%9 = load %Nat32, %Nat32* %8
+	%10 = icmp ult %Nat32 %9, 16
 	br %Bool %10 , label %body_2, label %break_2
 body_2:
-	%11 = load %Int32, %Int32* %1
-	%12 = load %Int32, %Int32* %8
-	%13 = add %Int32 %11, %12
-	%14 = getelementptr [0 x %Word8], [0 x %Word8]* %2, %Int32 0, %Int32 %13
-	%15 = load %Word8, %Word8* %14
-	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str14 to [0 x i8]*), %Word8 %15)
-	%17 = load %Int32, %Int32* %8
-	%18 = add %Int32 %17, 1
-	store %Int32 %18, %Int32* %8
+	%11 = load %Nat32, %Nat32* %1
+	%12 = load %Nat32, %Nat32* %8
+	%13 = add %Nat32 %11, %12
+	%14 = bitcast %Nat32 %13 to %Nat32
+	%15 = getelementptr [0 x %Word8], [0 x %Word8]* %2, %Int32 0, %Nat32 %14
+	%16 = load %Word8, %Word8* %15
+	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str14 to [0 x i8]*), %Word8 %16)
+	%18 = load %Nat32, %Nat32* %8
+	%19 = add %Nat32 %18, 1
+	store %Nat32 %19, %Nat32* %8
 	br label %again_2
 break_2:
-	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str15 to [0 x i8]*))
-	%20 = load %Int32, %Int32* %1
-	%21 = add %Int32 %20, 16
-	store %Int32 %21, %Int32* %1
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str15 to [0 x i8]*))
+	%21 = load %Nat32, %Nat32* %1
+	%22 = add %Nat32 %21, 16
+	store %Nat32 %22, %Nat32* %1
 	br label %again_1
 break_1:
 	ret void

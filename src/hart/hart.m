@@ -12,7 +12,7 @@ include "decode"
 const traceMode = false
 
 
-public type Hart record {
+public type Hart = record {
 	reg: [32]Word32
 	pc, nexpc: Nat32
 
@@ -25,7 +25,7 @@ public type Hart record {
 }
 
 
-public type BusInterface record {
+public type BusInterface = record {
 	public read8: *(adr: Nat32) -> Word8
 	public read16: *(adr: Nat32) -> Word16
 	public read32: *(adr: Nat32) -> Word32
@@ -807,7 +807,7 @@ func notImplemented (form: *Str8, ...) -> Unit {
 
 
 public func show_regs (hart: *Hart) -> Unit {
-	var i = 0
+	var i = Nat16 0
 	while i < 16 {
 	printf("x%02d = 0x%08x", i, hart.reg[i])
 	printf("    ")

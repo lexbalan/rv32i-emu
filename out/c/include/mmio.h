@@ -2,11 +2,11 @@
 #ifndef MMIO_H
 #define MMIO_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #include <stdio.h>
-
 
 void mmio_write8(uint32_t adr, uint8_t value);
 

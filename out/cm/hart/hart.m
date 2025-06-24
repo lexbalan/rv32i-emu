@@ -3,13 +3,14 @@ include "stdio"
 include "unistd"
 include "stdlib"
 include "decode"
-
+//
+//
 
 
 const traceMode: Bool = false
 
 
-public type Hart record {
+public type Hart = record {
 	reg: [32]Word32
 	pc: Nat32
 	nexpc: Nat32
@@ -23,7 +24,7 @@ public type Hart record {
 }
 
 
-public type BusInterface record {
+public type BusInterface = record {
 	public read8: *(adr: Nat32) -> Word8
 	public read16: *(adr: Nat32) -> Word16
 	public read32: *(adr: Nat32) -> Word32
@@ -34,24 +35,27 @@ public type BusInterface record {
 }
 
 
-const opL = 0x03
-const opI = 0x13
-const opS = 0x23
-const opR = 0x33
-const opB = 0x63
+const opL = 0x03// load
+const opI = 0x13// immediate
+const opS = 0x23// store
+const opR = 0x33// reg
+const opB = 0x63// branch
 
-const opLUI = 0x37
-const opAUIPC = 0x17
-const opJAL = 0x6F
-const opJALR = 0x67
+const opLUI = 0x37// load upper immediate
+const opAUIPC = 0x17// add upper immediate to PC
+const opJAL = 0x6F// jump and link
+const opJALR = 0x67// jump and link by register
 
-const opSYSTEM = 0x73
-const opFENCE = 0x0F
+const opSYSTEM = 0x73//
+const opFENCE = 0x0F//
 
 
 const instrECALL = opSYSTEM or 0x00000000
 const instrEBREAK = opSYSTEM or 0x00100000
 const instrPAUSE = opFENCE or 0x01000000
+
+
+// funct3 for CSR
 const funct3_CSRRW = 1
 const funct3_CSRRS = 2
 const funct3_CSRRC = 3
@@ -154,7 +158,7 @@ func execI (hart: *Hart, instr: Word32) -> Unit {
 		trace(hart.pc, "slli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		hart.reg[rd] = hart.reg[rs1] << Nat8 imm
+		hart.reg[rd] = hart.reg[rs1] << unsafe Nat8 imm
 	} else if funct3 == 2 {
 		// SLTI - set [1 to rd if rs1] less than immediate
 
@@ -176,12 +180,12 @@ func execI (hart: *Hart, instr: Word32) -> Unit {
 		trace(hart.pc, "srli x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		hart.reg[rd] = (hart.reg[rs1] >> Nat8 imm)
+		hart.reg[rd] = (hart.reg[rs1] >> unsafe Nat8 imm)
 	} else if funct3 == 5 and funct7 == 0x20 {
 		trace(hart.pc, "srai x%d, x%d, %d\n", rd, rs1, imm)
 
 		//
-		hart.reg[rd] = hart.reg[rs1] >> Nat8 imm
+		hart.reg[rd] = hart.reg[rs1] >> unsafe Nat8 imm
 	} else if funct3 == 6 {
 		trace(hart.pc, "ori x%d, x%d, %d\n", rd, rs1, imm)
 
@@ -234,7 +238,7 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 			// которые бы не поместились в него при обычном умножении
 			trace(hart.pc, "mulh x%d, x%d, x%d\n", rd, rs1, rs2)
 
-			hart.reg[rd] = Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
+			hart.reg[rd] = unsafe Word32 (unsafe Word64 (unsafe Int64 v0 * unsafe Int64 v1) >> 32)
 		} else if funct3 == 2 {
 			// MULHSU rd, rs1, rs2
 			// mul high signed unsigned
@@ -292,7 +296,7 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 		trace(hart.pc, "sll x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
-		hart.reg[rd] = v0 << Nat8 v1
+		hart.reg[rd] = v0 << unsafe Nat8 v1
 	} else if funct3 == 2 {
 		// set less than
 
@@ -318,7 +322,7 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 
 		trace(hart.pc, "srl x%d, x%d, x%d\n", rd, rs1, rs2)
 
-		hart.reg[rd] = v0 >> Nat8 v1
+		hart.reg[rd] = v0 >> unsafe Nat8 v1
 	} else if funct3 == 5 and funct7 == 0x20 {
 		// shift right arithmetical
 
@@ -556,7 +560,7 @@ func execS (hart: *Hart, instr: Word32) -> Unit {
 
 	let imm4to0 = Nat32 rd
 	let imm11to5 = Nat32 funct7
-	let _imm: Word32 = (Word32 imm11to5 << 5) or Word32 imm4to0
+	let _imm: Word32 = (unsafe Word32 imm11to5 << 5) or unsafe Word32 imm4to0
 	let imm: Int32 = expand12(_imm)
 
 	let adr = Nat32 Word32 (Int32 hart.reg[rs1] + imm)
@@ -569,7 +573,7 @@ func execS (hart: *Hart, instr: Word32) -> Unit {
 		trace(hart.pc, "sb x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
-		hart.bus.write8(adr, Word8 val)
+		hart.bus.write8(adr, unsafe Word8 val)
 	} else if funct3 == 1 {
 		// SH (save 16-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
@@ -577,7 +581,7 @@ func execS (hart: *Hart, instr: Word32) -> Unit {
 		trace(hart.pc, "sh x%d, %d(x%d)\n", rs2, imm, rs1)
 
 		//
-		hart.bus.write16(adr, Word16 val)
+		hart.bus.write16(adr, unsafe Word16 val)
 	} else if funct3 == 2 {
 		// SW (save 32-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
@@ -598,7 +602,7 @@ func execSystem (hart: *Hart, instr: Word32) -> Unit {
 	let rd: Nat8 = extract_rd(instr)
 	let rs1: Nat8 = extract_rs1(instr)
 
-	let csr: Nat16 = Nat16 imm12
+	let csr: Nat16 = unsafe Nat16 imm12
 
 	if instr == instrECALL {
 		trace(hart.pc, "ecall\n")
@@ -648,6 +652,13 @@ func execFence (hart: *Hart, instr: Word32) -> Unit {
 
 
 
+//
+// CSR's
+// see: https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
+//
+
+
+
 const mstatus_adr = 0x300
 const misa_adr = 0x301
 const mie_adr = 0x304
@@ -665,6 +676,11 @@ const stvec_adr = 0x105
 const scause_adr = 0x142
 const stval_adr = 0x143
 const sip_adr = 0x144
+
+
+/*
+The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
+*/
 func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	let nv: Word32 = hart.reg[rs1]
 
@@ -694,18 +710,36 @@ func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 		// mip (machine interrupt pending)
 	}
 }
+
+
+/*
+The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
+*/
 func csr_rs (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
+
+/*
+The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
+*/
 func csr_rc (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	//TODO
 }
+
+
+// -
 func csr_rwi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
+
+
+// read+clear immediate(5-bit)
 func csr_rsi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
+
+
+// read+clear immediate(5-bit)
 func csr_rci (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 	//TODO
 }
@@ -735,7 +769,7 @@ func notImplemented (form: *Str8, ...) -> Unit {
 
 
 public func show_regs (hart: *Hart) -> Unit {
-	var i: Int32 = 0
+	var i = Nat16 0
 	while i < 16 {
 		printf("x%02d = 0x%08x", i, hart.reg[i])
 		printf("    ")

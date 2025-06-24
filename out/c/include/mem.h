@@ -1,14 +1,18 @@
+//
+//
 
 #ifndef MEM_H
 #define MEM_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "mmio.h"
+
+// see mem.ld
 #define mem_ramSize  (1024 * 16)
 #define mem_ramStart  (0x10000000)
 #define mem_ramEnd  (mem_ramStart + mem_ramSize)

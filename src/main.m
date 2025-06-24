@@ -89,12 +89,12 @@ func loader (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 
 
 func show_mem () -> Unit {
-	var i = 0
+	var i = Nat32 0
 	let ramptr = mem.get_ram_ptr()
 	while i < 256 {
 		printf("%08X", i * 16)
 
-		var j = 0
+		var j = Nat32 0
 		while j < 16 {
 			printf(" %02X", ramptr[i + j]);
 			j = j + 1
