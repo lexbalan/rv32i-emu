@@ -718,12 +718,14 @@ static void csr_rci(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm) {
 }
 
 static void trace(uint32_t pc, char *form, ...) {
+	if (!traceMode) {
+		return;
+	}
+
 	va_list va;
 	va_start(va, form);
-	if (traceMode) {
-		printf("[%08X] ", pc);
-		vprintf(form, va);
-	}
+	printf("[%08X] ", pc);
+	vprintf(form, va);
 	va_end(va);
 }
 

@@ -785,12 +785,14 @@ func csr_rci (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
 
 
 func trace (pc: Nat32, form: *Str8, ...) -> Unit {
+	if not traceMode {
+		return
+	}
+
 	var va: __VA_List
 	__va_start(va, form)
-	if traceMode {
-		printf("[%08X] ", pc)
-		vprintf(form, va)
-	}
+	printf("[%08X] ", pc)
+	vprintf(form, va)
 	__va_end(va)
 }
 

@@ -2207,19 +2207,21 @@ define internal void @csr_rci(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %
 }
 
 define internal void @trace(%Nat32 %pc, %Str8* %form, ...) {
-	%1 = alloca %__VA_List, align 1
-	%2 = bitcast %__VA_List* %1 to i8*
-	call void @llvm.va_start(i8* %2)
 ; if_0
-	br %Bool 0 , label %then_0, label %endif_0
+	%1 = xor %Bool 0, 1
+	br %Bool %1 , label %then_0, label %endif_0
 then_0:
-	%3 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str55 to [0 x i8]*), %Nat32 %pc)
-	%4 = load %__VA_List, %__VA_List* %1
-	%5 = call %Int @vprintf(%Str8* %form, %__VA_List %4)
+	ret void
 	br label %endif_0
 endif_0:
-	%6 = bitcast %__VA_List* %1 to i8*
-	call void @llvm.va_end(i8* %6)
+	%3 = alloca %__VA_List, align 1
+	%4 = bitcast %__VA_List* %3 to i8*
+	call void @llvm.va_start(i8* %4)
+	%5 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str55 to [0 x i8]*), %Nat32 %pc)
+	%6 = load %__VA_List, %__VA_List* %3
+	%7 = call %Int @vprintf(%Str8* %form, %__VA_List %6)
+	%8 = bitcast %__VA_List* %3 to i8*
+	call void @llvm.va_end(i8* %8)
 	ret void
 }
 
