@@ -14,8 +14,7 @@ void putchar(char c) {
 	write(0, &c, 1);
 }
 
-void put_str8(char *s)
-{
+void put_str8(char *s) {
 	while (1) {
 		const char c = *s;
 		if (c == 0) {
@@ -31,8 +30,7 @@ char *sprintf_hex32(char *buf, int d);
 char *sprintf_dec32(char *buf, int d);
 
 
-int printf(const char *str, ...)
-{
+int printf(const char *str, ...) {
 	va_list a_list;
 	va_start(a_list, str);
 
@@ -87,8 +85,7 @@ int printf(const char *str, ...)
 }
 
 
-char *sprintf_hex32(char *buf, int d)
-{
+char *sprintf_hex32(char *buf, int d) {
 	char cc[8] = {0};
 	int pos = 8;
 
@@ -125,8 +122,7 @@ char *sprintf_hex32(char *buf, int d)
 }
 
 
-char *sprintf_dec32(char *buf, int d)
-{
+char *sprintf_dec32(char *buf, int d) {
 	char cc[11] = {0};
 
 	const int neg = d < 0;

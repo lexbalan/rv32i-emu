@@ -15,9 +15,6 @@
 #define consolePrintInt32HexAdr	  (consoleMMIOAdr + 0x18)
 #define consolePrintUInt32HexAdr	 (consoleMMIOAdr + 0x1C)
 
-// not implemented
-//#define consolePrintInt64Adr		(consoleMMIOAdr + 0x20)
-//#define consolePrintUInt64Adr	   (consoleMMIOAdr + 0x28)
 
 #define CONSOLE_PUT_CHAR8  (*((volatile uint8_t *)CONSOLE_PUT_CHAR8_ADR))
 #define CONSOLE_GET_CHAR8  (*((volatile uint8_t *)CONSOLE_GET_CHAR8_ADR))

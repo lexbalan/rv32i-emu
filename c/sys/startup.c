@@ -3,6 +3,7 @@
 
 #include "base.h"
 
+
 void __rt0() {
 #if 1
   // Зануление BSS сегмента
@@ -47,8 +48,7 @@ extern void _data_start, _data_end, _data_flash_start;
 
 
 __attribute__ ((section (".startup")))
-void startup()
-{
+void startup() {
 	const uint32_t bss_size = (uint32_t)&_bss_end - (uint32_t)&_bss_start;
 	memzero(&_bss_start, bss_size);
 
