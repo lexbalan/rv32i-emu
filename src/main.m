@@ -41,7 +41,7 @@ public func main () -> Int {
 
 	rvHart.init(&hart, &memctl)
 
-	printf("~~~ START ~~~\n")
+	printf("*** START ***\n")
 
 	while not hart.end {
 		rvHart.tick(&hart)

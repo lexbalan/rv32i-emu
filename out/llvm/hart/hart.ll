@@ -364,7 +364,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 @str50 = private constant [17 x i8] [i8 115, i8 119, i8 32, i8 120, i8 37, i8 100, i8 44, i8 32, i8 37, i8 100, i8 40, i8 120, i8 37, i8 100, i8 41, i8 10, i8 0]
 @str51 = private constant [7 x i8] [i8 101, i8 99, i8 97, i8 108, i8 108, i8 10, i8 0]
 @str52 = private constant [8 x i8] [i8 101, i8 98, i8 114, i8 101, i8 97, i8 107, i8 10, i8 0]
-@str53 = private constant [6 x i8] [i8 69, i8 78, i8 68, i8 46, i8 10, i8 0]
+@str53 = private constant [13 x i8] [i8 42, i8 42, i8 42, i8 32, i8 69, i8 78, i8 68, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
 @str54 = private constant [34 x i8] [i8 85, i8 78, i8 75, i8 78, i8 79, i8 87, i8 78, i8 32, i8 83, i8 89, i8 83, i8 84, i8 69, i8 77, i8 32, i8 73, i8 78, i8 83, i8 84, i8 82, i8 85, i8 67, i8 84, i8 73, i8 79, i8 78, i8 58, i8 32, i8 48, i8 120, i8 37, i8 120, i8 10, i8 0]
 @str55 = private constant [7 x i8] [i8 80, i8 65, i8 85, i8 83, i8 69, i8 10, i8 0]
 @str56 = private constant [8 x i8] [i8 91, i8 37, i8 48, i8 56, i8 88, i8 93, i8 32, i8 0]
@@ -1937,7 +1937,7 @@ then_1:
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %17, %Str8* bitcast ([8 x i8]* @str52 to [0 x i8]*))
 
 	;
-	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str53 to [0 x i8]*))
+	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str53 to [0 x i8]*))
 	%19 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
 	store %Bool 1, %Bool* %19
 

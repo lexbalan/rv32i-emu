@@ -43,7 +43,7 @@ int main() {
 
 	hart_init(&hart, &memctl);
 
-	printf("~~~ START ~~~\n");
+	printf("*** START ***\n");
 
 	while (!hart.end) {
 		hart_tick(&hart);

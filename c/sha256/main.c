@@ -71,10 +71,6 @@ static bool doTest(SHA256_TestCase *test) {
 int main() {
 	doTest(&test0);
 	doTest(&test1);
-
-	asm("ecall");
-	asm("ebreak");
-
 	return 0;
 }
 

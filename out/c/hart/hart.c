@@ -596,7 +596,7 @@ static void execSystem(hart_Hart *hart, uint32_t instr) {
 		trace(hart->pc, "ebreak\n");
 
 		//
-		printf("END.\n");
+		printf("*** END ***\n");
 		hart->end = true;
 
 		// CSR instructions

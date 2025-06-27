@@ -649,7 +649,7 @@ func execSystem (hart: *Hart, instr: Word32) -> Unit {
 		trace(hart.pc, "ebreak\n")
 
 		//
-		printf("END.\n")
+		printf("*** END ***\n")
 		hart.end = true
 
 	// CSR instructions

@@ -50,9 +50,11 @@ _start:
 	lui sp, %hi(_stack_start)
 	addi sp, sp, %lo(_stack_start)
 
-	jr zero, %lo(startup)
+	jal ra, startup
 
 	ebreak
+
+	j trap_empty
 
 
 trap_empty:
