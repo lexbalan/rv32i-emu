@@ -10,11 +10,6 @@
 #include <stdio.h>
 #include "mem.h"
 #include "hart.h"
-
-//public func mem_violation_event(reason: Nat32) {
-//	hart.irq(&hart, rvHart.intMemViolation)
-//}
-
 int main();
 
 #endif /* MAIN_H */

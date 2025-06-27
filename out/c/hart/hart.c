@@ -17,7 +17,7 @@
 
 #define traceMode  false
 
-#define opL  0x03// load
+#define opL  0x3// load
 #define opI  0x13// immediate
 #define opS  0x23// store
 #define opR  0x33// reg
@@ -29,11 +29,11 @@
 #define opJALR  0x67// jump and link by register
 
 #define opSYSTEM  0x73//
-#define opFENCE  0x0F//
+#define opFENCE  0xF//
 
-#define instrECALL  (opSYSTEM | 0x00000000)
-#define instrEBREAK  (opSYSTEM | 0x00100000)
-#define instrPAUSE  (opFENCE | 0x01000000)
+#define instrECALL  (opSYSTEM | 0x0)
+#define instrEBREAK  (opSYSTEM | 0x100000)
+#define instrPAUSE  (opFENCE | 0x1000000)
 
 // funct3 for CSR
 #define funct3_CSRRW  1
@@ -57,11 +57,11 @@ static inline uint32_t fetch(hart_Hart *hart) {
 static void trace(uint32_t pc, char *form, ...);
 static void exec(hart_Hart *hart, uint32_t instr);
 void hart_tick(hart_Hart *hart) {
-	if (hart->irq != 0) {
+	if (hart->irq != 0x0) {
 		trace(hart->pc, "\nINT #%02X\n", hart->irq);
 		const uint32_t vect_offset = hart->irq * 4;
 		hart->pc = vect_offset;
-		hart->irq = 0;
+		hart->irq = 0x0;
 	}
 
 	const uint32_t instr = fetch(hart);
@@ -98,7 +98,7 @@ static void exec(hart_Hart *hart, uint32_t instr) {
 		execAUIPC(hart, instr);
 	} else if (op == opJAL) {
 		execJAL(hart, instr);
-	} else if (op == opJALR && funct3 == 0) {
+	} else if (op == opJALR && funct3 == 0x0) {
 		execJALR(hart, instr);
 	} else if (op == opB) {
 		execB(hart, instr);
@@ -127,14 +127,14 @@ static void execI(hart_Hart *hart, uint32_t instr) {
 		return;
 	}
 
-	if (funct3 == 0) {
+	if (funct3 == 0x0) {
 		// Add immediate
 
 		trace(hart->pc, "addi x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
 		hart->reg[rd] = (uint32_t)((int32_t)hart->reg[rs1] + imm);
-	} else if (funct3 == 1 && funct7 == 0) {
+	} else if (funct3 == 0x1 && funct7 == 0x0) {
 		/* SLLI is a logical left shift (zeros are shifted
 		into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
 		is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). */
@@ -143,39 +143,39 @@ static void execI(hart_Hart *hart, uint32_t instr) {
 
 		//
 		hart->reg[rd] = hart->reg[rs1] << ABS(imm);
-	} else if (funct3 == 2) {
+	} else if (funct3 == 0x2) {
 		// SLTI - set [1 to rd if rs1] less than immediate
 
 		trace(hart->pc, "slti x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
 		hart->reg[rd] = (uint32_t)((int32_t)hart->reg[rs1] < imm);
-	} else if (funct3 == 3) {
+	} else if (funct3 == 0x3) {
 		trace(hart->pc, "sltiu x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
 		hart->reg[rd] = (uint32_t)(hart->reg[rs1] < ABS(imm));
-	} else if (funct3 == 4) {
+	} else if (funct3 == 0x4) {
 		trace(hart->pc, "xori x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
 		hart->reg[rd] = hart->reg[rs1] ^ (uint32_t)imm;
-	} else if (funct3 == 5 && funct7 == 0) {
+	} else if (funct3 == 0x5 && funct7 == 0x0) {
 		trace(hart->pc, "srli x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
 		hart->reg[rd] = (hart->reg[rs1] >> ABS(imm));
-	} else if (funct3 == 5 && funct7 == 0x20) {
+	} else if (funct3 == 0x5 && funct7 == 0x20) {
 		trace(hart->pc, "srai x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
 		hart->reg[rd] = hart->reg[rs1] >> ABS(imm);
-	} else if (funct3 == 6) {
+	} else if (funct3 == 0x6) {
 		trace(hart->pc, "ori x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
 		hart->reg[rd] = hart->reg[rs1] | (uint32_t)imm;
-	} else if (funct3 == 7) {
+	} else if (funct3 == 0x7) {
 		trace(hart->pc, "andi x%d, x%d, %d\n", rd, rs1, imm);
 
 		//
@@ -205,26 +205,26 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 	//let f5 = extract_funct5(instr)
 	//let f2 = extract_funct2(instr)
 	//if f5 == 0 and f2 == 1 {
-	if (f7 == 1) {
+	if (f7 == 0x1) {
 		//printf("MUL(%i)\n", Int32 funct3)
 
 		//
 		// "M" extension
 		//
 
-		if (funct3 == 0) {
+		if (funct3 == 0x0) {
 			// MUL rd, rs1, rs2
 			trace(hart->pc, "mul x%d, x%d, x%d\n", rd, rs1, rs2);
 
 			hart->reg[rd] = (uint32_t)((int32_t)v0 * (int32_t)v1);
-		} else if (funct3 == 1) {
+		} else if (funct3 == 0x1) {
 			// MULH rd, rs1, rs2
 			// Записывает в целевой регистр старшие биты
 			// которые бы не поместились в него при обычном умножении
 			trace(hart->pc, "mulh x%d, x%d, x%d\n", rd, rs1, rs2);
 
 			hart->reg[rd] = (uint32_t)((uint64_t)((int64_t)v0 * (int64_t)v1) >> 32);
-		} else if (funct3 == 2) {
+		} else if (funct3 == 0x2) {
 			// MULHSU rd, rs1, rs2
 			// mul high signed unsigned
 			trace(hart->pc, "mulhsu x%d, x%d, x%d\n", rd, rs1, rs2);
@@ -232,29 +232,29 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 			// NOT IMPLEMENTED!
 			notImplemented("mulhsu x%d, x%d, x%d", rd, rs1, rs2);
 			//hart.reg[rd] = unsafe Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
-		} else if (funct3 == 3) {
+		} else if (funct3 == 0x3) {
 			// MULHU rd, rs1, rs2
 			trace(hart->pc, "mulhu x%d, x%d, x%d\n", rd, rs1, rs2);
 
 			// multiply unsigned high
 			notImplemented("mulhu x%d, x%d, x%d\n", rd, rs1, rs2);
 			//hart.reg[rd] = unsafe Word32 (Word64 (Nat64 v0 * Nat64 v1) >> 32)
-		} else if (funct3 == 4) {
+		} else if (funct3 == 0x4) {
 			// DIV rd, rs1, rs2
 			trace(hart->pc, "div x%d, x%d, x%d\n", rd, rs1, rs2);
 
 			hart->reg[rd] = (uint32_t)((int32_t)v0 / (int32_t)v1);
-		} else if (funct3 == 5) {
+		} else if (funct3 == 0x5) {
 			// DIVU rd, rs1, rs2
 			trace(hart->pc, "divu x%d, x%d, x%d\n", rd, rs1, rs2);
 
 			hart->reg[rd] = (v0 / v1);
-		} else if (funct3 == 6) {
+		} else if (funct3 == 0x6) {
 			// REM rd, rs1, rs2
 			trace(hart->pc, "rem x%d, x%d, x%d\n", rd, rs1, rs2);
 
 			hart->reg[rd] = (uint32_t)((int32_t)v0 % (int32_t)v1);
-		} else if (funct3 == 7) {
+		} else if (funct3 == 0x7) {
 			// REMU rd, rs1, rs2
 			trace(hart->pc, "remu x%d, x%d, x%d\n", rd, rs1, rs2);
 
@@ -265,62 +265,62 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 	}
 
 
-	if (funct3 == 0 && funct7 == 0x00) {
+	if (funct3 == 0x0 && funct7 == 0x0) {
 		trace(hart->pc, "add x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = (uint32_t)((int32_t)v0 + (int32_t)v1);
-	} else if (funct3 == 0 && funct7 == 0x20) {
+	} else if (funct3 == 0x0 && funct7 == 0x20) {
 		trace(hart->pc, "sub x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = (uint32_t)((int32_t)v0 - (int32_t)v1);
-	} else if (funct3 == 1) {
+	} else if (funct3 == 0x1) {
 		// shift left logical
 
 		trace(hart->pc, "sll x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = v0 << (uint8_t)v1;
-	} else if (funct3 == 2) {
+	} else if (funct3 == 0x2) {
 		// set less than
 
 		trace(hart->pc, "slt x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = (uint32_t)((int32_t)v0 < (int32_t)v1);
-	} else if (funct3 == 3) {
+	} else if (funct3 == 0x3) {
 		// set less than unsigned
 
 		trace(hart->pc, "sltu x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = (uint32_t)(v0 < v1);
-	} else if (funct3 == 4) {
+	} else if (funct3 == 0x4) {
 
 		trace(hart->pc, "xor x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = v0 ^ v1;
-	} else if (funct3 == 5 && funct7 == 0) {
+	} else if (funct3 == 0x5 && funct7 == 0x0) {
 		// shift right logical
 
 		trace(hart->pc, "srl x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		hart->reg[rd] = v0 >> (uint8_t)v1;
-	} else if (funct3 == 5 && funct7 == 0x20) {
+	} else if (funct3 == 0x5 && funct7 == 0x20) {
 		// shift right arithmetical
 
 		trace(hart->pc, "sra x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		// ERROR: не реализован арифм сдвиг!
 		//hart.reg[rd] = v0 >> Int32 v1
-	} else if (funct3 == 6) {
+	} else if (funct3 == 0x6) {
 		trace(hart->pc, "or x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = v0 | v1;
-	} else if (funct3 == 7) {
+	} else if (funct3 == 0x7) {
 		trace(hart->pc, "and x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
@@ -383,7 +383,7 @@ static void execJALR(hart_Hart *hart, uint32_t instr) {
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
 	const int32_t next_instr_ptr = (int32_t)(hart->pc + 4);
-	const uint32_t jump_to = (uint32_t)((int32_t)hart->reg[rs1] + imm) & 0xFFFFFFFE;
+	const uint32_t jump_to = (uint32_t)((int32_t)hart->reg[rs1] + imm) & 0xFFFFFFFEUL;
 
 	if (rd != 0) {
 		hart->reg[rd] = (uint32_t)next_instr_ptr;
@@ -407,13 +407,13 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 	uint16_t bits = (bit12 | bit11 | bit10to5 | bit4to1);
 
 	// распространяем знак, если он есть
-	if ((bits & (1 << 12)) != 0) {
+	if ((bits & (0x1 << 12)) != 0x0) {
 		bits = 0xF000 | bits;
 	}
 
 	const int16_t imm = (int16_t)bits;
 
-	if (funct3 == 0) {
+	if (funct3 == 0x0) {
 		// BEQ - Branch if equal
 
 		trace(hart->pc, "beq x%d, x%d, %d\n", rs1, rs2, imm);
@@ -422,7 +422,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 		if (hart->reg[rs1] == hart->reg[rs2]) {
 			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
-	} else if (funct3 == 1) {
+	} else if (funct3 == 0x1) {
 		// BNE - Branch if not equal
 
 		trace(hart->pc, "bne x%d, x%d, %d\n", rs1, rs2, imm);
@@ -431,7 +431,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 		if (hart->reg[rs1] != hart->reg[rs2]) {
 			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
-	} else if (funct3 == 4) {
+	} else if (funct3 == 0x4) {
 		// BLT - Branch if less than (signed)
 
 		trace(hart->pc, "blt x%d, x%d, %d\n", rs1, rs2, imm);
@@ -440,7 +440,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 		if ((int32_t)hart->reg[rs1] < (int32_t)hart->reg[rs2]) {
 			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
-	} else if (funct3 == 5) {
+	} else if (funct3 == 0x5) {
 		// BGE - Branch if greater or equal (signed)
 
 		trace(hart->pc, "bge x%d, x%d, %d\n", rs1, rs2, imm);
@@ -449,7 +449,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 		if ((int32_t)hart->reg[rs1] >= (int32_t)hart->reg[rs2]) {
 			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
-	} else if (funct3 == 6) {
+	} else if (funct3 == 0x6) {
 		// BLTU - Branch if less than (unsigned)
 
 		trace(hart->pc, "bltu x%d, x%d, %d\n", rs1, rs2, imm);
@@ -458,7 +458,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 		if (hart->reg[rs1] < hart->reg[rs2]) {
 			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
-	} else if (funct3 == 7) {
+	} else if (funct3 == 0x7) {
 		// BGEU - Branch if greater or equal (unsigned)
 
 		trace(hart->pc, "bgeu x%d, x%d, %d\n", rs1, rs2, imm);
@@ -481,7 +481,7 @@ static void execL(hart_Hart *hart, uint32_t instr) {
 
 	const uint32_t adr = ABS(((int32_t)hart->reg[rs1] + imm));
 
-	if (funct3 == 0) {
+	if (funct3 == 0x0) {
 		// LB (Load 8-bit signed integer value)
 
 		trace(hart->pc, "lb x%d, %d(x%d)\n", rd, imm, rs1);
@@ -490,7 +490,7 @@ static void execL(hart_Hart *hart, uint32_t instr) {
 		if (rd != 0) {
 			hart->reg[rd] = (uint32_t)val;
 		}
-	} else if (funct3 == 1) {
+	} else if (funct3 == 0x1) {
 		// LH (Load 16-bit signed integer value)
 
 		trace(hart->pc, "lh x%d, %d(x%d)\n", rd, imm, rs1);
@@ -499,7 +499,7 @@ static void execL(hart_Hart *hart, uint32_t instr) {
 		if (rd != 0) {
 			hart->reg[rd] = (uint32_t)val;
 		}
-	} else if (funct3 == 2) {
+	} else if (funct3 == 0x2) {
 		// LW (Load 32-bit signed integer value)
 
 		trace(hart->pc, "lw x%d, %d(x%d)\n", rd, imm, rs1);
@@ -508,7 +508,7 @@ static void execL(hart_Hart *hart, uint32_t instr) {
 		if (rd != 0) {
 			hart->reg[rd] = val;
 		}
-	} else if (funct3 == 4) {
+	} else if (funct3 == 0x4) {
 		// LBU (Load 8-bit unsigned integer value)
 
 		trace(hart->pc, "lbu x%d, %d(x%d)\n", rd, imm, rs1);
@@ -517,7 +517,7 @@ static void execL(hart_Hart *hart, uint32_t instr) {
 		if (rd != 0) {
 			hart->reg[rd] = val;
 		}
-	} else if (funct3 == 5) {
+	} else if (funct3 == 0x5) {
 		// LHU (Load 16-bit unsigned integer value)
 
 		trace(hart->pc, "lhu x%d, %d(x%d)\n", rd, imm, rs1);
@@ -544,7 +544,7 @@ static void execS(hart_Hart *hart, uint32_t instr) {
 	const uint32_t adr = (uint32_t)((int32_t)hart->reg[rs1] + imm);
 	const uint32_t val = hart->reg[rs2];
 
-	if (funct3 == 0) {
+	if (funct3 == 0x0) {
 		// SB (save 8-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 
@@ -552,7 +552,7 @@ static void execS(hart_Hart *hart, uint32_t instr) {
 
 		//
 		hart->bus->write8(adr, (uint8_t)val);
-	} else if (funct3 == 1) {
+	} else if (funct3 == 0x1) {
 		// SH (save 16-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 
@@ -560,7 +560,7 @@ static void execS(hart_Hart *hart, uint32_t instr) {
 
 		//
 		hart->bus->write16(adr, (uint16_t)val);
-	} else if (funct3 == 2) {
+	} else if (funct3 == 0x2) {
 		// SW (save 32-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
 
@@ -661,29 +661,29 @@ The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSR
 static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1) {
 	const uint32_t nv = hart->reg[rs1];
 
-	if (csr == 0x300) {
+	if (csr == 768) {
 		// mstatus (Machine status register)
-	} else if (csr == 0x301) {
+	} else if (csr == 769) {
 		// misa (ISA and extensions)
-	} else if (csr == 0x302) {
+	} else if (csr == 770) {
 		// medeleg (Machine exception delegation register)
-	} else if (csr == 0x303) {
+	} else if (csr == 771) {
 		// mideleg (Machine interrupt delegation register)
-	} else if (csr == 0x304) {
+	} else if (csr == 772) {
 		// mie (Machine interrupt-enable register)
-	} else if (csr == 0x305) {
+	} else if (csr == 773) {
 		// mtvec (Machine trap-handler base address)
-	} else if (csr == 0x306) {
+	} else if (csr == 774) {
 		// mcounteren (Machine counter enable)
-	} else if (csr == 0x340) {
+	} else if (csr == 832) {
 		// mscratch
-	} else if (csr == 0x341) {
+	} else if (csr == 833) {
 		// mepc
-	} else if (csr == 0x342) {
+	} else if (csr == 834) {
 		// mcause
-	} else if (csr == 0x343) {
+	} else if (csr == 835) {
 		// mbadaddr
-	} else if (csr == 0x344) {
+	} else if (csr == 836) {
 		// mip (machine interrupt pending)
 	}
 }

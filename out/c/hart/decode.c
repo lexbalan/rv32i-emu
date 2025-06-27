@@ -14,15 +14,15 @@ uint8_t decode_extract_op(uint32_t instr) {
 }
 
 uint8_t decode_extract_funct2(uint32_t instr) {
-	return (uint8_t)((instr >> 25) & 0x03);
+	return (uint8_t)((instr >> 25) & 0x3);
 }
 
 uint8_t decode_extract_funct3(uint32_t instr) {
-	return (uint8_t)((instr >> 12) & 0x07);
+	return (uint8_t)((instr >> 12) & 0x7);
 }
 
 uint8_t decode_extract_funct5(uint32_t instr) {
-	return (uint8_t)((instr >> 27) & 0x01F);
+	return (uint8_t)((instr >> 27) & 0x1F);
 }
 
 uint8_t decode_extract_rd(uint32_t instr) {
@@ -62,8 +62,8 @@ uint32_t decode_extract_jal_imm(uint32_t instr) {
 // sign expand (12bit -> 32bit)
 int32_t decode_expand12(uint32_t val_12bit) {
 	uint32_t v = val_12bit;
-	if ((v & 0x800) != 0) {
-		v = v | 0xFFFFF000;
+	if ((v & 0x800) != 0x0) {
+		v = v | 0xFFFFF000UL;
 	}
 	return (int32_t)v;
 }
@@ -71,8 +71,8 @@ int32_t decode_expand12(uint32_t val_12bit) {
 // sign expand (20bit -> 32bit)
 int32_t decode_expand20(uint32_t val_20bit) {
 	uint32_t v = val_20bit;
-	if ((v & 0x80000) != 0) {
-		v = v | 0xFFF00000;
+	if ((v & 0x80000) != 0x0) {
+		v = v | 0xFFF00000UL;
 	}
 	return (int32_t)v;
 }

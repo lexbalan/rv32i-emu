@@ -13,8 +13,8 @@
 
 // see mem.ld
 
-#define mmioSize  (0xFFFF)
-#define mmioStart  (0xF00C0000)
+#define mmioSize  (65535)
+#define mmioStart  (4027318272UL)
 #define mmioEnd  (mmioStart + mmioSize)
 
 static uint8_t rom[mem_romSize];
@@ -43,7 +43,7 @@ static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b) {
 }
 
 uint8_t mem_read8(uint32_t adr) {
-	uint8_t x = 0;
+	uint8_t x = 0x0;
 
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint8_t *const ptr = (uint8_t *)&ram[adr - mem_ramStart];
@@ -55,7 +55,7 @@ uint8_t mem_read8(uint32_t adr) {
 		x = *ptr;
 	} else {
 		memoryViolation('r', adr);
-		x = 0;
+		x = 0x0;
 	}
 
 	//printf("MEM_READ_8[%x] = 0x%x\n", adr, x to Nat32)
@@ -64,7 +64,7 @@ uint8_t mem_read8(uint32_t adr) {
 }
 
 uint16_t mem_read16(uint32_t adr) {
-	uint16_t x = 0;
+	uint16_t x = 0x0;
 
 	if (isAdressInRange(adr, mem_ramStart, mem_ramEnd)) {
 		uint16_t *const ptr = (uint16_t *)&ram[adr - mem_ramStart];
@@ -83,7 +83,7 @@ uint16_t mem_read16(uint32_t adr) {
 }
 
 uint32_t mem_read32(uint32_t adr) {
-	uint32_t x = 0;
+	uint32_t x = 0x0;
 
 	if (isAdressInRange(adr, mem_romStart, mem_romEnd)) {
 		uint32_t *const ptr = (uint32_t *)&rom[adr - mem_romStart];
