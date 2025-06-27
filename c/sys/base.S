@@ -29,20 +29,20 @@ memset_loop:
 # t1 - mcpy_4 lim adr
 # t2 - mcpy_1 lim adr
 
-# void memcopy(void *dst, void *src, uint32_t len);
-.global memcopy
-memcopy:
+# void memcpy(void *dst, void *src, uint32_t len);
+.global memcpy
+memcpy:
 	# вычисляю предельные адреса для mcpy_4 & mcpy_1
 	li t0, 0xFFFFFFFC
 	and t0, a2, t0		  # t0 = len & 0xFFFFFFFC; // n words
 	add t1, t0, a0		  # t1 = t0 + dst; // lim adr4
 	sub t0, a2, t0		  # t0 = len - t1; // rest (n bytes)
 	add t2, t1, t0		  # t2 = t1 + t0;  // lim adr1
-	
+
 mcpy_4:
 
 	beq t1, a0, mcpy_1	  # if (t1 == dst) goto mcpy_1;
-	
+
 mcpy_loop4:
 	lw t0, 0(a1)			# t1 = *((uint32_t *)src)
 	sw t0, 0(a0)			# *((uint32_t *)dst) = t1
@@ -60,9 +60,8 @@ mcpy_loop1:
 	addi a0, a0, 1		  # ++src
 	addi a1, a1, 1		  # ++dst
 	blt a0, t2, mcpy_loop1  # if (dst < t2) goto mcpy_loop1
-	
+
 mcpy_exit:
 	ret
-	
-	
+
 

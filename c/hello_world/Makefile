@@ -20,10 +20,10 @@ LDSCRIPT = $(SYS)/mem.ld
 all:
 	# translate C to ASM
 	#$(CC) $(CFLAGS) -S main.c
-	
+
 	# translate ASM to OBJ
 	#$(CC) $(CFLAGS) main.s -c -o main.o
-	
+
 	$(CC) $(CFLAGS) $(SYS)/muldivmod.c -c -o muldivmod.o
 	$(CC) $(CFLAGS) $(SYS)/vect.S -c -o vect.o
 	$(CC) $(CFLAGS) $(SYS)/base.S -c -o base.o
@@ -32,18 +32,17 @@ all:
 	$(CC) $(CFLAGS) $(SYS)/console.c -c -o console.o
 	$(CC) $(CFLAGS) $(SYS)/printf.c -c -o printf.o
 	$(CC) $(CFLAGS) main.c -c -o main.o
-	$(CC) $(CFLAGS) sha256.c -c -o sha256.o
-	
-	
+
+
 	# link OBJects to ELF
-	$(CC) $(CFLAGS) -nostdlib -o main.elf -T $(LDSCRIPT) vect.o startup.o system.o console.o printf.o base.o muldivmod.o sha256.o main.o
-	
+	$(CC) $(CFLAGS) -nostdlib -o main.elf -T $(LDSCRIPT) vect.o startup.o system.o console.o printf.o base.o muldivmod.o main.o
+
 	rm *.o
-	
+
 	# extract sections from ELF to BIN file
-	
+
 	llvm-objcopy -Iriscv32 main.elf $(ONLYSECTION) -Obinary ../../image.bin
-	
+
 	# make ELF dump
 	llvm-objdump --full-contents -d ./main.elf > ./dump.txt
 

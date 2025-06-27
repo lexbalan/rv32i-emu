@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mmio.h"
-#define mem_ramSize  (1024 * 16)
+#define mem_ramSize  (16 * 1024)
 #define mem_ramStart  (268435456)
 #define mem_ramEnd  (mem_ramStart + mem_ramSize)
 

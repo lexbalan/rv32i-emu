@@ -1,4 +1,4 @@
-//
+// RISC-V hart implementation
 //
 
 #include <stddef.h>
@@ -44,6 +44,7 @@
 #define funct3_CSRRCI  6
 
 void hart_init(hart_Hart *hart, hart_BusInterface *bus) {
+	printf("HART INIT\n");
 	*hart = (hart_Hart){
 		.bus = bus
 	};
@@ -200,12 +201,7 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 	const uint32_t v0 = hart->reg[rs1];
 	const uint32_t v1 = hart->reg[rs2];
 
-
-	const uint8_t f7 = decode_extract_funct7(instr);
-	//let f5 = extract_funct5(instr)
-	//let f2 = extract_funct2(instr)
-	//if f5 == 0 and f2 == 1 {
-	if (f7 == 0x1) {
+	if (funct7 == 0x1) {
 		//printf("MUL(%i)\n", Int32 funct3)
 
 		//
@@ -281,6 +277,7 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 		trace(hart->pc, "sll x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
+		//printf("?%x\n", v0)
 		hart->reg[rd] = v0 << (uint8_t)v1;
 	} else if (funct3 == 0x2) {
 		// set less than
@@ -320,24 +317,26 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 
 		//
 		hart->reg[rd] = v0 | v1;
+		//printf("=%08x (%08x, %08x)\n", hart.reg[rd], v0, v1)
 	} else if (funct3 == 0x7) {
 		trace(hart->pc, "and x%d, x%d, x%d\n", rd, rs1, rs2);
 
 		//
 		hart->reg[rd] = v0 & v1;
+		//printf("=%08x (%08x, %08x)\n", hart.reg[rd], v0, v1)
 	}
 }
 
 static void execLUI(hart_Hart *hart, uint32_t instr) {
 	// load upper immediate
 
-	const int32_t imm = decode_expand12(decode_extract_imm31_12(instr));
+	const uint32_t imm = decode_extract_imm31_12(instr);
 	const uint8_t rd = decode_extract_rd(instr);
 
 	trace(hart->pc, "lui x%d, 0x%X\n", rd, imm);
 
 	if (rd != 0) {
-		hart->reg[rd] = (uint32_t)imm << 12;
+		hart->reg[rd] = imm << 12;
 	}
 }
 
@@ -722,6 +721,14 @@ static void trace(uint32_t pc, char *form, ...) {
 		return;
 	}
 
+	va_list va;
+	va_start(va, form);
+	printf("[%08X] ", pc);
+	vprintf(form, va);
+	va_end(va);
+}
+
+static void trace2(uint32_t pc, char *form, ...) {
 	va_list va;
 	va_start(va, form);
 	printf("[%08X] ", pc);

@@ -3,7 +3,7 @@ include "stdio"
 include "unistd"
 include "stdlib"
 include "decode"
-//
+// RISC-V hart implementation
 //
 
 
@@ -70,6 +70,7 @@ public const intMemViolation = 0x0B
 
 
 public func init (hart: *Hart, bus: *BusInterface) -> Unit {
+	printf("HART INIT\n")
 	*hart = Hart {
 		bus = bus
 	}
@@ -215,12 +216,7 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 	let v0: Word32 = hart.reg[rs1]
 	let v1: Word32 = hart.reg[rs2]
 
-
-	let f7: Word8 = extract_funct7(instr)
-	//let f5 = extract_funct5(instr)
-	//let f2 = extract_funct2(instr)
-	//if f5 == 0 and f2 == 1 {
-	if f7 == 1 {
+	if funct7 == 1 {
 		//printf("MUL(%i)\n", Int32 funct3)
 
 		//
@@ -296,6 +292,7 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 		trace(hart.pc, "sll x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
+		//printf("?%x\n", v0)
 		hart.reg[rd] = v0 << unsafe Nat8 v1
 	} else if funct3 == 2 {
 		// set less than
@@ -335,11 +332,13 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 
 		//
 		hart.reg[rd] = v0 or v1
+		//printf("=%08x (%08x, %08x)\n", hart.reg[rd], v0, v1)
 	} else if funct3 == 7 {
 		trace(hart.pc, "and x%d, x%d, x%d\n", rd, rs1, rs2)
 
 		//
 		hart.reg[rd] = v0 and v1
+		//printf("=%08x (%08x, %08x)\n", hart.reg[rd], v0, v1)
 	}
 }
 
@@ -347,13 +346,13 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 func execLUI (hart: *Hart, instr: Word32) -> Unit {
 	// load upper immediate
 
-	let imm: Int32 = expand12(extract_imm31_12(instr))
+	let imm: Word32 = extract_imm31_12(instr)
 	let rd: Nat8 = extract_rd(instr)
 
 	trace(hart.pc, "lui x%d, 0x%X\n", rd, imm)
 
 	if rd != 0 {
-		hart.reg[rd] = Word32 imm << 12
+		hart.reg[rd] = imm << 12
 	}
 }
 
@@ -751,6 +750,15 @@ func trace (pc: Nat32, form: *Str8, ...) -> Unit {
 		return
 	}
 
+	var va: va_list
+	__va_start(va, form)
+	printf("[%08X] ", pc)
+	vprintf(form, va)
+	__va_end(va)
+}
+
+
+func trace2 (pc: Nat32, form: *Str8, ...) -> Unit {
 	var va: va_list
 	__va_start(va, form)
 	printf("[%08X] ", pc)

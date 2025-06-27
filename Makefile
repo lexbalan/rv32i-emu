@@ -2,6 +2,8 @@
 INDIR=./src
 OUTDIR=./out
 
+.PHONY: C LLVM CM clean
+
 # output dir prefix
 CMPREFIX=$(OUTDIR)/cm/
 CPREFIX=$(OUTDIR)/c/
@@ -41,3 +43,4 @@ C:
 
 clean:
 	rm *.o
+

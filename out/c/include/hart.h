@@ -1,4 +1,4 @@
-//
+// RISC-V hart implementation
 //
 
 #ifndef HART_H

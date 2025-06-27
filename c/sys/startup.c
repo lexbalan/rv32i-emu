@@ -53,7 +53,7 @@ void startup()
 	memzero(&_bss_start, bss_size);
 
 	const uint32_t data_size = (uint32_t)&_data_end - (uint32_t)&_data_start;
-	memcopy(&_data_start, &_data_flash_start, data_size);
+	memcpy(&_data_start, &_data_flash_start, data_size);
 
 	main();
 }

@@ -14,44 +14,44 @@
 
 vectors:
 	jr zero, %lo(_start)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(system)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(__mem_violation)
-	
+
 	jr zero, %lo(trap_empty)
-	
+
 	jr zero, %lo(trap_empty)
 
 
 
 _start:
-	# setup stack pointer	
+	# setup stack pointer
 	lui sp, %hi(_stack_start)
 	addi sp, sp, %lo(_stack_start)
-	
+
 	jr zero, %lo(startup)
-	
+
 	ebreak
 
 

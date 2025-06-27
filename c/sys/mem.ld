@@ -1,7 +1,7 @@
 /* Thanks https://github.com/darklife/darkriscv */
 
-__heap_size  = 0x20;
-__stack_size = 0x1FF;
+__heap_size  = 0x1000;
+__stack_size = 0x1000;
 
 
 MEMORY
@@ -33,9 +33,9 @@ SECTIONS
 		*(.data SORT(.data.*))
 		_data_end = .;
 	} > RAM AT > ROM
-	
+
 	_data_flash_start = LOADADDR(.data);
-	
+
 	.bss :
 	{
 		_bss_start = .;
@@ -43,7 +43,7 @@ SECTIONS
 		*(.bss SORT(.bss.*) COMMON)
 		_bss_end = .;
 	} > RAM
-	
+
 	.heap :
 	{
 		. = ALIGN(4);
