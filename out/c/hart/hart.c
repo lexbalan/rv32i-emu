@@ -1,5 +1,6 @@
-// RISC-V hart implementation
-//
+/*
+ * RV32IM simple software implementation
+ */
 
 #include <stddef.h>
 #include <stdint.h>
@@ -44,10 +45,14 @@
 #define funct3_CSRRCI  6
 
 void hart_init(hart_Hart *hart, uint32_t id, hart_BusInterface *bus) {
-	printf("hart #%d init\n", hart->id);
-	*hart = (hart_Hart){
-		.bus = bus
-	};
+	printf("hart #%d init\n", id);
+	hart->id = id;
+	memset(&hart->reg, 0, sizeof(uint32_t[32]));
+	hart->pc = 0;
+	hart->bus = bus;
+	hart->irq = 0x0;
+	hart->cnt = 0;
+	hart->end = false;
 }
 
 static inline uint32_t fetch(hart_Hart *hart) {

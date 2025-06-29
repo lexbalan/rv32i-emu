@@ -374,8 +374,9 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 @str60 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
 @str61 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
 @str62 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
-; -- endstrings --; RISC-V hart implementation
-;
+; -- endstrings --;
+; * RV32IM simple software implementation
+; 
 %hart_Hart = type {
 	%Nat32,
 	[32 x %Word32],
@@ -395,12 +396,25 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 
 ; funct3 for CSR
 define void @hart_init(%hart_Hart* %hart, %Nat32 %id, %hart_BusInterface* %bus) {
-	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
-	%2 = load %Nat32, %Nat32* %1
-	%3 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str1 to [0 x i8]*), %Nat32 %2)
-	%4 = bitcast %hart_BusInterface* %bus to %hart_BusInterface*
-	%5 = insertvalue %hart_Hart zeroinitializer, %hart_BusInterface* %4, 3
-	store %hart_Hart %5, %hart_Hart* %hart
+	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str1 to [0 x i8]*), %Nat32 %id)
+	%2 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	store %Nat32 %id, %Nat32* %2
+	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%4 = zext i8 32 to %Nat32
+	%5 = mul %Nat32 %4, 4
+	%6 = bitcast [32 x %Word32]* %3 to i8*
+	call void (i8*, i8, i32, i1) @llvm.memset.p0.i32(i8* %6, i8 0, %Nat32 %5, i1 0)
+	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	store %Nat32 0, %Nat32* %7
+	%8 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%9 = bitcast %hart_BusInterface* %bus to %hart_BusInterface*
+	store %hart_BusInterface* %9, %hart_BusInterface** %8
+	%10 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	store %Word32 0, %Word32* %10
+	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	store %Nat32 0, %Nat32* %11
+	%12 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
+	store %Bool 0, %Bool* %12
 	ret void
 }
 

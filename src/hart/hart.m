@@ -1,5 +1,6 @@
-// RISC-V hart implementation
-//
+/*
+ * RV32IM simple software implementation
+ */
 
 include "libc/ctypes"
 include "libc/stdio"
@@ -68,10 +69,14 @@ public const intMemViolation = 0x0B
 
 
 public func init (hart: *Hart, id: Nat32, bus: *BusInterface) -> Unit {
-	printf("hart #%d init\n", hart.id)
-	*hart = Hart {
-		bus=bus
-	}
+	printf("hart #%d init\n", id)
+	hart.id = id
+	hart.reg = []
+	hart.pc = 0
+	hart.bus = bus
+	hart.irq = 0x0
+	hart.cnt = 0
+	hart.end = false
 }
 
 

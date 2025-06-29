@@ -1,5 +1,6 @@
-// RISC-V hart implementation
-//
+/*
+ * RV32IM simple software implementation
+ */
 
 #ifndef HART_H
 #define HART_H
