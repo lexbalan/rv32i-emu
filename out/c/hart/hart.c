@@ -460,9 +460,6 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 		if (hart->reg[rs1] >= hart->reg[rs2]) {
 			nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
-	} else {
-		// default: /NO JUMP/
-		nexpc = hart->pc + 4;
 	}
 
 	hart->pc = nexpc;

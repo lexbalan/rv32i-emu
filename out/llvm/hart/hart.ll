@@ -1609,7 +1609,7 @@ else_9:
 ; if_11
 	%136 = bitcast i8 7 to %Word8
 	%137 = icmp eq %Word8 %1, %136
-	br %Bool %137 , label %then_11, label %else_11
+	br %Bool %137 , label %then_11, label %endif_11
 then_11:
 	; BGEU - Branch if greater or equal (unsigned)
 	%138 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
@@ -1641,13 +1641,6 @@ then_12:
 	br label %endif_12
 endif_12:
 	br label %endif_11
-else_11:
-	; default: /NO JUMP/
-	%157 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%158 = load %Nat32, %Nat32* %157
-	%159 = add %Nat32 %158, 4
-	store %Nat32 %159, %Nat32* %31
-	br label %endif_11
 endif_11:
 	br label %endif_9
 endif_9:
@@ -1659,9 +1652,9 @@ endif_5:
 endif_3:
 	br label %endif_1
 endif_1:
-	%160 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%161 = load %Nat32, %Nat32* %31
-	store %Nat32 %161, %Nat32* %160
+	%157 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%158 = load %Nat32, %Nat32* %31
+	store %Nat32 %158, %Nat32* %157
 	ret void
 }
 

@@ -507,9 +507,6 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 		if Nat32 hart.reg[rs1] >= Nat32 hart.reg[rs2] {
 			nexpc = Nat32 (Int32 hart.pc + Int32 imm)
 		}
-	} else {
-		// default: /NO JUMP/
-		nexpc = hart.pc + 4
 	}
 
 	hart.pc = nexpc
