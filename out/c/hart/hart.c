@@ -547,12 +547,9 @@ static void csr_rci(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm);
 
 static void execSystem(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
-	const uint8_t funct7 = decode_extract_funct7(instr);
-	const uint32_t imm12 = decode_extract_imm12(instr);
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
-
-	const uint16_t csr = (uint16_t)imm12;
+	const uint16_t csr = (uint16_t)decode_extract_imm12(instr);
 
 	if (instr == instrECALL) {
 		trace(hart->pc, "ecall\n");

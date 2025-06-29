@@ -593,12 +593,9 @@ func execS (hart: *Hart, instr: Word32) -> Unit {
 
 func execSystem (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
-
-	let csr = unsafe Nat16 imm12
+	let csr = unsafe Nat16 extract_imm12(instr)
 
 	if instr == instrECALL {
 		trace(hart.pc, "ecall\n")
