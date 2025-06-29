@@ -20,28 +20,9 @@
 static uint8_t rom[bus_romSize];
 static uint8_t ram[bus_ramSize];
 
-uint8_t *bus_get_ram_ptr() {
-	return (uint8_t *)&ram;
-}
 
-uint8_t *bus_get_rom_ptr() {
-	return (uint8_t *)&rom;
-}
-
-static uint32_t memviolationCnt = 0;
-static void memoryViolation(char rw, uint32_t adr) {
-	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
-	if (memviolationCnt > 10) {
-		exit(1);
-	}
-	memviolationCnt = memviolationCnt + 1;
-	//	memoryViolation_event(0x55) // !
-}
-
-static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b) {
-	return x >= a && x < b;
-}
-
+static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b);
+static void memoryViolation(char rw, uint32_t adr);
 uint32_t bus_read(uint32_t adr, uint8_t size) {
 	if (isAdressInRange(adr, bus_ramStart, bus_ramEnd)) {
 		if (size == 1) {
@@ -99,5 +80,27 @@ void bus_write(uint32_t adr, uint32_t value, uint8_t size) {
 	} else {
 		memoryViolation('w', adr);
 	}
+}
+
+static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b) {
+	return x >= a && x < b;
+}
+
+uint8_t *bus_get_ram_ptr() {
+	return (uint8_t *)&ram;
+}
+
+uint8_t *bus_get_rom_ptr() {
+	return (uint8_t *)&rom;
+}
+
+static uint32_t memviolationCnt = 0;
+static void memoryViolation(char rw, uint32_t adr) {
+	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
+	if (memviolationCnt > 10) {
+		exit(1);
+	}
+	memviolationCnt = memviolationCnt + 1;
+	//	memoryViolation_event(0x55) // !
 }
 

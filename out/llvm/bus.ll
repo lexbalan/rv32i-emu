@@ -228,39 +228,6 @@ declare %Word32 @mmio_read32(%Nat32 %adr)
 ; see mem.ld
 @rom = internal global [1048576 x %Word8] zeroinitializer
 @ram = internal global [16384 x %Word8] zeroinitializer
-define [0 x %Word8]* @bus_get_ram_ptr() {
-	ret [0 x %Word8]* bitcast ([16384 x %Word8]* @ram to [0 x %Word8]*)
-}
-
-define [0 x %Word8]* @bus_get_rom_ptr() {
-	ret [0 x %Word8]* bitcast ([1048576 x %Word8]* @rom to [0 x %Word8]*)
-}
-
-@memviolationCnt = internal global %Nat32 0
-define internal void @memoryViolation(%Char8 %rw, %Nat32 %adr) {
-	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str1 to [0 x i8]*), %Char8 %rw, %Nat32 %adr)
-; if_0
-	%2 = load %Nat32, %Nat32* @memviolationCnt
-	%3 = icmp ugt %Nat32 %2, 10
-	br %Bool %3 , label %then_0, label %endif_0
-then_0:
-	call void @exit(%Int 1)
-	br label %endif_0
-endif_0:
-	%4 = load %Nat32, %Nat32* @memviolationCnt
-	%5 = add %Nat32 %4, 1
-	store %Nat32 %5, %Nat32* @memviolationCnt
-	;	memoryViolation_event(0x55) // !
-	ret void
-}
-
-define internal %Bool @isAdressInRange(%Nat32 %x, %Nat32 %a, %Nat32 %b) {
-	%1 = icmp uge %Nat32 %x, %a
-	%2 = icmp ult %Nat32 %x, %b
-	%3 = and %Bool %1, %2
-	ret %Bool %3
-}
-
 define %Word32 @bus_read(%Nat32 %adr, %Nat8 %size) {
 ; if_0
 	%1 = call %Bool @isAdressInRange(%Nat32 %adr, %Nat32 268435456, %Nat32 268451840)
@@ -481,6 +448,39 @@ endif_8:
 endif_4:
 	br label %endif_0
 endif_0:
+	ret void
+}
+
+define internal %Bool @isAdressInRange(%Nat32 %x, %Nat32 %a, %Nat32 %b) {
+	%1 = icmp uge %Nat32 %x, %a
+	%2 = icmp ult %Nat32 %x, %b
+	%3 = and %Bool %1, %2
+	ret %Bool %3
+}
+
+define [0 x %Word8]* @bus_get_ram_ptr() {
+	ret [0 x %Word8]* bitcast ([16384 x %Word8]* @ram to [0 x %Word8]*)
+}
+
+define [0 x %Word8]* @bus_get_rom_ptr() {
+	ret [0 x %Word8]* bitcast ([1048576 x %Word8]* @rom to [0 x %Word8]*)
+}
+
+@memviolationCnt = internal global %Nat32 0
+define internal void @memoryViolation(%Char8 %rw, %Nat32 %adr) {
+	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str1 to [0 x i8]*), %Char8 %rw, %Nat32 %adr)
+; if_0
+	%2 = load %Nat32, %Nat32* @memviolationCnt
+	%3 = icmp ugt %Nat32 %2, 10
+	br %Bool %3 , label %then_0, label %endif_0
+then_0:
+	call void @exit(%Int 1)
+	br label %endif_0
+endif_0:
+	%4 = load %Nat32, %Nat32* @memviolationCnt
+	%5 = add %Nat32 %4, 1
+	store %Nat32 %5, %Nat32* @memviolationCnt
+	;	memoryViolation_event(0x55) // !
 	ret void
 }
 

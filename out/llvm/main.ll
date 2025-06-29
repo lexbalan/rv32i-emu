@@ -220,10 +220,10 @@ declare %Word32 @mmio_read32(%Nat32 %adr)
 ; end from import "mmio"
 
 ; from import "bus"
-declare [0 x %Word8]* @bus_get_ram_ptr()
-declare [0 x %Word8]* @bus_get_rom_ptr()
 declare %Word32 @bus_read(%Nat32 %adr, %Nat8 %size)
 declare void @bus_write(%Nat32 %adr, %Word32 %value, %Nat8 %size)
+declare [0 x %Word8]* @bus_get_ram_ptr()
+declare [0 x %Word8]* @bus_get_rom_ptr()
 
 ; end from import "bus"
 ; from included unistd

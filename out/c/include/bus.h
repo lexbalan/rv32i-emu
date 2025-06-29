@@ -18,9 +18,9 @@
 #define bus_romSize  (1048576)
 #define bus_romStart  (0)
 #define bus_romEnd  (bus_romStart + bus_romSize)
-uint8_t *bus_get_ram_ptr();
-uint8_t *bus_get_rom_ptr();
 uint32_t bus_read(uint32_t adr, uint8_t size);
 void bus_write(uint32_t adr, uint32_t value, uint8_t size);
+uint8_t *bus_get_ram_ptr();
+uint8_t *bus_get_rom_ptr();
 
 #endif /* BUS_H */

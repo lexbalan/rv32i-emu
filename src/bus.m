@@ -27,33 +27,6 @@ var rom: [romSize]Word8
 var ram: [ramSize]Word8
 
 
-public func get_ram_ptr () -> *[]Word8 {
-	return &ram
-}
-
-
-public func get_rom_ptr () -> *[]Word8 {
-	return &rom
-}
-
-
-var memviolationCnt = Nat32 0
-func memoryViolation (rw: Char8, adr: Nat32) -> Unit {
-	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
-	if memviolationCnt > 10 {
-		exit(1)
-	}
-	++memviolationCnt
-//	memoryViolation_event(0x55) // !
-}
-
-
-@inline
-func isAdressInRange (x: Nat32, a: Nat32, b: Nat32) -> Bool {
-	return x >= a and x < b
-}
-
-
 public func read (adr: Nat32, size: Nat8) -> Word32 {
 	if isAdressInRange(adr, ramStart, ramEnd) {
 		if size == 1 {
@@ -113,5 +86,34 @@ public func write (adr: Nat32, value: Word32, size: Nat8) -> Unit {
 		memoryViolation("w", adr)
 	}
 }
+
+
+@inline
+func isAdressInRange (x: Nat32, a: Nat32, b: Nat32) -> Bool {
+	return x >= a and x < b
+}
+
+
+public func get_ram_ptr () -> *[]Word8 {
+	return &ram
+}
+
+
+public func get_rom_ptr () -> *[]Word8 {
+	return &rom
+}
+
+
+var memviolationCnt = Nat32 0
+func memoryViolation (rw: Char8, adr: Nat32) -> Unit {
+	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
+	if memviolationCnt > 10 {
+		exit(1)
+	}
+	++memviolationCnt
+//	memoryViolation_event(0x55) // !
+}
+
+
 
 
