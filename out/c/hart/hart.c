@@ -558,9 +558,6 @@ static void execSystem(hart_Hart *hart, uint32_t instr) {
 		hart->irq = hart->irq | hart_intSysCall;
 	} else if (instr == instrEBREAK) {
 		trace(hart->pc, "ebreak\n");
-
-		//
-		printf("*** END ***\n");
 		hart->end = true;
 
 		// CSR instructions

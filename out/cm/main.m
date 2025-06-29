@@ -44,6 +44,8 @@ public func main () -> Int {
 		rvHart.tick(&hart)
 	}
 
+	printf("*** END ***\n")
+
 	printf("hart.cnt = %u\n", hart.cnt)
 
 	printf("\nCore dump:\n")

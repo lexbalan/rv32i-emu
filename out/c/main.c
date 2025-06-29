@@ -46,6 +46,8 @@ int main() {
 		hart_tick(&hart);
 	}
 
+	printf("*** END ***\n");
+
 	printf("hart.cnt = %u\n", hart.cnt);
 
 	printf("\nCore dump:\n");

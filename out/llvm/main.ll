@@ -353,18 +353,19 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
 @str2 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]
 @str3 = private constant [15 x i8] [i8 42, i8 42, i8 42, i8 32, i8 83, i8 84, i8 65, i8 82, i8 84, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
-@str4 = private constant [15 x i8] [i8 104, i8 97, i8 114, i8 116, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
-@str5 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
-@str6 = private constant [2 x i8] [i8 10, i8 0]
-@str7 = private constant [10 x i8] [i8 76, i8 79, i8 65, i8 68, i8 58, i8 32, i8 37, i8 115, i8 10, i8 0]
-@str8 = private constant [3 x i8] [i8 114, i8 98, i8 0]
-@str9 = private constant [29 x i8] [i8 101, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 99, i8 97, i8 110, i8 110, i8 111, i8 116, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 102, i8 105, i8 108, i8 101, i8 32, i8 39, i8 37, i8 115, i8 39, i8 0]
-@str10 = private constant [19 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 122, i8 117, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
-@str11 = private constant [15 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
-@str12 = private constant [13 x i8] [i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 10, i8 0]
-@str13 = private constant [5 x i8] [i8 37, i8 48, i8 56, i8 88, i8 0]
-@str14 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
-@str15 = private constant [2 x i8] [i8 10, i8 0]
+@str4 = private constant [13 x i8] [i8 42, i8 42, i8 42, i8 32, i8 69, i8 78, i8 68, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
+@str5 = private constant [15 x i8] [i8 104, i8 97, i8 114, i8 116, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
+@str6 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
+@str7 = private constant [2 x i8] [i8 10, i8 0]
+@str8 = private constant [10 x i8] [i8 76, i8 79, i8 65, i8 68, i8 58, i8 32, i8 37, i8 115, i8 10, i8 0]
+@str9 = private constant [3 x i8] [i8 114, i8 98, i8 0]
+@str10 = private constant [29 x i8] [i8 101, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 99, i8 97, i8 110, i8 110, i8 111, i8 116, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 102, i8 105, i8 108, i8 101, i8 32, i8 39, i8 37, i8 115, i8 39, i8 0]
+@str11 = private constant [19 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 122, i8 117, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
+@str12 = private constant [15 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
+@str13 = private constant [13 x i8] [i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 10, i8 0]
+@str14 = private constant [5 x i8] [i8 37, i8 48, i8 56, i8 88, i8 0]
+@str15 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
+@str16 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
 @hart = internal global %hart_Hart zeroinitializer
 
@@ -401,24 +402,25 @@ body_1:
 	call void @hart_tick(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	br label %again_1
 break_1:
-	%13 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
-	%14 = load %Nat32, %Nat32* %13
-	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Nat32 %14)
-	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
+	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str4 to [0 x i8]*))
+	%14 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
+	%15 = load %Nat32, %Nat32* %14
+	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str5 to [0 x i8]*), %Nat32 %15)
+	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str6 to [0 x i8]*))
 	call void @hart_show_regs(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
-	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
+	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str7 to [0 x i8]*))
 	call void @show_mem()
 	ret %Int 0
 }
 
 define internal %Nat32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Nat32 %buf_size) {
-	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str7 to [0 x i8]*), %Str8* %filename)
-	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str8 to [0 x i8]*))
+	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str8 to [0 x i8]*), %Str8* %filename)
+	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str9 to [0 x i8]*))
 ; if_0
 	%3 = icmp eq %File* %2, null
 	br %Bool %3 , label %then_0, label %endif_0
 then_0:
-	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str9 to [0 x i8]*), %Str8* %filename)
+	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str10 to [0 x i8]*), %Str8* %filename)
 	ret %Nat32 0
 	br label %endif_0
 endif_0:
@@ -426,7 +428,7 @@ endif_0:
 	%7 = zext %Nat32 %buf_size to %SizeT
 	%8 = bitcast %File* %2 to %File*
 	%9 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %8)
-	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str10 to [0 x i8]*), %SizeT %9)
+	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str11 to [0 x i8]*), %SizeT %9)
 ; if_1
 	br %Bool 0 , label %then_1, label %endif_1
 then_1:
@@ -446,13 +448,13 @@ body_1:
 	%18 = trunc %SizeT %16 to %Nat32
 	%19 = getelementptr [0 x %Nat32], [0 x %Nat32]* %17, %Int32 0, %Nat32 %18
 	%20 = load %Nat32, %Nat32* %19
-	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str11 to [0 x i8]*), %SizeT %15, %Nat32 %20)
+	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str12 to [0 x i8]*), %SizeT %15, %Nat32 %20)
 	%22 = load %SizeT, %SizeT* %11
 	%23 = add %SizeT %22, 4
 	store %SizeT %23, %SizeT* %11
 	br label %again_1
 break_1:
-	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str12 to [0 x i8]*))
+	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str13 to [0 x i8]*))
 	br label %endif_1
 endif_1:
 	%25 = bitcast %File* %2 to %File*
@@ -474,7 +476,7 @@ again_1:
 body_1:
 	%5 = load %Nat32, %Nat32* %1
 	%6 = mul %Nat32 %5, 16
-	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str13 to [0 x i8]*), %Nat32 %6)
+	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str14 to [0 x i8]*), %Nat32 %6)
 	%8 = alloca %Nat32, align 4
 	store %Nat32 0, %Nat32* %8
 ; while_2
@@ -490,13 +492,13 @@ body_2:
 	%14 = bitcast %Nat32 %13 to %Nat32
 	%15 = getelementptr [0 x %Word8], [0 x %Word8]* %2, %Int32 0, %Nat32 %14
 	%16 = load %Word8, %Word8* %15
-	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str14 to [0 x i8]*), %Word8 %16)
+	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str15 to [0 x i8]*), %Word8 %16)
 	%18 = load %Nat32, %Nat32* %8
 	%19 = add %Nat32 %18, 1
 	store %Nat32 %19, %Nat32* %8
 	br label %again_2
 break_2:
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str15 to [0 x i8]*))
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str16 to [0 x i8]*))
 	%21 = load %Nat32, %Nat32* %1
 	%22 = add %Nat32 %21, 16
 	store %Nat32 %22, %Nat32* %1

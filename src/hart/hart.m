@@ -605,9 +605,6 @@ func execSystem (hart: *Hart, instr: Word32) -> Unit {
 
 	} else if instr == instrEBREAK {
 		trace(hart.pc, "ebreak\n")
-
-		//
-		printf("*** END ***\n")
 		hart.end = true
 
 	// CSR instructions
@@ -645,12 +642,10 @@ func execFence (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-
 //
 // CSR's
 // see: https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
 //
-
 
 
 const mstatus_adr = 0x300
