@@ -222,6 +222,7 @@ declare %Word32 @mmio_read32(%Nat32 %adr)
 ; from import "bus"
 declare %Word32 @bus_read(%Nat32 %adr, %Nat8 %size)
 declare void @bus_write(%Nat32 %adr, %Word32 %value, %Nat8 %size)
+declare %Nat32 @bus_load_rom(%Str8* %filename)
 declare [0 x %Word8]* @bus_get_ram_ptr()
 declare [0 x %Word8]* @bus_get_rom_ptr()
 
@@ -357,15 +358,9 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 @str5 = private constant [15 x i8] [i8 104, i8 97, i8 114, i8 116, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
 @str6 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 @str7 = private constant [2 x i8] [i8 10, i8 0]
-@str8 = private constant [10 x i8] [i8 76, i8 79, i8 65, i8 68, i8 58, i8 32, i8 37, i8 115, i8 10, i8 0]
-@str9 = private constant [3 x i8] [i8 114, i8 98, i8 0]
-@str10 = private constant [29 x i8] [i8 101, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 99, i8 97, i8 110, i8 110, i8 111, i8 116, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 102, i8 105, i8 108, i8 101, i8 32, i8 39, i8 37, i8 115, i8 39, i8 0]
-@str11 = private constant [19 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 122, i8 117, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
-@str12 = private constant [15 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
-@str13 = private constant [13 x i8] [i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 10, i8 0]
-@str14 = private constant [5 x i8] [i8 37, i8 48, i8 56, i8 88, i8 0]
-@str15 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
-@str16 = private constant [2 x i8] [i8 10, i8 0]
+@str8 = private constant [5 x i8] [i8 37, i8 48, i8 56, i8 88, i8 0]
+@str9 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
+@str10 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
 @hart = internal global %hart_Hart zeroinitializer
 
@@ -379,88 +374,37 @@ define %Int @main() {
 	%3 = insertvalue %hart_BusInterface zeroinitializer, %Word32 (%Nat32, %Nat8)* @bus_read, 0
 	%4 = insertvalue %hart_BusInterface %3, void (%Nat32, %Word32, %Nat8)* @bus_write, 1
 	store %hart_BusInterface %4, %hart_BusInterface* %2
-	%5 = call [0 x %Word8]* @bus_get_rom_ptr()
-	%6 = call %Nat32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %5, %Nat32 1048576)
+	%5 = call %Nat32 @bus_load_rom(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*))
 ; if_0
-	%7 = icmp ule %Nat32 %6, 0
-	br %Bool %7 , label %then_0, label %endif_0
+	%6 = icmp ule %Nat32 %5, 0
+	br %Bool %6 , label %then_0, label %endif_0
 then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	%8 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
-	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %Nat32 0, %hart_BusInterface* %8)
-	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+	%7 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
+	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %Nat32 0, %hart_BusInterface* %7)
+	%8 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 ; while_1
 	br label %again_1
 again_1:
-	%10 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 6
-	%11 = load %Bool, %Bool* %10
-	%12 = xor %Bool %11, 1
-	br %Bool %12 , label %body_1, label %break_1
+	%9 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 6
+	%10 = load %Bool, %Bool* %9
+	%11 = xor %Bool %10, 1
+	br %Bool %11 , label %body_1, label %break_1
 body_1:
 	call void @hart_tick(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	br label %again_1
 break_1:
-	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str4 to [0 x i8]*))
-	%14 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
-	%15 = load %Nat32, %Nat32* %14
-	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str5 to [0 x i8]*), %Nat32 %15)
-	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str6 to [0 x i8]*))
+	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str4 to [0 x i8]*))
+	%13 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
+	%14 = load %Nat32, %Nat32* %13
+	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str5 to [0 x i8]*), %Nat32 %14)
+	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str6 to [0 x i8]*))
 	call void @hart_show_regs(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
-	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str7 to [0 x i8]*))
+	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str7 to [0 x i8]*))
 	call void @show_mem()
 	ret %Int 0
-}
-
-define internal %Nat32 @loader(%Str8* %filename, [0 x %Word8]* %bufptr, %Nat32 %buf_size) {
-	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str8 to [0 x i8]*), %Str8* %filename)
-	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str9 to [0 x i8]*))
-; if_0
-	%3 = icmp eq %File* %2, null
-	br %Bool %3 , label %then_0, label %endif_0
-then_0:
-	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str10 to [0 x i8]*), %Str8* %filename)
-	ret %Nat32 0
-	br label %endif_0
-endif_0:
-	%6 = bitcast [0 x %Word8]* %bufptr to i8*
-	%7 = zext %Nat32 %buf_size to %SizeT
-	%8 = bitcast %File* %2 to %File*
-	%9 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %8)
-	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str11 to [0 x i8]*), %SizeT %9)
-; if_1
-	br %Bool 0 , label %then_1, label %endif_1
-then_1:
-	%11 = alloca %SizeT, align 8
-	store %SizeT 0, %SizeT* %11
-; while_1
-	br label %again_1
-again_1:
-	%12 = udiv %SizeT %9, 4
-	%13 = load %SizeT, %SizeT* %11
-	%14 = icmp ult %SizeT %13, %12
-	br %Bool %14 , label %body_1, label %break_1
-body_1:
-	%15 = load %SizeT, %SizeT* %11
-	%16 = load %SizeT, %SizeT* %11
-	%17 = bitcast [0 x %Word8]* %bufptr to [0 x %Nat32]*
-	%18 = trunc %SizeT %16 to %Nat32
-	%19 = getelementptr [0 x %Nat32], [0 x %Nat32]* %17, %Int32 0, %Nat32 %18
-	%20 = load %Nat32, %Nat32* %19
-	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str12 to [0 x i8]*), %SizeT %15, %Nat32 %20)
-	%22 = load %SizeT, %SizeT* %11
-	%23 = add %SizeT %22, 4
-	store %SizeT %23, %SizeT* %11
-	br label %again_1
-break_1:
-	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str13 to [0 x i8]*))
-	br label %endif_1
-endif_1:
-	%25 = bitcast %File* %2 to %File*
-	%26 = call %Int @fclose(%File* %25)
-	%27 = trunc %SizeT %9 to %Nat32
-	ret %Nat32 %27
 }
 
 define internal void @show_mem() {
@@ -476,7 +420,7 @@ again_1:
 body_1:
 	%5 = load %Nat32, %Nat32* %1
 	%6 = mul %Nat32 %5, 16
-	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str14 to [0 x i8]*), %Nat32 %6)
+	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str8 to [0 x i8]*), %Nat32 %6)
 	%8 = alloca %Nat32, align 4
 	store %Nat32 0, %Nat32* %8
 ; while_2
@@ -492,13 +436,13 @@ body_2:
 	%14 = bitcast %Nat32 %13 to %Nat32
 	%15 = getelementptr [0 x %Word8], [0 x %Word8]* %2, %Int32 0, %Nat32 %14
 	%16 = load %Word8, %Word8* %15
-	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str15 to [0 x i8]*), %Word8 %16)
+	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str9 to [0 x i8]*), %Word8 %16)
 	%18 = load %Nat32, %Nat32* %8
 	%19 = add %Nat32 %18, 1
 	store %Nat32 %19, %Nat32* %8
 	br label %again_2
 break_2:
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str16 to [0 x i8]*))
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str10 to [0 x i8]*))
 	%21 = load %Nat32, %Nat32* %1
 	%22 = add %Nat32 %21, 16
 	store %Nat32 %22, %Nat32* %1

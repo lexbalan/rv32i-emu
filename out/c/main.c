@@ -11,8 +11,6 @@
 
 #define text_filename  "./image.bin"
 
-#define showText  false
-
 static hart_Hart hart;
 
 //public func bus_violation_event(reason: Nat32) {
@@ -20,7 +18,6 @@ static hart_Hart hart;
 //}
 
 
-static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
 static void show_mem();
 
 int main() {
@@ -31,8 +28,7 @@ int main() {
 		.write = &bus_write
 	};
 
-	uint8_t *const romptr = bus_get_rom_ptr();
-	const uint32_t nbytes = loader(text_filename, romptr, bus_romSize);
+	const uint32_t nbytes = bus_load_rom(text_filename);
 
 	if (nbytes <= 0) {
 		exit(1);
@@ -56,35 +52,6 @@ int main() {
 	show_mem();
 
 	return 0;
-}
-
-static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size) {
-	printf("LOAD: %s\n", filename);
-
-	FILE *const fp = fopen(filename, "rb");
-
-	if (fp == NULL) {
-		printf("error: cannot open file '%s'", filename);
-		return 0;
-	}
-
-	const size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
-
-	printf("LOADED: %zu bytes\n", n);
-
-	if (showText) {
-		size_t i = 0;
-		while (i < (n / 4)) {
-			printf("%08zx: 0x%08x\n", i, ((uint32_t *)bufptr)[i]);
-			i = i + 4;
-		}
-
-		printf("-----------\n");
-	}
-
-	fclose(fp);
-
-	return (uint32_t)n;
 }
 
 static void show_mem() {

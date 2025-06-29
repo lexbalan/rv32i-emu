@@ -11,6 +11,8 @@
 #include "bus.h"
 
 
+#define showText  false
+
 // see mem.ld
 
 #define mmioSize  (65535)
@@ -85,6 +87,42 @@ void bus_write(uint32_t adr, uint32_t value, uint8_t size) {
 
 static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b) {
 	return x >= a && x < b;
+}
+
+
+static uint32_t load(char *filename, uint8_t *bufptr, uint32_t buf_size);
+
+uint32_t bus_load_rom(char *filename) {
+	return load(filename, (uint8_t *)&rom, bus_romSize);
+}
+
+static uint32_t load(char *filename, uint8_t *bufptr, uint32_t buf_size) {
+	printf("LOAD: %s\n", filename);
+
+	FILE *const fp = fopen(filename, "rb");
+
+	if (fp == NULL) {
+		printf("error: cannot open file '%s'", filename);
+		return 0;
+	}
+
+	const size_t n = fread(bufptr, 1, (size_t)buf_size, fp);
+
+	printf("LOADED: %zu bytes\n", n);
+
+	if (showText) {
+		size_t i = 0;
+		while (i < (n / 4)) {
+			printf("%08zx: 0x%08x\n", i, ((uint32_t *)bufptr)[i]);
+			i = i + 4;
+		}
+
+		printf("-----------\n");
+	}
+
+	fclose(fp);
+
+	return (uint32_t)n;
 }
 
 uint8_t *bus_get_ram_ptr() {

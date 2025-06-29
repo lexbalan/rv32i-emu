@@ -9,8 +9,6 @@ import "hart/hart" as rvHart
 
 const text_filename = "./image.bin"
 
-const showText = false
-
 
 var hart: rvHart.Hart
 
@@ -28,8 +26,7 @@ public func main () -> Int {
 		write = &bus.write
 	}
 
-	let romptr = bus.get_rom_ptr()
-	let nbytes = loader(text_filename, romptr, bus.romSize)
+	let nbytes = bus.load_rom(text_filename)
 
 	if nbytes <= 0 {
 		exit(1)
@@ -55,35 +52,6 @@ public func main () -> Int {
 	return 0
 }
 
-
-func loader (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
-	printf("LOAD: %s\n", filename)
-
-	let fp = fopen(filename, "rb")
-
-	if fp == nil {
-		printf("error: cannot open file '%s'", filename)
-		return 0
-	}
-
-	let n = fread(bufptr, 1, SizeT buf_size, fp)
-
-	printf("LOADED: %zu bytes\n", n)
-
-	if showText {
-		var i = SizeT 0
-		while i < (n / 4) {
-			printf("%08zx: 0x%08x\n", i, (unsafe *[]Nat32 bufptr)[i])
-			i = i + 4
-		}
-
-		printf("-----------\n")
-	}
-
-	fclose(fp)
-
-	return unsafe Nat32 n
-}
 
 
 func show_mem () -> Unit {

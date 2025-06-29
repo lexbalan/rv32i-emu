@@ -7,6 +7,9 @@ include "libc/stdlib"
 import "mmio"
 
 
+const showText = false
+
+
 // see mem.ld
 public const ramSize = Nat32 16 * 1024
 public const ramStart = Nat32 0x10000000
@@ -92,6 +95,43 @@ public func write (adr: Nat32, value: Word32, size: Nat8) -> Unit {
 func isAdressInRange (x: Nat32, a: Nat32, b: Nat32) -> Bool {
 	return x >= a and x < b
 }
+
+
+
+public func load_rom (filename: *Str8) -> Nat32 {
+	return load(filename, &rom, romSize)
+}
+
+
+func load (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
+	printf("LOAD: %s\n", filename)
+
+	let fp = fopen(filename, "rb")
+
+	if fp == nil {
+		printf("error: cannot open file '%s'", filename)
+		return 0
+	}
+
+	let n = fread(bufptr, 1, SizeT buf_size, fp)
+
+	printf("LOADED: %zu bytes\n", n)
+
+	if showText {
+		var i = SizeT 0
+		while i < (n / 4) {
+			printf("%08zx: 0x%08x\n", i, (unsafe *[]Nat32 bufptr)[i])
+			i = i + 4
+		}
+
+		printf("-----------\n")
+	}
+
+	fclose(fp)
+
+	return unsafe Nat32 n
+}
+
 
 
 public func get_ram_ptr () -> *[]Word8 {
