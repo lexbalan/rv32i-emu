@@ -145,8 +145,7 @@ func exec (hart: *Hart, instr: Word32) -> Unit {
 func execI (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
+	let imm = expand12(extract_imm12(instr))
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 
@@ -502,8 +501,7 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 func execL (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
-	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
+	let imm = expand12(extract_imm12(instr))
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 	let rs2 = extract_rs2(instr)
@@ -597,7 +595,6 @@ func execSystem (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
 	let imm12 = extract_imm12(instr)
-	let imm = expand12(imm12)
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 

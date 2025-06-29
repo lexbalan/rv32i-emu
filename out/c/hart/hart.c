@@ -62,6 +62,7 @@ static inline uint32_t fetch(hart_Hart *hart) {
 
 static void trace(uint32_t pc, char *form, ...);
 static void exec(hart_Hart *hart, uint32_t instr);
+
 void hart_tick(hart_Hart *hart) {
 	if (hart->irq != 0x0) {
 		trace(hart->pc, "\nINT #%02X\n", hart->irq);
@@ -87,6 +88,7 @@ static void execL(hart_Hart *hart, uint32_t instr);
 static void execS(hart_Hart *hart, uint32_t instr);
 static void execSystem(hart_Hart *hart, uint32_t instr);
 static void execFence(hart_Hart *hart, uint32_t instr);
+
 static void exec(hart_Hart *hart, uint32_t instr) {
 	const uint8_t op = decode_extract_op(instr);
 	const uint8_t funct3 = decode_extract_funct3(instr);
@@ -131,8 +133,7 @@ static void exec(hart_Hart *hart, uint32_t instr) {
 static void execI(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
-	const uint32_t imm12 = decode_extract_imm12(instr);
-	const int32_t imm = decode_expand12(imm12);
+	const int32_t imm = decode_expand12(decode_extract_imm12(instr));
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
 
@@ -194,6 +195,7 @@ static void execI(hart_Hart *hart, uint32_t instr) {
 
 
 static void notImplemented(char *form, ...);
+
 static void execR(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -453,8 +455,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 static void execL(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
-	const uint32_t imm12 = decode_extract_imm12(instr);
-	const int32_t imm = decode_expand12(imm12);
+	const int32_t imm = decode_expand12(decode_extract_imm12(instr));
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
 	const uint8_t rs2 = decode_extract_rs2(instr);
@@ -543,11 +544,11 @@ static void csr_rc(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1);
 static void csr_rwi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm);
 static void csr_rsi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm);
 static void csr_rci(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm);
+
 static void execSystem(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
 	const uint32_t imm12 = decode_extract_imm12(instr);
-	const int32_t imm = decode_expand12(imm12);
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
 

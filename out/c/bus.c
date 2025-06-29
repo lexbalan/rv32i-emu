@@ -23,6 +23,7 @@ static uint8_t ram[bus_ramSize];
 
 static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b);
 static void memoryViolation(char rw, uint32_t adr);
+
 uint32_t bus_read(uint32_t adr, uint8_t size) {
 	if (isAdressInRange(adr, bus_ramStart, bus_ramEnd)) {
 		if (size == 1) {

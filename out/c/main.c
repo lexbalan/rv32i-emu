@@ -22,6 +22,7 @@ static hart_Hart hart;
 
 static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size);
 static void show_mem();
+
 int main() {
 	printf("RISC-V VM\n");
 
