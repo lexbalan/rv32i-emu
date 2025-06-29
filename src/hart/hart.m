@@ -94,9 +94,6 @@ public func tick (hart: *Hart) -> Unit {
 
 	let instr = fetch(hart)
 	exec(hart, instr)
-
-	//hart.pc = hart.nexpc
-	//hart.nexpc = hart.pc + 4
 	++hart.cnt
 }
 
