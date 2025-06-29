@@ -94,8 +94,8 @@ public func tick (hart: *Hart) -> Unit {
 	let instr: Word32 = fetch(hart)
 	exec(hart, instr)
 
-	hart.pc = hart.nexpc
-	hart.nexpc = hart.pc + 4
+	//hart.pc = hart.nexpc
+	//hart.nexpc = hart.pc + 4
 	hart.cnt = hart.cnt + 1
 }
 
@@ -106,12 +106,16 @@ func exec (hart: *Hart, instr: Word32) -> Unit {
 
 	if op == opI {
 		execI(hart, instr)
+		hart.pc = hart.pc + 4
 	} else if op == opR {
 		execR(hart, instr)
+		hart.pc = hart.pc + 4
 	} else if op == opLUI {
 		execLUI(hart, instr)
+		hart.pc = hart.pc + 4
 	} else if op == opAUIPC {
 		execAUIPC(hart, instr)
+		hart.pc = hart.pc + 4
 	} else if op == opJAL {
 		execJAL(hart, instr)
 	} else if op == opJALR and funct3 == 0 {
@@ -120,12 +124,16 @@ func exec (hart: *Hart, instr: Word32) -> Unit {
 		execB(hart, instr)
 	} else if op == opL {
 		execL(hart, instr)
+		hart.pc = hart.pc + 4
 	} else if op == opS {
 		execS(hart, instr)
+		hart.pc = hart.pc + 4
 	} else if op == opSYSTEM {
 		execSystem(hart, instr)
+		hart.pc = hart.pc + 4
 	} else if op == opFENCE {
 		execFence(hart, instr)
+		hart.pc = hart.pc + 4
 	} else {
 		trace(hart.pc, "UNKNOWN OPCODE: %08X\n", op)
 	}
@@ -217,7 +225,6 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 	let v1: Word32 = hart.reg[rs2]
 
 	if funct7 == 1 {
-		//printf("MUL(%i)\n", Int32 funct3)
 
 		//
 		// "M" extension
@@ -385,7 +392,7 @@ func execJAL (hart: *Hart, instr: Word32) -> Unit {
 		hart.reg[rd] = Word32 (hart.pc + 4)
 	}
 
-	hart.nexpc = Nat32 (Int32 hart.pc + imm)
+	hart.pc = Nat32 (Int32 hart.pc + imm)
 }
 
 
@@ -401,13 +408,13 @@ func execJALR (hart: *Hart, instr: Word32) -> Unit {
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
 	let next_instr_ptr = Int32 (hart.pc + 4)
-	let jump_to: Word32 = Word32 (Int32 hart.reg[rs1] + imm) and 0xFFFFFFFE
+	let nexpc: Word32 = Word32 (Int32 hart.reg[rs1] + imm) and 0xFFFFFFFE
 
 	if rd != 0 {
 		hart.reg[rd] = Word32 next_instr_ptr
 	}
 
-	hart.nexpc = Nat32 jump_to
+	hart.pc = Nat32 nexpc
 }
 
 
@@ -432,6 +439,8 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 
 	let imm = Int16 bits
 
+	var nexpc: Nat32 = hart.pc + 4
+
 	if funct3 == 0 {
 		// BEQ - Branch if equal
 
@@ -439,7 +448,7 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 
 		// Branch if two registers are equal
 		if hart.reg[rs1] == hart.reg[rs2] {
-			hart.nexpc = Nat32 (Int32 hart.pc + Int32 imm)
+			nexpc = Nat32 (Int32 hart.pc + Int32 imm)
 		}
 	} else if funct3 == 1 {
 		// BNE - Branch if not equal
@@ -448,7 +457,7 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 
 		//
 		if hart.reg[rs1] != hart.reg[rs2] {
-			hart.nexpc = Nat32 (Int32 hart.pc + Int32 imm)
+			nexpc = Nat32 (Int32 hart.pc + Int32 imm)
 		}
 	} else if funct3 == 4 {
 		// BLT - Branch if less than (signed)
@@ -457,7 +466,7 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 
 		//
 		if Int32 hart.reg[rs1] < Int32 hart.reg[rs2] {
-			hart.nexpc = Nat32 (Int32 hart.pc + Int32 imm)
+			nexpc = Nat32 (Int32 hart.pc + Int32 imm)
 		}
 	} else if funct3 == 5 {
 		// BGE - Branch if greater or equal (signed)
@@ -466,7 +475,7 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 
 		//
 		if Int32 hart.reg[rs1] >= Int32 hart.reg[rs2] {
-			hart.nexpc = Nat32 (Int32 hart.pc + Int32 imm)
+			nexpc = Nat32 (Int32 hart.pc + Int32 imm)
 		}
 	} else if funct3 == 6 {
 		// BLTU - Branch if less than (unsigned)
@@ -475,7 +484,7 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 
 		//
 		if Nat32 hart.reg[rs1] < Nat32 hart.reg[rs2] {
-			hart.nexpc = Nat32 (Int32 hart.pc + Int32 imm)
+			nexpc = Nat32 (Int32 hart.pc + Int32 imm)
 		}
 	} else if funct3 == 7 {
 		// BGEU - Branch if greater or equal (unsigned)
@@ -484,9 +493,14 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 
 		//
 		if Nat32 hart.reg[rs1] >= Nat32 hart.reg[rs2] {
-			hart.nexpc = Nat32 (Int32 hart.pc + Int32 imm)
+			nexpc = Nat32 (Int32 hart.pc + Int32 imm)
 		}
+	} else {
+		// default: /NO JUMP/
+		nexpc = hart.pc + 4
 	}
+
+	hart.pc = nexpc
 }
 
 

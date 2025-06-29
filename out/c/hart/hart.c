@@ -68,8 +68,8 @@ void hart_tick(hart_Hart *hart) {
 	const uint32_t instr = fetch(hart);
 	exec(hart, instr);
 
-	hart->pc = hart->nexpc;
-	hart->nexpc = hart->pc + 4;
+	//hart.pc = hart.nexpc
+	//hart.nexpc = hart.pc + 4
 	hart->cnt = hart->cnt + 1;
 }
 
@@ -91,12 +91,16 @@ static void exec(hart_Hart *hart, uint32_t instr) {
 
 	if (op == opI) {
 		execI(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else if (op == opR) {
 		execR(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else if (op == opLUI) {
 		execLUI(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else if (op == opAUIPC) {
 		execAUIPC(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else if (op == opJAL) {
 		execJAL(hart, instr);
 	} else if (op == opJALR && funct3 == 0x0) {
@@ -105,12 +109,16 @@ static void exec(hart_Hart *hart, uint32_t instr) {
 		execB(hart, instr);
 	} else if (op == opL) {
 		execL(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else if (op == opS) {
 		execS(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else if (op == opSYSTEM) {
 		execSystem(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else if (op == opFENCE) {
 		execFence(hart, instr);
+		hart->pc = hart->pc + 4;
 	} else {
 		trace(hart->pc, "UNKNOWN OPCODE: %08X\n", op);
 	}
@@ -202,7 +210,6 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 	const uint32_t v1 = hart->reg[rs2];
 
 	if (funct7 == 0x1) {
-		//printf("MUL(%i)\n", Int32 funct3)
 
 		//
 		// "M" extension
@@ -367,7 +374,7 @@ static void execJAL(hart_Hart *hart, uint32_t instr) {
 		hart->reg[rd] = (hart->pc + 4);
 	}
 
-	hart->nexpc = ABS(((int32_t)hart->pc + imm));
+	hart->pc = ABS(((int32_t)hart->pc + imm));
 }
 
 static void execJALR(hart_Hart *hart, uint32_t instr) {
@@ -382,13 +389,13 @@ static void execJALR(hart_Hart *hart, uint32_t instr) {
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
 	const int32_t next_instr_ptr = (int32_t)(hart->pc + 4);
-	const uint32_t jump_to = (uint32_t)((int32_t)hart->reg[rs1] + imm) & 0xFFFFFFFEUL;
+	const uint32_t nexpc = (uint32_t)((int32_t)hart->reg[rs1] + imm) & 0xFFFFFFFEUL;
 
 	if (rd != 0) {
 		hart->reg[rd] = (uint32_t)next_instr_ptr;
 	}
 
-	hart->nexpc = jump_to;
+	hart->pc = nexpc;
 }
 
 static void execB(hart_Hart *hart, uint32_t instr) {
@@ -412,6 +419,8 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 
 	const int16_t imm = (int16_t)bits;
 
+	uint32_t nexpc = hart->pc + 4;
+
 	if (funct3 == 0x0) {
 		// BEQ - Branch if equal
 
@@ -419,7 +428,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 
 		// Branch if two registers are equal
 		if (hart->reg[rs1] == hart->reg[rs2]) {
-			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
+			nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
 	} else if (funct3 == 0x1) {
 		// BNE - Branch if not equal
@@ -428,7 +437,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 
 		//
 		if (hart->reg[rs1] != hart->reg[rs2]) {
-			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
+			nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
 	} else if (funct3 == 0x4) {
 		// BLT - Branch if less than (signed)
@@ -437,7 +446,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 
 		//
 		if ((int32_t)hart->reg[rs1] < (int32_t)hart->reg[rs2]) {
-			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
+			nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
 	} else if (funct3 == 0x5) {
 		// BGE - Branch if greater or equal (signed)
@@ -446,7 +455,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 
 		//
 		if ((int32_t)hart->reg[rs1] >= (int32_t)hart->reg[rs2]) {
-			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
+			nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
 	} else if (funct3 == 0x6) {
 		// BLTU - Branch if less than (unsigned)
@@ -455,7 +464,7 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 
 		//
 		if (hart->reg[rs1] < hart->reg[rs2]) {
-			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
+			nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
 	} else if (funct3 == 0x7) {
 		// BGEU - Branch if greater or equal (unsigned)
@@ -464,9 +473,14 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 
 		//
 		if (hart->reg[rs1] >= hart->reg[rs2]) {
-			hart->nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
+			nexpc = ABS(((int32_t)hart->pc + (int32_t)imm));
 		}
+	} else {
+		// default: /NO JUMP/
+		nexpc = hart->pc + 4;
 	}
+
+	hart->pc = nexpc;
 }
 
 static void execL(hart_Hart *hart, uint32_t instr) {
