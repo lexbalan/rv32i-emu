@@ -1410,7 +1410,7 @@ define internal void @execB(%hart_Hart* %hart, %Word32 %instr) {
 	%22 = or %Word16 %18, %21
 	store %Word16 %22, %Word16* %19
 
-	; распространяем знак, если он есть
+	; распространяем знак (если он есть)
 ; if_0
 	%23 = load %Word16, %Word16* %19
 	%24 = and %Word16 %23, 4096

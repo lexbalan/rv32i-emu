@@ -349,6 +349,7 @@ func execLUI (hart: *Hart, instr: Word32) -> Unit {
 	let rd: Nat8 = extract_rd(instr)
 
 	trace(hart.pc, "lui x%d, 0x%X\n", rd, imm)
+
 	hart.reg[rd] = imm << 12
 }
 
@@ -361,6 +362,7 @@ func execAUIPC (hart: *Hart, instr: Word32) -> Unit {
 	let rd: Nat8 = extract_rd(instr)
 
 	trace(hart.pc, "auipc x%d, 0x%X\n", rd, imm)
+
 	hart.reg[rd] = Word32 x
 }
 
@@ -409,14 +411,14 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 	let bit11: Word16 = (imm4to1_11 and 0x1) << 11
 	let bit12: Word16 = Word16 (imm12_10to5 and 0x40) << 6
 
-	var bits: Word16 = (bit12 or bit11 or bit10to5 or bit4to1)
+	var imm_bits: Word16 = (bit12 or bit11 or bit10to5 or bit4to1)
 
-	// распространяем знак, если он есть
-	if (bits and (Word16 1 << 12)) != 0 {
-		bits = 0xF000 or bits
+	// распространяем знак (если он есть)
+	if (imm_bits and (Word16 1 << 12)) != 0 {
+		imm_bits = 0xF000 or imm_bits
 	}
 
-	let imm = Int16 bits
+	let imm = Int16 imm_bits
 
 	var nexpc: Nat32 = hart.pc + 4
 

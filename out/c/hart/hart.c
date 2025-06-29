@@ -337,6 +337,7 @@ static void execLUI(hart_Hart *hart, uint32_t instr) {
 	const uint8_t rd = decode_extract_rd(instr);
 
 	trace(hart->pc, "lui x%d, 0x%X\n", rd, imm);
+
 	hart->reg[rd] = imm << 12;
 }
 
@@ -348,6 +349,7 @@ static void execAUIPC(hart_Hart *hart, uint32_t instr) {
 	const uint8_t rd = decode_extract_rd(instr);
 
 	trace(hart->pc, "auipc x%d, 0x%X\n", rd, imm);
+
 	hart->reg[rd] = x;
 }
 
@@ -393,14 +395,14 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 	const uint16_t bit11 = (imm4to1_11 & 0x1) << 11;
 	const uint16_t bit12 = (uint16_t)(imm12_10to5 & 0x40) << 6;
 
-	uint16_t bits = (bit12 | bit11 | bit10to5 | bit4to1);
+	uint16_t imm_bits = (bit12 | bit11 | bit10to5 | bit4to1);
 
-	// распространяем знак, если он есть
-	if ((bits & (0x1 << 12)) != 0x0) {
-		bits = 0xF000 | bits;
+	// распространяем знак (если он есть)
+	if ((imm_bits & (0x1 << 12)) != 0x0) {
+		imm_bits = 0xF000 | imm_bits;
 	}
 
-	const int16_t imm = (int16_t)bits;
+	const int16_t imm = (int16_t)imm_bits;
 
 	uint32_t nexpc = hart->pc + 4;
 
