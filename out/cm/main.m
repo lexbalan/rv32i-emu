@@ -36,7 +36,7 @@ public func main () -> Int {
 		exit(1)
 	}
 
-	rvHart.init(&hart, &busctl)
+	rvHart.init(&hart, 0, &busctl)
 
 	printf("*** START ***\n")
 

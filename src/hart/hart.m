@@ -13,6 +13,8 @@ const traceMode = false
 
 
 public type Hart = record {
+	id: Nat32
+
 	reg: [32]Word32
 	pc: Nat32
 
@@ -23,9 +25,6 @@ public type Hart = record {
 	public cnt: Nat32
 	public end: Bool
 }
-
-
-
 
 
 public type BusInterface = record {
@@ -45,8 +44,8 @@ const opAUIPC = 0x17  // add upper immediate to PC
 const opJAL = 0x6F	  // jump and link
 const opJALR = 0x67   // jump and link by register
 
-const opSYSTEM = 0x73 //
-const opFENCE = 0x0F  //
+const opSYSTEM = 0x73 // system
+const opFENCE = 0x0F  // fence
 
 
 const instrECALL = opSYSTEM or 0x00000000
@@ -68,8 +67,8 @@ public const intMemViolation = 0x0B
 
 
 
-public func init (hart: *Hart, bus: *BusInterface) -> Unit {
-	printf("HART INIT\n")
+public func init (hart: *Hart, id: Nat32, bus: *BusInterface) -> Unit {
+	printf("hart #%d init\n", hart.id)
 	*hart = Hart {
 		bus=bus
 	}

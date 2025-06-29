@@ -37,7 +37,7 @@ int main() {
 		exit(1);
 	}
 
-	hart_init(&hart, &busctl);
+	hart_init(&hart, 0, &busctl);
 
 	printf("*** START ***\n");
 

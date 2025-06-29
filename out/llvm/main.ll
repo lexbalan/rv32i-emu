@@ -328,6 +328,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 
 ; from import "rvHart"
 %hart_Hart = type {
+	%Nat32,
 	[32 x %Word32],
 	%Nat32,
 	%hart_BusInterface*,
@@ -341,7 +342,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 	void (%Nat32, %Word32, %Nat8)*
 };
 
-declare void @hart_init(%hart_Hart* %hart, %hart_BusInterface* %bus)
+declare void @hart_init(%hart_Hart* %hart, %Nat32 %id, %hart_BusInterface* %bus)
 declare void @hart_tick(%hart_Hart* %hart)
 declare void @hart_show_regs(%hart_Hart* %hart)
 
@@ -386,12 +387,12 @@ then_0:
 	br label %endif_0
 endif_0:
 	%8 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
-	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %hart_BusInterface* %8)
+	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %Nat32 0, %hart_BusInterface* %8)
 	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 ; while_1
 	br label %again_1
 again_1:
-	%10 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
+	%10 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 6
 	%11 = load %Bool, %Bool* %10
 	%12 = xor %Bool %11, 1
 	br %Bool %12 , label %body_1, label %break_1
@@ -399,7 +400,7 @@ body_1:
 	call void @hart_tick(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	br label %again_1
 break_1:
-	%13 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 4
+	%13 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
 	%14 = load %Nat32, %Nat32* %13
 	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Nat32 %14)
 	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))

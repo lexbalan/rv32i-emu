@@ -18,6 +18,8 @@
 struct hart_BusInterface;
 typedef struct hart_BusInterface hart_BusInterface;
 struct hart_Hart {
+	uint32_t id;
+
 	uint32_t reg[32];
 	uint32_t pc;
 
@@ -37,7 +39,7 @@ struct hart_BusInterface {
 
 #define hart_intSysCall  0x8
 #define hart_intMemViolation  0xB
-void hart_init(hart_Hart *hart, hart_BusInterface *bus);
+void hart_init(hart_Hart *hart, uint32_t id, hart_BusInterface *bus);
 void hart_tick(hart_Hart *hart);
 void hart_show_regs(hart_Hart *hart);
 

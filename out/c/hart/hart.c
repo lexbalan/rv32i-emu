@@ -28,8 +28,8 @@
 #define opJAL  0x6F// jump and link
 #define opJALR  0x67// jump and link by register
 
-#define opSYSTEM  0x73//
-#define opFENCE  0xF//
+#define opSYSTEM  0x73// system
+#define opFENCE  0xF// fence
 
 #define instrECALL  (opSYSTEM | 0x0)
 #define instrEBREAK  (opSYSTEM | 0x100000)
@@ -43,8 +43,8 @@
 #define funct3_CSRRSI  5
 #define funct3_CSRRCI  6
 
-void hart_init(hart_Hart *hart, hart_BusInterface *bus) {
-	printf("HART INIT\n");
+void hart_init(hart_Hart *hart, uint32_t id, hart_BusInterface *bus) {
+	printf("hart #%d init\n", hart->id);
 	*hart = (hart_Hart){
 		.bus = bus
 	};
