@@ -2,7 +2,7 @@
 COMPILER_PATH=/opt/homebrew/opt/llvm@14/bin
 
 CC=$(COMPILER_PATH)/clang
-MACHINE = --target=riscv32 -march=rv32i
+MACHINE = --target=riscv32 -march=rv32im
 
 # Кароче, -nostdlib -fno-builtin -fno-builtin-memset не помогают
 # гребаный компайлер все равно норовит вызывать memset и невозможно отделаться!
@@ -45,7 +45,7 @@ all:
 	llvm-objcopy -Iriscv32 main.elf $(ONLYSECTION) -Obinary ../../image.bin
 
 	# make ELF dump
-	llvm-objdump --full-contents -d ./main.elf > ./dump.txt
+	llvm-objdump --full-contents --section=.text --section=.data -d ./main.elf > ./dump.txt
 
 
 

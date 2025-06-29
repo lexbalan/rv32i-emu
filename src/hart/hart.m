@@ -226,7 +226,6 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 	let v1 = hart.reg[rs2]
 
 	if funct7 == 1 {
-		//printf("MUL(%i)\n", Int32 funct3)
 
 		//
 		// "M" extension
