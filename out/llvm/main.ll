@@ -370,19 +370,19 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 ;}
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
-	%2 = alloca %hart_BusInterface, align 16
-	%3 = insertvalue %hart_BusInterface zeroinitializer, %Word32 (%Nat32, %Nat8)* @bus_read, 0
-	%4 = insertvalue %hart_BusInterface %3, void (%Nat32, %Word32, %Nat8)* @bus_write, 1
-	store %hart_BusInterface %4, %hart_BusInterface* %2
-	%5 = call %Nat32 @bus_load_rom(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*))
+	%2 = call %Nat32 @bus_load_rom(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*))
 ; if_0
-	%6 = icmp ule %Nat32 %5, 0
-	br %Bool %6 , label %then_0, label %endif_0
+	%3 = icmp ule %Nat32 %2, 0
+	br %Bool %3 , label %then_0, label %endif_0
 then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	%7 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
+	%4 = alloca %hart_BusInterface, align 16
+	%5 = insertvalue %hart_BusInterface zeroinitializer, %Word32 (%Nat32, %Nat8)* @bus_read, 0
+	%6 = insertvalue %hart_BusInterface %5, void (%Nat32, %Word32, %Nat8)* @bus_write, 1
+	store %hart_BusInterface %6, %hart_BusInterface* %4
+	%7 = bitcast %hart_BusInterface* %4 to %hart_BusInterface*
 	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %Nat32 0, %hart_BusInterface* %7)
 	%8 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 ; while_1

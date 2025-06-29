@@ -23,16 +23,15 @@ static void show_mem();
 int main() {
 	printf("RISC-V VM\n");
 
+	const uint32_t nbytes = bus_load_rom(text_filename);
+	if (nbytes <= 0) {
+		exit(1);
+	}
+
 	hart_BusInterface busctl = (hart_BusInterface){
 		.read = &bus_read,
 		.write = &bus_write
 	};
-
-	const uint32_t nbytes = bus_load_rom(text_filename);
-
-	if (nbytes <= 0) {
-		exit(1);
-	}
 
 	hart_init(&hart, 0, &busctl);
 

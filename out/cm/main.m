@@ -22,15 +22,14 @@ var hart: Hart
 public func main () -> Int {
 	printf("RISC-V VM\n")
 
+	let nbytes: Nat32 = bus.load_rom(text_filename)
+	if nbytes <= 0 {
+		exit(1)
+	}
+
 	var busctl: BusInterface = BusInterface {
 		read = &bus.read
 		write = &bus.write
-	}
-
-	let nbytes: Nat32 = bus.load_rom(text_filename)
-
-	if nbytes <= 0 {
-		exit(1)
 	}
 
 	rvHart.init(&hart, 0, &busctl)
