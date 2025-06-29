@@ -385,24 +385,9 @@ static void execJALR(hart_Hart *hart, uint32_t instr) {
 
 static void execB(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
-	const uint8_t imm12_10to5 = decode_extract_funct7(instr);
-	const uint16_t imm4to1_11 = (uint16_t)decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
 	const uint8_t rs2 = decode_extract_rs2(instr);
-
-	const uint16_t bit4to1 = imm4to1_11 & 0x1E;
-	const uint16_t bit10to5 = (uint16_t)(imm12_10to5 & 0x3F) << 5;
-	const uint16_t bit11 = (imm4to1_11 & 0x1) << 11;
-	const uint16_t bit12 = (uint16_t)(imm12_10to5 & 0x40) << 6;
-
-	uint16_t imm_bits = (bit12 | bit11 | bit10to5 | bit4to1);
-
-	// распространяем знак (если он есть)
-	if ((imm_bits & (0x1 << 12)) != 0x0) {
-		imm_bits = 0xF000 | imm_bits;
-	}
-
-	const int16_t imm = (int16_t)imm_bits;
+	const int16_t imm = decode_extract_b_imm(instr);
 
 	uint32_t nexpc = hart->pc + 4;
 

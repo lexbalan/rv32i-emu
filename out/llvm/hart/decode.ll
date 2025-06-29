@@ -196,6 +196,46 @@ define %Word32 @decode_extract_imm31_12(%Word32 %instr) {
 	ret %Word32 %3
 }
 
+define %Int16 @decode_extract_b_imm(%Word32 %instr) {
+	%1 = call %Nat8 @decode_extract_rd(%Word32 %instr)
+	%2 = zext %Nat8 %1 to %Word16
+	%3 = call %Word8 @decode_extract_funct7(%Word32 %instr)
+	%4 = and %Word16 %2, 30
+	%5 = and %Word8 %3, 63
+	%6 = zext %Word8 %5 to %Word16
+	%7 = zext i8 5 to %Word16
+	%8 = shl %Word16 %6, %7
+	%9 = and %Word16 %2, 1
+	%10 = zext i8 11 to %Word16
+	%11 = shl %Word16 %9, %10
+	%12 = and %Word8 %3, 64
+	%13 = zext %Word8 %12 to %Word16
+	%14 = zext i8 6 to %Word16
+	%15 = shl %Word16 %13, %14
+	%16 = alloca %Word16, align 2
+	%17 = or %Word16 %8, %4
+	%18 = or %Word16 %11, %17
+	%19 = or %Word16 %15, %18
+	store %Word16 %19, %Word16* %16
+
+	; распространяем знак (если он есть)
+; if_0
+	%20 = load %Word16, %Word16* %16
+	%21 = and %Word16 %20, 4096
+	%22 = zext i8 0 to %Word16
+	%23 = icmp ne %Word16 %21, %22
+	br %Bool %23 , label %then_0, label %endif_0
+then_0:
+	%24 = load %Word16, %Word16* %16
+	%25 = or %Word16 61440, %24
+	store %Word16 %25, %Word16* %16
+	br label %endif_0
+endif_0:
+	%26 = load %Word16, %Word16* %16
+	%27 = bitcast %Word16 %26 to %Int16
+	ret %Int16 %27
+}
+
 define %Word32 @decode_extract_jal_imm(%Word32 %instr) {
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = zext i8 0 to %Word32

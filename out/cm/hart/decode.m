@@ -53,6 +53,24 @@ public func extract_imm31_12 (instr: Word32) -> Word32 {
 }
 
 
+public func extract_b_imm (instr: Word32) -> Int16 {
+	let imm4to1_11 = Word16 extract_rd(instr)
+	let imm12_10to5: Word8 = extract_funct7(instr)
+	let bit4to1: Word16 = imm4to1_11 and 0x1E
+	let bit10to5: Word16 = Word16 (imm12_10to5 and 0x3F) << 5
+	let bit11: Word16 = (imm4to1_11 and 0x1) << 11
+	let bit12: Word16 = Word16 (imm12_10to5 and 0x40) << 6
+
+	var imm_bits: Word16 = (bit12 or bit11 or bit10to5 or bit4to1)
+
+	// распространяем знак (если он есть)
+	if (imm_bits and (Word16 1 << 12)) != 0 {
+		imm_bits = 0xF000 or imm_bits
+	}
+
+	return Int16 imm_bits
+}
+
 public func extract_jal_imm (instr: Word32) -> Word32 {
 	let imm: Word32 = extract_imm31_12(instr)
 	let bit19to12_msk: Word32 = ((imm >> 0) and 0xFF) << 12

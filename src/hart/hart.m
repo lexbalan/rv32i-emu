@@ -425,26 +425,12 @@ func execJALR (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+
 func execB (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
-	let imm12_10to5 = extract_funct7(instr)
-	let imm4to1_11 = Word16 extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 	let rs2 = extract_rs2(instr)
-
-	let bit4to1 = imm4to1_11 and 0x1E
-	let bit10to5 = Word16 (imm12_10to5 and 0x3F) << 5
-	let bit11 = (imm4to1_11 and 0x1) << 11
-	let bit12 = Word16 (imm12_10to5 and 0x40) << 6
-
-	var imm_bits = (bit12 or bit11 or bit10to5 or bit4to1)
-
-	// распространяем знак (если он есть)
-	if (imm_bits and (Word16 1 << 12)) != 0 {
-		imm_bits = 0xF000 or imm_bits
-	}
-
-	let imm = Int16 imm_bits
+	let imm = extract_b_imm(instr)
 
 	var nexpc = hart.pc + 4
 
