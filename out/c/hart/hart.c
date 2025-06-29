@@ -51,7 +51,7 @@ void hart_init(hart_Hart *hart, hart_BusInterface *bus) {
 }
 
 static inline uint32_t fetch(hart_Hart *hart) {
-	return hart->bus->read32(hart->pc);
+	return hart->bus->read(hart->pc, /*size=*/4);
 }
 
 
@@ -67,9 +67,6 @@ void hart_tick(hart_Hart *hart) {
 
 	const uint32_t instr = fetch(hart);
 	exec(hart, instr);
-
-	//hart.pc = hart.nexpc
-	//hart.nexpc = hart.pc + 4
 	hart->cnt = hart->cnt + 1;
 }
 
@@ -88,6 +85,8 @@ static void execFence(hart_Hart *hart, uint32_t instr);
 static void exec(hart_Hart *hart, uint32_t instr) {
 	const uint8_t op = decode_extract_op(instr);
 	const uint8_t funct3 = decode_extract_funct3(instr);
+
+	hart->reg[0] = 0x0;
 
 	if (op == opI) {
 		execI(hart, instr);
@@ -131,10 +130,6 @@ static void execI(hart_Hart *hart, uint32_t instr) {
 	const int32_t imm = decode_expand12(imm12);
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
-
-	if (rd == 0) {
-		return;
-	}
 
 	if (funct3 == 0x0) {
 		// Add immediate
@@ -201,10 +196,6 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
 	const uint8_t rs2 = decode_extract_rs2(instr);
-
-	if (rd == 0) {
-		return;
-	}
 
 	const uint32_t v0 = hart->reg[rs1];
 	const uint32_t v1 = hart->reg[rs2];
@@ -341,10 +332,7 @@ static void execLUI(hart_Hart *hart, uint32_t instr) {
 	const uint8_t rd = decode_extract_rd(instr);
 
 	trace(hart->pc, "lui x%d, 0x%X\n", rd, imm);
-
-	if (rd != 0) {
-		hart->reg[rd] = imm << 12;
-	}
+	hart->reg[rd] = imm << 12;
 }
 
 static void execAUIPC(hart_Hart *hart, uint32_t instr) {
@@ -355,10 +343,7 @@ static void execAUIPC(hart_Hart *hart, uint32_t instr) {
 	const uint8_t rd = decode_extract_rd(instr);
 
 	trace(hart->pc, "auipc x%d, 0x%X\n", rd, imm);
-
-	if (rd != 0) {
-		hart->reg[rd] = x;
-	}
+	hart->reg[rd] = x;
 }
 
 static void execJAL(hart_Hart *hart, uint32_t instr) {
@@ -370,10 +355,7 @@ static void execJAL(hart_Hart *hart, uint32_t instr) {
 
 	trace(hart->pc, "jal x%d, %d\n", rd, imm);
 
-	if (rd != 0) {
-		hart->reg[rd] = (hart->pc + 4);
-	}
-
+	hart->reg[rd] = (hart->pc + 4);
 	hart->pc = ABS(((int32_t)hart->pc + imm));
 }
 
@@ -390,11 +372,7 @@ static void execJALR(hart_Hart *hart, uint32_t instr) {
 	// pc <- (rs1 + imm) & ~1
 	const int32_t next_instr_ptr = (int32_t)(hart->pc + 4);
 	const uint32_t nexpc = (uint32_t)((int32_t)hart->reg[rs1] + imm) & 0xFFFFFFFEUL;
-
-	if (rd != 0) {
-		hart->reg[rd] = (uint32_t)next_instr_ptr;
-	}
-
+	hart->reg[rd] = (uint32_t)next_instr_ptr;
 	hart->pc = nexpc;
 }
 
@@ -499,46 +477,31 @@ static void execL(hart_Hart *hart, uint32_t instr) {
 
 		trace(hart->pc, "lb x%d, %d(x%d)\n", rd, imm, rs1);
 
-		const int32_t val = (int32_t)hart->bus->read8(adr);
-		if (rd != 0) {
-			hart->reg[rd] = (uint32_t)val;
-		}
+		hart->reg[rd] = hart->bus->read(adr, /*size=*/1);
 	} else if (funct3 == 0x1) {
 		// LH (Load 16-bit signed integer value)
 
 		trace(hart->pc, "lh x%d, %d(x%d)\n", rd, imm, rs1);
 
-		const int32_t val = (int32_t)hart->bus->read16(adr);
-		if (rd != 0) {
-			hart->reg[rd] = (uint32_t)val;
-		}
+		hart->reg[rd] = hart->bus->read(adr, /*size=*/2);
 	} else if (funct3 == 0x2) {
 		// LW (Load 32-bit signed integer value)
 
 		trace(hart->pc, "lw x%d, %d(x%d)\n", rd, imm, rs1);
 
-		const uint32_t val = hart->bus->read32(adr);
-		if (rd != 0) {
-			hart->reg[rd] = val;
-		}
+		hart->reg[rd] = hart->bus->read(adr, /*size=*/4);
 	} else if (funct3 == 0x4) {
 		// LBU (Load 8-bit unsigned integer value)
 
 		trace(hart->pc, "lbu x%d, %d(x%d)\n", rd, imm, rs1);
 
-		const uint32_t val = (uint32_t)hart->bus->read8(adr);
-		if (rd != 0) {
-			hart->reg[rd] = val;
-		}
+		hart->reg[rd] = hart->bus->read(adr, /*size=*/1);
 	} else if (funct3 == 0x5) {
 		// LHU (Load 16-bit unsigned integer value)
 
 		trace(hart->pc, "lhu x%d, %d(x%d)\n", rd, imm, rs1);
 
-		const uint32_t val = (uint32_t)hart->bus->read16(adr);
-		if (rd != 0) {
-			hart->reg[rd] = val;
-		}
+		hart->reg[rd] = hart->bus->read(adr, /*size=*/2);
 	}
 }
 
@@ -564,7 +527,7 @@ static void execS(hart_Hart *hart, uint32_t instr) {
 		trace(hart->pc, "sb x%d, %d(x%d)\n", rs2, imm, rs1);
 
 		//
-		hart->bus->write8(adr, (uint8_t)val);
+		hart->bus->write(adr, val, /*size=*/1);
 	} else if (funct3 == 0x1) {
 		// SH (save 16-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
@@ -572,7 +535,7 @@ static void execS(hart_Hart *hart, uint32_t instr) {
 		trace(hart->pc, "sh x%d, %d(x%d)\n", rs2, imm, rs1);
 
 		//
-		hart->bus->write16(adr, (uint16_t)val);
+		hart->bus->write(adr, val, /*size=*/2);
 	} else if (funct3 == 0x2) {
 		// SW (save 32-bit value)
 		// <source:reg>, <offset:12bit_imm>(<address:reg>)
@@ -580,7 +543,7 @@ static void execS(hart_Hart *hart, uint32_t instr) {
 		trace(hart->pc, "sw x%d, %d(x%d)\n", rs2, imm, rs1);
 
 		//
-		hart->bus->write32(adr, val);
+		hart->bus->write(adr, val, /*size=*/4);
 	}
 }
 

@@ -20,7 +20,6 @@ typedef struct hart_BusInterface hart_BusInterface;
 struct hart_Hart {
 	uint32_t reg[32];
 	uint32_t pc;
-	uint32_t nexpc;
 
 	hart_BusInterface *bus;
 
@@ -32,13 +31,8 @@ struct hart_Hart {
 typedef struct hart_Hart hart_Hart;
 
 struct hart_BusInterface {
-	uint8_t(*read8)(uint32_t adr);
-	uint16_t(*read16)(uint32_t adr);
-	uint32_t(*read32)(uint32_t adr);
-
-	void(*write8)(uint32_t adr, uint8_t value);
-	void(*write16)(uint32_t adr, uint16_t value);
-	void(*write32)(uint32_t adr, uint32_t value);
+	uint32_t(*read)(uint32_t adr, uint8_t size);
+	void(*write)(uint32_t adr, uint32_t value, uint8_t size);
 };
 
 #define hart_intSysCall  0x8

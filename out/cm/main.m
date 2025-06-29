@@ -1,10 +1,10 @@
-import "mem"
+import "bus"
 import "hart/hart"
 include "ctypes"
 include "stdlib"
 include "stdio"
 
-import "mem" as mem
+import "bus" as bus
 import "hart/hart" as rvHart
 
 
@@ -16,7 +16,7 @@ const showText: Bool = false
 var hart: Hart
 
 
-//public func mem_violation_event(reason: Nat32) {
+//public func bus_violation_event(reason: Nat32) {
 //	hart.irq(&hart, rvHart.intMemViolation)
 //}
 
@@ -24,23 +24,19 @@ var hart: Hart
 public func main () -> Int {
 	printf("RISC-V VM\n")
 
-	var memctl: BusInterface = BusInterface {
-		read8 = &mem.read8
-		read16 = &mem.read16
-		read32 = &mem.read32
-		write8 = &mem.write8
-		write16 = &mem.write16
-		write32 = &mem.write32
+	var busctl: BusInterface = BusInterface {
+		read = &bus.read
+		write = &bus.write
 	}
 
-	let romptr: *[]Word8 = mem.get_rom_ptr()
-	let nbytes: Nat32 = loader(text_filename, romptr, mem.romSize)
+	let romptr: *[]Word8 = bus.get_rom_ptr()
+	let nbytes: Nat32 = loader(text_filename, romptr, bus.romSize)
 
 	if nbytes <= 0 {
 		exit(1)
 	}
 
-	rvHart.init(&hart, &memctl)
+	rvHart.init(&hart, &busctl)
 
 	printf("*** START ***\n")
 
@@ -91,7 +87,7 @@ func loader (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 
 func show_mem () -> Unit {
 	var i = Nat32 0
-	let ramptr: *[]Word8 = mem.get_ram_ptr()
+	let ramptr: *[]Word8 = bus.get_ram_ptr()
 	while i < 256 {
 		printf("%08X", i * 16)
 

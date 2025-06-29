@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "mem.h"
+#include "bus.h"
 #include "hart.h"
 int main();
 

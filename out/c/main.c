@@ -15,7 +15,7 @@
 
 static hart_Hart hart;
 
-//public func mem_violation_event(reason: Nat32) {
+//public func bus_violation_event(reason: Nat32) {
 //	hart.irq(&hart, rvHart.intMemViolation)
 //}
 
@@ -25,23 +25,19 @@ static void show_mem();
 int main() {
 	printf("RISC-V VM\n");
 
-	hart_BusInterface memctl = (hart_BusInterface){
-		.read8 = &mem_read8,
-		.read16 = &mem_read16,
-		.read32 = &mem_read32,
-		.write8 = &mem_write8,
-		.write16 = &mem_write16,
-		.write32 = &mem_write32
+	hart_BusInterface busctl = (hart_BusInterface){
+		.read = &bus_read,
+		.write = &bus_write
 	};
 
-	uint8_t *const romptr = mem_get_rom_ptr();
-	const uint32_t nbytes = loader(text_filename, romptr, mem_romSize);
+	uint8_t *const romptr = bus_get_rom_ptr();
+	const uint32_t nbytes = loader(text_filename, romptr, bus_romSize);
 
 	if (nbytes <= 0) {
 		exit(1);
 	}
 
-	hart_init(&hart, &memctl);
+	hart_init(&hart, &busctl);
 
 	printf("*** START ***\n");
 
@@ -90,7 +86,7 @@ static uint32_t loader(char *filename, uint8_t *bufptr, uint32_t buf_size) {
 
 static void show_mem() {
 	uint32_t i = 0;
-	uint8_t *const ramptr = mem_get_ram_ptr();
+	uint8_t *const ramptr = bus_get_ram_ptr();
 	while (i < 256) {
 		printf("%08X", i * 16);
 

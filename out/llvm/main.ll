@@ -219,17 +219,13 @@ declare %Word32 @mmio_read32(%Nat32 %adr)
 
 ; end from import "mmio"
 
-; from import "mem"
-declare [0 x %Word8]* @mem_get_ram_ptr()
-declare [0 x %Word8]* @mem_get_rom_ptr()
-declare %Word8 @mem_read8(%Nat32 %adr)
-declare %Word16 @mem_read16(%Nat32 %adr)
-declare %Word32 @mem_read32(%Nat32 %adr)
-declare void @mem_write8(%Nat32 %adr, %Word8 %value)
-declare void @mem_write16(%Nat32 %adr, %Word16 %value)
-declare void @mem_write32(%Nat32 %adr, %Word32 %value)
+; from import "bus"
+declare [0 x %Word8]* @bus_get_ram_ptr()
+declare [0 x %Word8]* @bus_get_rom_ptr()
+declare %Word32 @bus_read(%Nat32 %adr, %Nat8 %size)
+declare void @bus_write(%Nat32 %adr, %Word32 %value, %Nat8 %size)
 
-; end from import "mem"
+; end from import "bus"
 ; from included unistd
 declare %Int @access([0 x %ConstChar]* %path, %Int %amode)
 declare %UnsignedInt @alarm(%UnsignedInt %seconds)
@@ -334,7 +330,6 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 %hart_Hart = type {
 	[32 x %Word32],
 	%Nat32,
-	%Nat32,
 	%hart_BusInterface*,
 	%Word32,
 	%Nat32,
@@ -342,12 +337,8 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 };
 
 %hart_BusInterface = type {
-	%Word8 (%Nat32)*,
-	%Word16 (%Nat32)*,
-	%Word32 (%Nat32)*,
-	void (%Nat32, %Word8)*,
-	void (%Nat32, %Word16)*,
-	void (%Nat32, %Word32)*
+	%Word32 (%Nat32, %Nat8)*,
+	void (%Nat32, %Word32, %Nat8)*
 };
 
 declare void @hart_init(%hart_Hart* %hart, %hart_BusInterface* %bus)
@@ -376,48 +367,44 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 @hart = internal global %hart_Hart zeroinitializer
 
 
-;public func mem_violation_event(reason: Nat32) {
+;public func bus_violation_event(reason: Nat32) {
 ;	hart.irq(&hart, rvHart.intMemViolation)
 ;}
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
-	%2 = alloca %hart_BusInterface, align 64
-	%3 = insertvalue %hart_BusInterface zeroinitializer, %Word8 (%Nat32)* @mem_read8, 0
-	%4 = insertvalue %hart_BusInterface %3, %Word16 (%Nat32)* @mem_read16, 1
-	%5 = insertvalue %hart_BusInterface %4, %Word32 (%Nat32)* @mem_read32, 2
-	%6 = insertvalue %hart_BusInterface %5, void (%Nat32, %Word8)* @mem_write8, 3
-	%7 = insertvalue %hart_BusInterface %6, void (%Nat32, %Word16)* @mem_write16, 4
-	%8 = insertvalue %hart_BusInterface %7, void (%Nat32, %Word32)* @mem_write32, 5
-	store %hart_BusInterface %8, %hart_BusInterface* %2
-	%9 = call [0 x %Word8]* @mem_get_rom_ptr()
-	%10 = call %Nat32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %9, %Nat32 1048576)
+	%2 = alloca %hart_BusInterface, align 16
+	%3 = insertvalue %hart_BusInterface zeroinitializer, %Word32 (%Nat32, %Nat8)* @bus_read, 0
+	%4 = insertvalue %hart_BusInterface %3, void (%Nat32, %Word32, %Nat8)* @bus_write, 1
+	store %hart_BusInterface %4, %hart_BusInterface* %2
+	%5 = call [0 x %Word8]* @bus_get_rom_ptr()
+	%6 = call %Nat32 @loader(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), [0 x %Word8]* %5, %Nat32 1048576)
 ; if_0
-	%11 = icmp ule %Nat32 %10, 0
-	br %Bool %11 , label %then_0, label %endif_0
+	%7 = icmp ule %Nat32 %6, 0
+	br %Bool %7 , label %then_0, label %endif_0
 then_0:
 	call void @exit(%Int 1)
 	br label %endif_0
 endif_0:
-	%12 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
-	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %hart_BusInterface* %12)
-	%13 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+	%8 = bitcast %hart_BusInterface* %2 to %hart_BusInterface*
+	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %hart_BusInterface* %8)
+	%9 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
 ; while_1
 	br label %again_1
 again_1:
-	%14 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 6
-	%15 = load %Bool, %Bool* %14
-	%16 = xor %Bool %15, 1
-	br %Bool %16 , label %body_1, label %break_1
+	%10 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
+	%11 = load %Bool, %Bool* %10
+	%12 = xor %Bool %11, 1
+	br %Bool %12 , label %body_1, label %break_1
 body_1:
 	call void @hart_tick(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	br label %again_1
 break_1:
-	%17 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
-	%18 = load %Nat32, %Nat32* %17
-	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Nat32 %18)
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
+	%13 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 4
+	%14 = load %Nat32, %Nat32* %13
+	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str4 to [0 x i8]*), %Nat32 %14)
+	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*))
 	call void @hart_show_regs(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
-	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
+	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str6 to [0 x i8]*))
 	call void @show_mem()
 	ret %Int 0
 }
@@ -475,7 +462,7 @@ endif_1:
 define internal void @show_mem() {
 	%1 = alloca %Nat32, align 4
 	store %Nat32 0, %Nat32* %1
-	%2 = call [0 x %Word8]* @mem_get_ram_ptr()
+	%2 = call [0 x %Word8]* @bus_get_ram_ptr()
 ; while_1
 	br label %again_1
 again_1:

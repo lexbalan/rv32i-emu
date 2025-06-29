@@ -1,0 +1,117 @@
+//
+//
+
+include "libc/stdio"
+include "libc/stdlib"
+
+import "mmio"
+
+
+// see mem.ld
+public const ramSize = Nat32 16 * 1024
+public const ramStart = Nat32 0x10000000
+public const ramEnd = ramStart + ramSize
+
+
+public const romSize = Nat32 0x100000
+public const romStart = Nat32 0x00000000
+public const romEnd = romStart + romSize
+
+
+const mmioSize = Nat32 0xFFFF
+const mmioStart = Nat32 0xF00C0000
+const mmioEnd = mmioStart + mmioSize
+
+
+var rom: [romSize]Word8
+var ram: [ramSize]Word8
+
+
+public func get_ram_ptr () -> *[]Word8 {
+	return &ram
+}
+
+
+public func get_rom_ptr () -> *[]Word8 {
+	return &rom
+}
+
+
+var memviolationCnt = Nat32 0
+func memoryViolation (rw: Char8, adr: Nat32) -> Unit {
+	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
+	if memviolationCnt > 10 {
+		exit(1)
+	}
+	++memviolationCnt
+//	memoryViolation_event(0x55) // !
+}
+
+
+@inline
+func isAdressInRange (x: Nat32, a: Nat32, b: Nat32) -> Bool {
+	return x >= a and x < b
+}
+
+
+public func read (adr: Nat32, size: Nat8) -> Word32 {
+	if isAdressInRange(adr, ramStart, ramEnd) {
+		if size == 1 {
+			let ptr = *Word8 Ptr &ram[adr - ramStart]
+			return Word32 *ptr
+		} else if size == 2 {
+			let ptr = *Word16 Ptr &ram[adr - ramStart]
+			return Word32 *ptr
+		} else if size == 4 {
+			let ptr = *Word32 Ptr &ram[adr - ramStart]
+			return *ptr
+		}
+	} else if isAdressInRange(adr, romStart, romEnd) {
+		if size == 1 {
+			let ptr = *Word8 Ptr &rom[adr - romStart]
+			return Word32 *ptr
+		} else if size == 2 {
+			let ptr = *Word16 Ptr &rom[adr - romStart]
+			return Word32 *ptr
+		} else if size == 4 {
+			let ptr = *Word32 Ptr &rom[adr - romStart]
+			return *ptr
+		}
+	} else if isAdressInRange(adr, mmioStart, mmioEnd) {
+		// MMIO Read
+	} else {
+		memoryViolation("r", adr)
+	}
+
+	return 0
+}
+
+
+public func write (adr: Nat32, value: Word32, size: Nat8) -> Unit {
+	if isAdressInRange(adr, ramStart, ramEnd) {
+		if size == 1 {
+			let ptr = *Word8 Ptr &ram[adr - ramStart]
+			*ptr = unsafe Word8 value
+		} else if size == 2 {
+			let ptr = *Word16 Ptr &ram[adr - ramStart]
+			*ptr = unsafe Word16 value
+		} else if size == 4 {
+			let ptr = *Word32 Ptr &ram[adr - ramStart]
+			*ptr = value
+		}
+	} else if isAdressInRange(adr, mmioStart, mmioEnd) {
+		if size == 1 {
+			mmio.write8(adr - mmioStart, unsafe Word8 value)
+		} else if size == 2 {
+			mmio.write16(adr - mmioStart, unsafe Word16 value)
+		} else if size == 4 {
+			mmio.write32(adr - mmioStart, value)
+		}
+	} else if isAdressInRange(adr, romStart, romEnd) {
+		memoryViolation("w", adr)
+	} else {
+		memoryViolation("w", adr)
+	}
+}
+
+
