@@ -223,8 +223,7 @@ declare %Word32 @mmio_read32(%Nat32 %adr)
 declare %Word32 @bus_read(%Nat32 %adr, %Nat8 %size)
 declare void @bus_write(%Nat32 %adr, %Word32 %value, %Nat8 %size)
 declare %Nat32 @bus_load_rom(%Str8* %filename)
-declare [0 x %Word8]* @bus_get_ram_ptr()
-declare [0 x %Word8]* @bus_get_rom_ptr()
+declare void @bus_show_ram()
 
 ; end from import "bus"
 ; from included unistd
@@ -358,16 +357,8 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 @str5 = private constant [15 x i8] [i8 104, i8 97, i8 114, i8 116, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
 @str6 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 @str7 = private constant [2 x i8] [i8 10, i8 0]
-@str8 = private constant [5 x i8] [i8 37, i8 48, i8 56, i8 88, i8 0]
-@str9 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
-@str10 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
 @hart = internal global %hart_Hart zeroinitializer
-
-
-;public func bus_violation_event(reason: Nat32) {
-;	hart.irq(&hart, rvHart.intMemViolation)
-;}
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))
 	%2 = call %Nat32 @bus_load_rom(%Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*))
@@ -403,52 +394,8 @@ break_1:
 	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str6 to [0 x i8]*))
 	call void @hart_show_regs(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str7 to [0 x i8]*))
-	call void @show_mem()
+	call void @bus_show_ram()
 	ret %Int 0
-}
-
-define internal void @show_mem() {
-	%1 = alloca %Nat32, align 4
-	store %Nat32 0, %Nat32* %1
-	%2 = call [0 x %Word8]* @bus_get_ram_ptr()
-; while_1
-	br label %again_1
-again_1:
-	%3 = load %Nat32, %Nat32* %1
-	%4 = icmp ult %Nat32 %3, 256
-	br %Bool %4 , label %body_1, label %break_1
-body_1:
-	%5 = load %Nat32, %Nat32* %1
-	%6 = mul %Nat32 %5, 16
-	%7 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str8 to [0 x i8]*), %Nat32 %6)
-	%8 = alloca %Nat32, align 4
-	store %Nat32 0, %Nat32* %8
-; while_2
-	br label %again_2
-again_2:
-	%9 = load %Nat32, %Nat32* %8
-	%10 = icmp ult %Nat32 %9, 16
-	br %Bool %10 , label %body_2, label %break_2
-body_2:
-	%11 = load %Nat32, %Nat32* %1
-	%12 = load %Nat32, %Nat32* %8
-	%13 = add %Nat32 %11, %12
-	%14 = bitcast %Nat32 %13 to %Nat32
-	%15 = getelementptr [0 x %Word8], [0 x %Word8]* %2, %Int32 0, %Nat32 %14
-	%16 = load %Word8, %Word8* %15
-	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str9 to [0 x i8]*), %Word8 %16)
-	%18 = load %Nat32, %Nat32* %8
-	%19 = add %Nat32 %18, 1
-	store %Nat32 %19, %Nat32* %8
-	br label %again_2
-break_2:
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str10 to [0 x i8]*))
-	%21 = load %Nat32, %Nat32* %1
-	%22 = add %Nat32 %21, 16
-	store %Nat32 %22, %Nat32* %1
-	br label %again_1
-break_1:
-	ret void
 }
 
 

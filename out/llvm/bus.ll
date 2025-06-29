@@ -220,13 +220,16 @@ declare %Word32 @mmio_read32(%Nat32 %adr)
 ; end from import "mmio"
 ; -- end print imports 'bus' --
 ; -- strings --
-@str1 = private constant [10 x i8] [i8 76, i8 79, i8 65, i8 68, i8 58, i8 32, i8 37, i8 115, i8 10, i8 0]
-@str2 = private constant [3 x i8] [i8 114, i8 98, i8 0]
-@str3 = private constant [29 x i8] [i8 101, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 99, i8 97, i8 110, i8 110, i8 111, i8 116, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 102, i8 105, i8 108, i8 101, i8 32, i8 39, i8 37, i8 115, i8 39, i8 0]
-@str4 = private constant [19 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 122, i8 117, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
-@str5 = private constant [15 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
-@str6 = private constant [13 x i8] [i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 10, i8 0]
-@str7 = private constant [38 x i8] [i8 42, i8 42, i8 42, i8 32, i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
+@str1 = private constant [38 x i8] [i8 42, i8 42, i8 42, i8 32, i8 77, i8 69, i8 77, i8 79, i8 82, i8 89, i8 32, i8 86, i8 73, i8 79, i8 76, i8 65, i8 84, i8 73, i8 79, i8 78, i8 32, i8 39, i8 37, i8 99, i8 39, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
+@str2 = private constant [10 x i8] [i8 76, i8 79, i8 65, i8 68, i8 58, i8 32, i8 37, i8 115, i8 10, i8 0]
+@str3 = private constant [3 x i8] [i8 114, i8 98, i8 0]
+@str4 = private constant [29 x i8] [i8 101, i8 114, i8 114, i8 111, i8 114, i8 58, i8 32, i8 99, i8 97, i8 110, i8 110, i8 111, i8 116, i8 32, i8 111, i8 112, i8 101, i8 110, i8 32, i8 102, i8 105, i8 108, i8 101, i8 32, i8 39, i8 37, i8 115, i8 39, i8 0]
+@str5 = private constant [19 x i8] [i8 76, i8 79, i8 65, i8 68, i8 69, i8 68, i8 58, i8 32, i8 37, i8 122, i8 117, i8 32, i8 98, i8 121, i8 116, i8 101, i8 115, i8 10, i8 0]
+@str6 = private constant [15 x i8] [i8 37, i8 48, i8 56, i8 122, i8 120, i8 58, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
+@str7 = private constant [13 x i8] [i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 45, i8 10, i8 0]
+@str8 = private constant [5 x i8] [i8 37, i8 48, i8 56, i8 88, i8 0]
+@str9 = private constant [6 x i8] [i8 32, i8 37, i8 48, i8 50, i8 88, i8 0]
+@str10 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --;
 ;
 
@@ -464,19 +467,37 @@ define internal %Bool @isAdressInRange(%Nat32 %x, %Nat32 %a, %Nat32 %b) {
 	ret %Bool %3
 }
 
+@memviolationCnt = internal global %Nat32 0
+define internal void @memoryViolation(%Char8 %rw, %Nat32 %adr) {
+	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str1 to [0 x i8]*), %Char8 %rw, %Nat32 %adr)
+; if_0
+	%2 = load %Nat32, %Nat32* @memviolationCnt
+	%3 = icmp ugt %Nat32 %2, 10
+	br %Bool %3 , label %then_0, label %endif_0
+then_0:
+	call void @exit(%Int 1)
+	br label %endif_0
+endif_0:
+	%4 = load %Nat32, %Nat32* @memviolationCnt
+	%5 = add %Nat32 %4, 1
+	store %Nat32 %5, %Nat32* @memviolationCnt
+	;	memoryViolation_event(0x55) // !
+	ret void
+}
+
 define %Nat32 @bus_load_rom(%Str8* %filename) {
 	%1 = call %Nat32 @load(%Str8* %filename, [0 x %Word8]* bitcast ([1048576 x %Word8]* @rom to [0 x %Word8]*), %Nat32 1048576)
 	ret %Nat32 %1
 }
 
 define internal %Nat32 @load(%Str8* %filename, [0 x %Word8]* %bufptr, %Nat32 %buf_size) {
-	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str1 to [0 x i8]*), %Str8* %filename)
-	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str2 to [0 x i8]*))
+	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([10 x i8]* @str2 to [0 x i8]*), %Str8* %filename)
+	%2 = call %File* @fopen(%Str8* %filename, %ConstCharStr* bitcast ([3 x i8]* @str3 to [0 x i8]*))
 ; if_0
 	%3 = icmp eq %File* %2, null
 	br %Bool %3 , label %then_0, label %endif_0
 then_0:
-	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str3 to [0 x i8]*), %Str8* %filename)
+	%4 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([29 x i8]* @str4 to [0 x i8]*), %Str8* %filename)
 	ret %Nat32 0
 	br label %endif_0
 endif_0:
@@ -484,7 +505,7 @@ endif_0:
 	%7 = zext %Nat32 %buf_size to %SizeT
 	%8 = bitcast %File* %2 to %File*
 	%9 = call %SizeT @fread(i8* %6, %SizeT 1, %SizeT %7, %File* %8)
-	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str4 to [0 x i8]*), %SizeT %9)
+	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([19 x i8]* @str5 to [0 x i8]*), %SizeT %9)
 ; if_1
 	br %Bool 0 , label %then_1, label %endif_1
 then_1:
@@ -504,13 +525,13 @@ body_1:
 	%18 = trunc %SizeT %16 to %Nat32
 	%19 = getelementptr [0 x %Nat32], [0 x %Nat32]* %17, %Int32 0, %Nat32 %18
 	%20 = load %Nat32, %Nat32* %19
-	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str5 to [0 x i8]*), %SizeT %15, %Nat32 %20)
+	%21 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str6 to [0 x i8]*), %SizeT %15, %Nat32 %20)
 	%22 = load %SizeT, %SizeT* %11
 	%23 = add %SizeT %22, 4
 	store %SizeT %23, %SizeT* %11
 	br label %again_1
 break_1:
-	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str6 to [0 x i8]*))
+	%24 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str7 to [0 x i8]*))
 	br label %endif_1
 endif_1:
 	%25 = bitcast %File* %2 to %File*
@@ -519,29 +540,46 @@ endif_1:
 	ret %Nat32 %27
 }
 
-define [0 x %Word8]* @bus_get_ram_ptr() {
-	ret [0 x %Word8]* bitcast ([16384 x %Word8]* @ram to [0 x %Word8]*)
-}
-
-define [0 x %Word8]* @bus_get_rom_ptr() {
-	ret [0 x %Word8]* bitcast ([1048576 x %Word8]* @rom to [0 x %Word8]*)
-}
-
-@memviolationCnt = internal global %Nat32 0
-define internal void @memoryViolation(%Char8 %rw, %Nat32 %adr) {
-	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([38 x i8]* @str7 to [0 x i8]*), %Char8 %rw, %Nat32 %adr)
-; if_0
-	%2 = load %Nat32, %Nat32* @memviolationCnt
-	%3 = icmp ugt %Nat32 %2, 10
-	br %Bool %3 , label %then_0, label %endif_0
-then_0:
-	call void @exit(%Int 1)
-	br label %endif_0
-endif_0:
-	%4 = load %Nat32, %Nat32* @memviolationCnt
-	%5 = add %Nat32 %4, 1
-	store %Nat32 %5, %Nat32* @memviolationCnt
-	;	memoryViolation_event(0x55) // !
+define void @bus_show_ram() {
+	%1 = alloca %Nat32, align 4
+	store %Nat32 0, %Nat32* %1
+; while_1
+	br label %again_1
+again_1:
+	%2 = load %Nat32, %Nat32* %1
+	%3 = icmp ult %Nat32 %2, 256
+	br %Bool %3 , label %body_1, label %break_1
+body_1:
+	%4 = load %Nat32, %Nat32* %1
+	%5 = mul %Nat32 %4, 16
+	%6 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str8 to [0 x i8]*), %Nat32 %5)
+	%7 = alloca %Nat32, align 4
+	store %Nat32 0, %Nat32* %7
+; while_2
+	br label %again_2
+again_2:
+	%8 = load %Nat32, %Nat32* %7
+	%9 = icmp ult %Nat32 %8, 16
+	br %Bool %9 , label %body_2, label %break_2
+body_2:
+	%10 = load %Nat32, %Nat32* %1
+	%11 = load %Nat32, %Nat32* %7
+	%12 = add %Nat32 %10, %11
+	%13 = bitcast %Nat32 %12 to %Nat32
+	%14 = getelementptr [16384 x %Word8], [16384 x %Word8]* @ram, %Int32 0, %Nat32 %13
+	%15 = load %Word8, %Word8* %14
+	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([6 x i8]* @str9 to [0 x i8]*), %Word8 %15)
+	%17 = load %Nat32, %Nat32* %7
+	%18 = add %Nat32 %17, 1
+	store %Nat32 %18, %Nat32* %7
+	br label %again_2
+break_2:
+	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str10 to [0 x i8]*))
+	%20 = load %Nat32, %Nat32* %1
+	%21 = add %Nat32 %20, 16
+	store %Nat32 %21, %Nat32* %1
+	br label %again_1
+break_1:
 	ret void
 }
 

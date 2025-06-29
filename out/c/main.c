@@ -13,13 +13,6 @@
 
 static hart_Hart hart;
 
-//public func bus_violation_event(reason: Nat32) {
-//	hart.irq(&hart, rvHart.intMemViolation)
-//}
-
-
-static void show_mem();
-
 int main() {
 	printf("RISC-V VM\n");
 
@@ -42,32 +35,13 @@ int main() {
 	}
 
 	printf("*** END ***\n");
-
 	printf("hart.cnt = %u\n", hart.cnt);
 
 	printf("\nCore dump:\n");
 	hart_show_regs(&hart);
 	printf("\n");
-	show_mem();
+	bus_show_ram();
 
 	return 0;
-}
-
-static void show_mem() {
-	uint32_t i = 0;
-	uint8_t *const ramptr = bus_get_ram_ptr();
-	while (i < 256) {
-		printf("%08X", i * 16);
-
-		uint32_t j = 0;
-		while (j < 16) {
-			printf(" %02X", ramptr[i + j]);
-			j = j + 1;
-		}
-
-		printf("\n");
-
-		i = i + 16;
-	}
 }
 

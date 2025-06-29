@@ -89,6 +89,16 @@ static inline bool isAdressInRange(uint32_t x, uint32_t a, uint32_t b) {
 	return x >= a && x < b;
 }
 
+static uint32_t memviolationCnt = 0;
+static void memoryViolation(char rw, uint32_t adr) {
+	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
+	if (memviolationCnt > 10) {
+		exit(1);
+	}
+	memviolationCnt = memviolationCnt + 1;
+	//	memoryViolation_event(0x55) // !
+}
+
 
 static uint32_t load(char *filename, uint8_t *bufptr, uint32_t buf_size);
 
@@ -125,21 +135,21 @@ static uint32_t load(char *filename, uint8_t *bufptr, uint32_t buf_size) {
 	return (uint32_t)n;
 }
 
-uint8_t *bus_get_ram_ptr() {
-	return (uint8_t *)&ram;
-}
+void bus_show_ram() {
+	uint32_t i = 0;
+	uint8_t *const ramptr = &ram;
+	while (i < 256) {
+		printf("%08X", i * 16);
 
-uint8_t *bus_get_rom_ptr() {
-	return (uint8_t *)&rom;
-}
+		uint32_t j = 0;
+		while (j < 16) {
+			printf(" %02X", ramptr[i + j]);
+			j = j + 1;
+		}
 
-static uint32_t memviolationCnt = 0;
-static void memoryViolation(char rw, uint32_t adr) {
-	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr);
-	if (memviolationCnt > 10) {
-		exit(1);
+		printf("\n");
+
+		i = i + 16;
 	}
-	memviolationCnt = memviolationCnt + 1;
-	//	memoryViolation_event(0x55) // !
 }
 

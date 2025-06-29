@@ -96,6 +96,17 @@ func isAdressInRange (x: Nat32, a: Nat32, b: Nat32) -> Bool {
 }
 
 
+var memviolationCnt = Nat32 0
+func memoryViolation (rw: Char8, adr: Nat32) -> Unit {
+	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
+	if memviolationCnt > 10 {
+		exit(1)
+	}
+	memviolationCnt = memviolationCnt + 1
+	//	memoryViolation_event(0x55) // !
+}
+
+
 
 public func load_rom (filename: *Str8) -> Nat32 {
 	return load(filename, &rom, romSize)
@@ -132,24 +143,21 @@ func load (filename: *Str8, bufptr: *[]Word8, buf_size: Nat32) -> Nat32 {
 }
 
 
+public func show_ram () -> Unit {
+	var i = Nat32 0
+	let ramptr: *[ramSize]Word8 = &ram
+	while i < 256 {
+		printf("%08X", i * 16)
 
-public func get_ram_ptr () -> *[]Word8 {
-	return &ram
-}
+		var j = Nat32 0
+		while j < 16 {
+			printf(" %02X", ramptr[i + j])
+			j = j + 1
+		}
 
+		printf("\n")
 
-public func get_rom_ptr () -> *[]Word8 {
-	return &rom
-}
-
-
-var memviolationCnt = Nat32 0
-func memoryViolation (rw: Char8, adr: Nat32) -> Unit {
-	printf("*** MEMORY VIOLATION '%c' 0x%08x ***\n", rw, adr)
-	if memviolationCnt > 10 {
-		exit(1)
+		i = i + 16
 	}
-	memviolationCnt = memviolationCnt + 1
-	//	memoryViolation_event(0x55) // !
 }
 

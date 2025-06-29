@@ -21,7 +21,6 @@
 uint32_t bus_read(uint32_t adr, uint8_t size);
 void bus_write(uint32_t adr, uint32_t value, uint8_t size);
 uint32_t bus_load_rom(char *filename);
-uint8_t *bus_get_ram_ptr();
-uint8_t *bus_get_rom_ptr();
+void bus_show_ram();
 
 #endif /* BUS_H */
