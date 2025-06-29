@@ -1,6 +1,5 @@
 import "bus"
 import "hart/hart"
-include "ctypes"
 include "stdlib"
 include "stdio"
 

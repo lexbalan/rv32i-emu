@@ -1,5 +1,4 @@
 
-include "libc/ctypes"
 include "libc/stdlib"
 include "libc/stdio"
 
