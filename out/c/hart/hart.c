@@ -130,6 +130,7 @@ static void exec(hart_Hart *hart, uint32_t instr) {
 	}
 }
 
+// Immediate instructions
 static void execI(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -193,13 +194,13 @@ static void execI(hart_Hart *hart, uint32_t instr) {
 	}
 }
 
+// Register to register
 
 static void notImplemented(char *form, ...);
 
 static void execR(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
-	const int32_t imm = decode_expand12(decode_extract_imm12(instr));
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
 	const uint8_t rs2 = decode_extract_rs2(instr);
@@ -332,8 +333,8 @@ static void execR(hart_Hart *hart, uint32_t instr) {
 	}
 }
 
+// Load upper immediate
 static void execLUI(hart_Hart *hart, uint32_t instr) {
-	// load upper immediate
 
 	const uint32_t imm = decode_extract_imm31_12(instr);
 	const uint8_t rd = decode_extract_rd(instr);
@@ -343,9 +344,8 @@ static void execLUI(hart_Hart *hart, uint32_t instr) {
 	hart->reg[rd] = imm << 12;
 }
 
+// Add upper immediate to PC
 static void execAUIPC(hart_Hart *hart, uint32_t instr) {
-	// Add upper immediate to PC
-
 	const int32_t imm = decode_expand12(decode_extract_imm31_12(instr));
 	const uint32_t x = hart->pc + ((uint32_t)imm << 12);
 	const uint8_t rd = decode_extract_rd(instr);
@@ -355,9 +355,8 @@ static void execAUIPC(hart_Hart *hart, uint32_t instr) {
 	hart->reg[rd] = x;
 }
 
+// Jump and link
 static void execJAL(hart_Hart *hart, uint32_t instr) {
-	// Jump and link
-
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint32_t raw_imm = decode_extract_jal_imm(instr);
 	const int32_t imm = decode_expand20(raw_imm);
@@ -368,9 +367,8 @@ static void execJAL(hart_Hart *hart, uint32_t instr) {
 	hart->pc = ABS(((int32_t)hart->pc + imm));
 }
 
+// Jump and link (by register)
 static void execJALR(hart_Hart *hart, uint32_t instr) {
-	// Jump and link (by register)
-
 	const uint8_t rs1 = decode_extract_rs1(instr);
 	const uint8_t rd = decode_extract_rd(instr);
 	const int32_t imm = decode_expand12(decode_extract_imm12(instr));
@@ -379,12 +377,14 @@ static void execJALR(hart_Hart *hart, uint32_t instr) {
 
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
+
 	const int32_t next_instr_ptr = (int32_t)(hart->pc + 4);
 	const uint32_t nexpc = (uint32_t)((int32_t)hart->reg[rs1] + imm) & 0xFFFFFFFEUL;
 	hart->reg[rd] = (uint32_t)next_instr_ptr;
 	hart->pc = nexpc;
 }
 
+// Branch instructions
 static void execB(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
@@ -452,9 +452,9 @@ static void execB(hart_Hart *hart, uint32_t instr) {
 	hart->pc = nexpc;
 }
 
+// Load instructions
 static void execL(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
-	const uint8_t funct7 = decode_extract_funct7(instr);
 	const int32_t imm = decode_expand12(decode_extract_imm12(instr));
 	const uint8_t rd = decode_extract_rd(instr);
 	const uint8_t rs1 = decode_extract_rs1(instr);
@@ -495,6 +495,7 @@ static void execL(hart_Hart *hart, uint32_t instr) {
 	}
 }
 
+// Store instructions
 static void execS(hart_Hart *hart, uint32_t instr) {
 	const uint8_t funct3 = decode_extract_funct3(instr);
 	const uint8_t funct7 = decode_extract_funct7(instr);
@@ -620,6 +621,12 @@ The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSR
 */
 static void csr_rw(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1) {
 	const uint32_t nv = hart->reg[rs1];
+
+	//	if csr == Nat16 0xB00 {
+	//		mcycle
+	//	} else if csr == Nat16 0xB80 {
+	//		mcycleh
+	//	}
 
 	if (csr == 768) {
 		// mstatus (Machine status register)

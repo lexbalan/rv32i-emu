@@ -142,6 +142,7 @@ func exec (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+// Immediate instructions
 func execI (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
@@ -214,10 +215,10 @@ func execI (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+// Register to register
 func execR (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
-	let imm = expand12(extract_imm12(instr))
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
 	let rs2 = extract_rs2(instr)
@@ -367,8 +368,9 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+
+// Load upper immediate
 func execLUI (hart: *Hart, instr: Word32) -> Unit {
-	// load upper immediate
 
 	let imm = extract_imm31_12(instr)
 	let rd = extract_rd(instr)
@@ -379,9 +381,8 @@ func execLUI (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+// Add upper immediate to PC
 func execAUIPC (hart: *Hart, instr: Word32) -> Unit {
-	// Add upper immediate to PC
-
 	let imm = expand12(extract_imm31_12(instr))
 	let x = hart.pc + Nat32 (Word32 imm << 12)
 	let rd = extract_rd(instr)
@@ -392,9 +393,8 @@ func execAUIPC (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+// Jump and link
 func execJAL (hart: *Hart, instr: Word32) -> Unit {
-	// Jump and link
-
 	let rd = extract_rd(instr)
 	let raw_imm = extract_jal_imm(instr)
 	let imm = expand20(raw_imm)
@@ -406,9 +406,8 @@ func execJAL (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+// Jump and link (by register)
 func execJALR (hart: *Hart, instr: Word32) -> Unit {
-	// Jump and link (by register)
-
 	let rs1 = extract_rs1(instr)
 	let rd = extract_rd(instr)
 	let imm = expand12(extract_imm12(instr))
@@ -417,6 +416,7 @@ func execJALR (hart: *Hart, instr: Word32) -> Unit {
 
 	// rd <- pc + 4
 	// pc <- (rs1 + imm) & ~1
+
 	let next_instr_ptr = Int32 (hart.pc + 4)
 	let nexpc = Word32 (Int32 hart.reg[rs1] + imm) and 0xFFFFFFFE
 	hart.reg[rd] = Word32 next_instr_ptr
@@ -424,7 +424,7 @@ func execJALR (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
-
+// Branch instructions
 func execB (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let rs1 = extract_rs1(instr)
@@ -498,9 +498,9 @@ func execB (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+// Load instructions
 func execL (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
-	let funct7 = extract_funct7(instr)
 	let imm = expand12(extract_imm12(instr))
 	let rd = extract_rd(instr)
 	let rs1 = extract_rs1(instr)
@@ -546,6 +546,7 @@ func execL (hart: *Hart, instr: Word32) -> Unit {
 }
 
 
+// Store instructions
 func execS (hart: *Hart, instr: Word32) -> Unit {
 	let funct3 = extract_funct3(instr)
 	let funct7 = extract_funct7(instr)
@@ -672,6 +673,12 @@ The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSR
 */
 func csr_rw (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 	let nv = hart.reg[rs1]
+
+//	if csr == Nat16 0xB00 {
+//		mcycle
+//	} else if csr == Nat16 0xB80 {
+//		mcycleh
+//	}
 
 	if csr == Nat16 0x300 {
 		// mstatus (Machine status register)

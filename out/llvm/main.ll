@@ -358,7 +358,6 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 @str6 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 @str7 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
-;include "libc/ctypes"
 @hart = internal global %hart_Hart zeroinitializer
 define %Int @main() {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([11 x i8]* @str1 to [0 x i8]*))

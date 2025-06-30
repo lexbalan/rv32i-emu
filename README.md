@@ -1,3 +1,4 @@
 # RV32IM emulator
 
-Just for fun; now in research.
+Created just for fun as Modest language test/example project.
+
