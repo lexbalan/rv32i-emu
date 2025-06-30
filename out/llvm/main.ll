@@ -204,6 +204,7 @@ declare %Int @putchar(%Int %char)
 declare %Int @puts(%ConstCharStr* %str)
 declare %Int @ungetc(%Int %char, %File* %f)
 declare void @perror(%ConstCharStr* %str)
+; from included csr
 ; -- end print includes --
 ; -- print imports 'main' --
 ; -- 2
@@ -329,13 +330,12 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 
 ; from import "rvHart"
 %hart_Hart = type {
-	%Nat32,
 	[32 x %Word32],
 	%Nat32,
 	%hart_BusInterface*,
 	%Word32,
-	%Nat32,
-	%Bool
+	%Bool,
+	[4096 x %Word32]
 };
 
 %hart_BusInterface = type {
@@ -352,9 +352,9 @@ declare void @hart_show_regs(%hart_Hart* %hart)
 ; -- strings --
 @str1 = private constant [11 x i8] [i8 82, i8 73, i8 83, i8 67, i8 45, i8 86, i8 32, i8 86, i8 77, i8 10, i8 0]
 @str2 = private constant [12 x i8] [i8 46, i8 47, i8 105, i8 109, i8 97, i8 103, i8 101, i8 46, i8 98, i8 105, i8 110, i8 0]
-@str3 = private constant [15 x i8] [i8 42, i8 42, i8 42, i8 32, i8 83, i8 84, i8 65, i8 82, i8 84, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
-@str4 = private constant [13 x i8] [i8 42, i8 42, i8 42, i8 32, i8 69, i8 78, i8 68, i8 32, i8 42, i8 42, i8 42, i8 10, i8 0]
-@str5 = private constant [15 x i8] [i8 104, i8 97, i8 114, i8 116, i8 46, i8 99, i8 110, i8 116, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
+@str3 = private constant [82 x i8] [i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 62, i8 10, i8 0]
+@str4 = private constant [82 x i8] [i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 60, i8 10, i8 0]
+@str5 = private constant [13 x i8] [i8 109, i8 99, i8 121, i8 99, i8 108, i8 101, i8 32, i8 61, i8 32, i8 37, i8 117, i8 10, i8 0]
 @str6 = private constant [13 x i8] [i8 10, i8 67, i8 111, i8 114, i8 101, i8 32, i8 100, i8 117, i8 109, i8 112, i8 58, i8 10, i8 0]
 @str7 = private constant [2 x i8] [i8 10, i8 0]
 ; -- endstrings --
@@ -375,11 +375,11 @@ endif_0:
 	store %hart_BusInterface %6, %hart_BusInterface* %4
 	%7 = bitcast %hart_BusInterface* %4 to %hart_BusInterface*
 	call void @hart_init(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*), %Nat32 0, %hart_BusInterface* %7)
-	%8 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str3 to [0 x i8]*))
+	%8 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([82 x i8]* @str3 to [0 x i8]*))
 ; while_1
 	br label %again_1
 again_1:
-	%9 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 6
+	%9 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 4
 	%10 = load %Bool, %Bool* %9
 	%11 = xor %Bool %10, 1
 	br %Bool %11 , label %body_1, label %break_1
@@ -387,13 +387,15 @@ body_1:
 	call void @hart_tick(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	br label %again_1
 break_1:
-	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str4 to [0 x i8]*))
+	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([82 x i8]* @str4 to [0 x i8]*))
 	%13 = getelementptr %hart_Hart, %hart_Hart* @hart, %Int32 0, %Int32 5
-	%14 = load %Nat32, %Nat32* %13
-	%15 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str5 to [0 x i8]*), %Nat32 %14)
-	%16 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str6 to [0 x i8]*))
+	%14 = bitcast %Nat32 2816 to %Nat32
+	%15 = getelementptr [4096 x %Word32], [4096 x %Word32]* %13, %Int32 0, %Nat32 %14
+	%16 = load %Word32, %Word32* %15
+	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str5 to [0 x i8]*), %Word32 %16)
+	%18 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([13 x i8]* @str6 to [0 x i8]*))
 	call void @hart_show_regs(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
-	%17 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str7 to [0 x i8]*))
+	%19 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([2 x i8]* @str7 to [0 x i8]*))
 	call void @bus_show_ram()
 	ret %Int 0
 }

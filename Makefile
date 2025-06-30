@@ -28,16 +28,18 @@ CM:
 	mcc -o $(CMPREFIX)/main $(CM_OPTS) -mbackend=cm $(INDIR)/main.m
 	mcc -o $(CMPREFIX)/hart/hart $(CM_OPTS) -mbackend=cm $(INDIR)/hart/hart.m
 	mcc -o $(CMPREFIX)/hart/decode $(CM_OPTS) -mbackend=cm $(INDIR)/hart/decode.m
+	mcc -o $(CMPREFIX)/hart/csr $(CM_OPTS) $(CM_OPTS) -mbackend=c $(INDIR)/hart/csr.m
 	mcc -o $(CMPREFIX)/bus $(CM_OPTS) -mbackend=cm $(INDIR)/bus.m
 	mcc -o $(CMPREFIX)/mmio $(CM_OPTS) -mbackend=cm $(INDIR)/mmio.m
 
 
 C:
-	mcc -o $(CPREFIX)/main $(COPTIONS) $(CM_OPTS) -mbackend=c $(INDIR)/main.m
-	mcc -o $(CPREFIX)/hart/hart $(COPTIONS) -mbackend=c $(CM_OPTS) $(INDIR)/hart/hart.m
-	mcc -o $(CPREFIX)/hart/decode $(COPTIONS) -mbackend=c $(CM_OPTS) $(INDIR)/hart/decode.m
-	mcc -o $(CPREFIX)/bus $(CM_OPTS) $(COPTIONS) -mbackend=c $(INDIR)/bus.m
-	mcc -o $(CPREFIX)/mmio $(CM_OPTS) $(COPTIONS) -mbackend=c $(INDIR)/mmio.m
+	mcc -o $(CPREFIX)/main $(CM_OPTS) -mbackend=c $(INDIR)/main.m
+	mcc -o $(CPREFIX)/hart/hart $(CM_OPTS) -mbackend=c $(CM_OPTS) $(INDIR)/hart/hart.m
+	mcc -o $(CPREFIX)/hart/csr $(CM_OPTS) $(COPTIONS) -mbackend=c $(INDIR)/hart/csr.m
+	mcc -o $(CPREFIX)/hart/decode $(CM_OPTS) -mbackend=c $(CM_OPTS) $(INDIR)/hart/decode.m
+	mcc -o $(CPREFIX)/bus $(CM_OPTS) $(CM_OPTS) -mbackend=c $(INDIR)/bus.m
+	mcc -o $(CPREFIX)/mmio $(CM_OPTS) $(CM_OPTS) -mbackend=c $(INDIR)/mmio.m
 	CC -I$(CPREFIX)/include $(CPREFIX)/main.c $(CPREFIX)/hart/hart.c $(CPREFIX)/hart/decode.c $(CPREFIX)/bus.c $(CPREFIX)/mmio.c
 
 

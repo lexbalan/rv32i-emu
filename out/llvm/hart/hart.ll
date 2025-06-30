@@ -293,6 +293,7 @@ declare %LongInt @labs(%LongInt %x)
 declare %Str* @secure_getenv(%Str* %name)
 declare i8* @malloc(%SizeT %size)
 declare %Int @system([0 x %ConstChar]* %string)
+; from included csr
 ; from included decode
 declare %Word8 @decode_extract_op(%Word32 %instr)
 declare %Word8 @decode_extract_funct2(%Word32 %instr)
@@ -367,24 +368,26 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 @str52 = private constant [8 x i8] [i8 101, i8 98, i8 114, i8 101, i8 97, i8 107, i8 10, i8 0]
 @str53 = private constant [34 x i8] [i8 85, i8 78, i8 75, i8 78, i8 79, i8 87, i8 78, i8 32, i8 83, i8 89, i8 83, i8 84, i8 69, i8 77, i8 32, i8 73, i8 78, i8 83, i8 84, i8 82, i8 85, i8 67, i8 84, i8 73, i8 79, i8 78, i8 58, i8 32, i8 48, i8 120, i8 37, i8 120, i8 10, i8 0]
 @str54 = private constant [7 x i8] [i8 80, i8 65, i8 85, i8 83, i8 69, i8 10, i8 0]
-@str55 = private constant [8 x i8] [i8 91, i8 37, i8 48, i8 56, i8 88, i8 93, i8 32, i8 0]
-@str56 = private constant [8 x i8] [i8 91, i8 37, i8 48, i8 56, i8 88, i8 93, i8 32, i8 0]
-@str57 = private constant [33 x i8] [i8 10, i8 10, i8 73, i8 78, i8 83, i8 84, i8 82, i8 85, i8 67, i8 84, i8 73, i8 79, i8 78, i8 95, i8 78, i8 79, i8 84, i8 95, i8 73, i8 77, i8 80, i8 76, i8 69, i8 77, i8 69, i8 78, i8 84, i8 69, i8 68, i8 58, i8 32, i8 34, i8 0]
-@str58 = private constant [3 x i8] [i8 34, i8 10, i8 0]
-@str59 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
-@str60 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
-@str61 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
+@str55 = private constant [21 x i8] [i8 82, i8 87, i8 73, i8 32, i8 110, i8 111, i8 116, i8 32, i8 105, i8 109, i8 112, i8 108, i8 101, i8 109, i8 101, i8 110, i8 116, i8 101, i8 100, i8 10, i8 0]
+@str56 = private constant [21 x i8] [i8 82, i8 83, i8 73, i8 32, i8 110, i8 111, i8 116, i8 32, i8 105, i8 109, i8 112, i8 108, i8 101, i8 109, i8 101, i8 110, i8 116, i8 101, i8 100, i8 10, i8 0]
+@str57 = private constant [21 x i8] [i8 82, i8 67, i8 73, i8 32, i8 110, i8 111, i8 116, i8 32, i8 105, i8 109, i8 112, i8 108, i8 101, i8 109, i8 101, i8 110, i8 116, i8 101, i8 100, i8 10, i8 0]
+@str58 = private constant [8 x i8] [i8 91, i8 37, i8 48, i8 56, i8 88, i8 93, i8 32, i8 0]
+@str59 = private constant [8 x i8] [i8 91, i8 37, i8 48, i8 56, i8 88, i8 93, i8 32, i8 0]
+@str60 = private constant [33 x i8] [i8 10, i8 10, i8 73, i8 78, i8 83, i8 84, i8 82, i8 85, i8 67, i8 84, i8 73, i8 79, i8 78, i8 95, i8 78, i8 79, i8 84, i8 95, i8 73, i8 77, i8 80, i8 76, i8 69, i8 77, i8 69, i8 78, i8 84, i8 69, i8 68, i8 58, i8 32, i8 34, i8 0]
+@str61 = private constant [3 x i8] [i8 34, i8 10, i8 0]
+@str62 = private constant [15 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 0]
+@str63 = private constant [5 x i8] [i8 32, i8 32, i8 32, i8 32, i8 0]
+@str64 = private constant [16 x i8] [i8 120, i8 37, i8 48, i8 50, i8 100, i8 32, i8 61, i8 32, i8 48, i8 120, i8 37, i8 48, i8 56, i8 120, i8 10, i8 0]
 ; -- endstrings --;
 ; * RV32IM simple software implementation
 ; 
 %hart_Hart = type {
-	%Nat32,
 	[32 x %Word32],
 	%Nat32,
 	%hart_BusInterface*,
 	%Word32,
-	%Nat32,
-	%Bool
+	%Bool,
+	[4096 x %Word32]
 };
 
 %hart_BusInterface = type {
@@ -397,31 +400,36 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 ; funct3 for CSR
 define void @hart_init(%hart_Hart* %hart, %Nat32 %id, %hart_BusInterface* %bus) {
 	%1 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str1 to [0 x i8]*), %Nat32 %id)
-	%2 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
-	store %Nat32 %id, %Nat32* %2
-	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
-	%4 = zext i8 32 to %Nat32
-	%5 = mul %Nat32 %4, 4
-	%6 = bitcast [32 x %Word32]* %3 to i8*
-	call void (i8*, i8, i32, i1) @llvm.memset.p0.i32(i8* %6, i8 0, %Nat32 %5, i1 0)
-	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	store %Nat32 0, %Nat32* %7
-	%8 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
-	%9 = bitcast %hart_BusInterface* %bus to %hart_BusInterface*
-	store %hart_BusInterface* %9, %hart_BusInterface** %8
-	%10 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
-	store %Word32 0, %Word32* %10
-	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
-	store %Nat32 0, %Nat32* %11
-	%12 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
-	store %Bool 0, %Bool* %12
+	%2 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%3 = bitcast %Nat32 3860 to %Nat32
+	%4 = getelementptr [4096 x %Word32], [4096 x %Word32]* %2, %Int32 0, %Nat32 %3
+	%5 = bitcast %Nat32 %id to %Word32
+	store %Word32 %5, %Word32* %4
+	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%7 = bitcast %Nat32 769 to %Nat32
+	%8 = getelementptr [4096 x %Word32], [4096 x %Word32]* %6, %Int32 0, %Nat32 %7
+	store %Word32 1073746176, %Word32* %8
+	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%10 = zext i8 32 to %Nat32
+	%11 = mul %Nat32 %10, 4
+	%12 = bitcast [32 x %Word32]* %9 to i8*
+	call void (i8*, i8, i32, i1) @llvm.memset.p0.i32(i8* %12, i8 0, %Nat32 %11, i1 0)
+	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	store %Nat32 0, %Nat32* %13
+	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%15 = bitcast %hart_BusInterface* %bus to %hart_BusInterface*
+	store %hart_BusInterface* %15, %hart_BusInterface** %14
+	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	store %Word32 0, %Word32* %16
+	%17 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	store %Bool 0, %Bool* %17
 	ret void
 }
 
 define internal %Word32 @fetch(%hart_Hart* %hart) {
-	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%2 = load %Nat32, %Nat32* %1
-	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%4 = load %hart_BusInterface*, %hart_BusInterface** %3
 	%5 = getelementptr %hart_BusInterface, %hart_BusInterface* %4, %Int32 0, %Int32 0
 	%6 = load %Word32 (%Nat32, %Nat8)*, %Word32 (%Nat32, %Nat8)** %5
@@ -431,24 +439,24 @@ define internal %Word32 @fetch(%hart_Hart* %hart) {
 
 define void @hart_tick(%hart_Hart* %hart) {
 ; if_0
-	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
 	%2 = zext i8 0 to %Word32
 	%3 = load %Word32, %Word32* %1
 	%4 = icmp ne %Word32 %3, %2
 	br %Bool %4 , label %then_0, label %endif_0
 then_0:
-	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%6 = load %Nat32, %Nat32* %5
-	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
 	%8 = load %Word32, %Word32* %7
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %6, %Str8* bitcast ([12 x i8]* @str2 to [0 x i8]*), %Word32 %8)
-	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
 	%10 = load %Word32, %Word32* %9
 	%11 = bitcast %Word32 %10 to %Nat32
 	%12 = mul %Nat32 %11, 4
-	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	store %Nat32 %12, %Nat32* %13
-	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
 	%15 = zext i8 0 to %Word32
 	store %Word32 %15, %Word32* %14
 	br label %endif_0
@@ -457,18 +465,26 @@ endif_0:
 	%17 = call %Word32 @fetch(%hart_Hart* %16)
 	%18 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @exec(%hart_Hart* %18, %Word32 %17)
+
+	; count mcycle
 	%19 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
-	%20 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
-	%21 = load %Nat32, %Nat32* %20
-	%22 = add %Nat32 %21, 1
-	store %Nat32 %22, %Nat32* %19
+	%20 = bitcast %Nat32 2816 to %Nat32
+	%21 = getelementptr [4096 x %Word32], [4096 x %Word32]* %19, %Int32 0, %Nat32 %20
+	%22 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%23 = bitcast %Nat32 2816 to %Nat32
+	%24 = getelementptr [4096 x %Word32], [4096 x %Word32]* %22, %Int32 0, %Nat32 %23
+	%25 = load %Word32, %Word32* %24
+	%26 = bitcast %Word32 %25 to %Nat32
+	%27 = add %Nat32 %26, 1
+	%28 = bitcast %Nat32 %27 to %Word32
+	store %Word32 %28, %Word32* %21
 	ret void
 }
 
 define internal void @exec(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word8 @decode_extract_op(%Word32 %instr)
 	%2 = call %Word8 @decode_extract_funct3(%Word32 %instr)
-	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%4 = getelementptr [32 x %Word32], [32 x %Word32]* %3, %Int32 0, %Int32 0
 	%5 = zext i8 0 to %Word32
 	store %Word32 %5, %Word32* %4
@@ -478,8 +494,8 @@ define internal void @exec(%hart_Hart* %hart, %Word32 %instr) {
 then_0:
 	%7 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execI(%hart_Hart* %7, %Word32 %instr)
-	%8 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%8 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%10 = load %Nat32, %Nat32* %9
 	%11 = add %Nat32 %10, 4
 	store %Nat32 %11, %Nat32* %8
@@ -491,8 +507,8 @@ else_0:
 then_1:
 	%13 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execR(%hart_Hart* %13, %Word32 %instr)
-	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%15 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%15 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%16 = load %Nat32, %Nat32* %15
 	%17 = add %Nat32 %16, 4
 	store %Nat32 %17, %Nat32* %14
@@ -504,8 +520,8 @@ else_1:
 then_2:
 	%19 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execLUI(%hart_Hart* %19, %Word32 %instr)
-	%20 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%21 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%20 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%21 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%22 = load %Nat32, %Nat32* %21
 	%23 = add %Nat32 %22, 4
 	store %Nat32 %23, %Nat32* %20
@@ -517,8 +533,8 @@ else_2:
 then_3:
 	%25 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execAUIPC(%hart_Hart* %25, %Word32 %instr)
-	%26 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%27 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%26 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%27 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%28 = load %Nat32, %Nat32* %27
 	%29 = add %Nat32 %28, 4
 	store %Nat32 %29, %Nat32* %26
@@ -557,8 +573,8 @@ else_6:
 then_7:
 	%40 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execL(%hart_Hart* %40, %Word32 %instr)
-	%41 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%42 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%41 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%42 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%43 = load %Nat32, %Nat32* %42
 	%44 = add %Nat32 %43, 4
 	store %Nat32 %44, %Nat32* %41
@@ -570,8 +586,8 @@ else_7:
 then_8:
 	%46 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execS(%hart_Hart* %46, %Word32 %instr)
-	%47 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%48 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%47 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%48 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%49 = load %Nat32, %Nat32* %48
 	%50 = add %Nat32 %49, 4
 	store %Nat32 %50, %Nat32* %47
@@ -583,8 +599,8 @@ else_8:
 then_9:
 	%52 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execSystem(%hart_Hart* %52, %Word32 %instr)
-	%53 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%54 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%53 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%54 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%55 = load %Nat32, %Nat32* %54
 	%56 = add %Nat32 %55, 4
 	store %Nat32 %56, %Nat32* %53
@@ -596,14 +612,14 @@ else_9:
 then_10:
 	%58 = bitcast %hart_Hart* %hart to %hart_Hart*
 	call void @execFence(%hart_Hart* %58, %Word32 %instr)
-	%59 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%60 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%59 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%60 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%61 = load %Nat32, %Nat32* %60
 	%62 = add %Nat32 %61, 4
 	store %Nat32 %62, %Nat32* %59
 	br label %endif_10
 else_10:
-	%63 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%63 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%64 = load %Nat32, %Nat32* %63
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %64, %Str8* bitcast ([22 x i8]* @str3 to [0 x i8]*), %Word8 %1)
 	br label %endif_10
@@ -647,15 +663,15 @@ define internal void @execI(%hart_Hart* %hart, %Word32 %instr) {
 	br %Bool %8 , label %then_0, label %else_0
 then_0:
 	; Add immediate
-	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%10 = load %Nat32, %Nat32* %9
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %10, %Str8* bitcast ([19 x i8]* @str4 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%12 = zext %Nat8 %5 to %Nat32
 	%13 = getelementptr [32 x %Word32], [32 x %Word32]* %11, %Int32 0, %Nat32 %12
-	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%15 = zext %Nat8 %6 to %Nat32
 	%16 = getelementptr [32 x %Word32], [32 x %Word32]* %14, %Int32 0, %Nat32 %15
 	%17 = load %Word32, %Word32* %16
@@ -676,15 +692,15 @@ then_1:
 ; SLLI is a logical left shift (zeros are shifted
 ;		into the lower bits); SRLI is a logical right shift (zeros are shifted into the upper bits); and SRAI
 ;		is an arithmetic right shift (the original sign bit is copied into the vacated upper bits). 
-	%26 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%26 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%27 = load %Nat32, %Nat32* %26
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %27, %Str8* bitcast ([19 x i8]* @str5 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%28 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%28 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%29 = zext %Nat8 %5 to %Nat32
 	%30 = getelementptr [32 x %Word32], [32 x %Word32]* %28, %Int32 0, %Nat32 %29
-	%31 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%31 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%32 = zext %Nat8 %6 to %Nat32
 	%33 = getelementptr [32 x %Word32], [32 x %Word32]* %31, %Int32 0, %Nat32 %32
 	%34 = load %Word32, %Word32* %33
@@ -700,15 +716,15 @@ else_1:
 	br %Bool %39 , label %then_2, label %else_2
 then_2:
 	; SLTI - set [1 to rd if rs1] less than immediate
-	%40 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%40 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%41 = load %Nat32, %Nat32* %40
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %41, %Str8* bitcast ([19 x i8]* @str6 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%42 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%42 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%43 = zext %Nat8 %5 to %Nat32
 	%44 = getelementptr [32 x %Word32], [32 x %Word32]* %42, %Int32 0, %Nat32 %43
-	%45 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%45 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%46 = zext %Nat8 %6 to %Nat32
 	%47 = getelementptr [32 x %Word32], [32 x %Word32]* %45, %Int32 0, %Nat32 %46
 	%48 = load %Word32, %Word32* %47
@@ -723,15 +739,15 @@ else_2:
 	%53 = icmp eq %Word8 %1, %52
 	br %Bool %53 , label %then_3, label %else_3
 then_3:
-	%54 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%54 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%55 = load %Nat32, %Nat32* %54
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %55, %Str8* bitcast ([20 x i8]* @str7 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%56 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%56 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%57 = zext %Nat8 %5 to %Nat32
 	%58 = getelementptr [32 x %Word32], [32 x %Word32]* %56, %Int32 0, %Nat32 %57
-	%59 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%59 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%60 = zext %Nat8 %6 to %Nat32
 	%61 = getelementptr [32 x %Word32], [32 x %Word32]* %59, %Int32 0, %Nat32 %60
 	%62 = load %Word32, %Word32* %61
@@ -747,15 +763,15 @@ else_3:
 	%68 = icmp eq %Word8 %1, %67
 	br %Bool %68 , label %then_4, label %else_4
 then_4:
-	%69 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%69 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%70 = load %Nat32, %Nat32* %69
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %70, %Str8* bitcast ([19 x i8]* @str8 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%71 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%71 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%72 = zext %Nat8 %5 to %Nat32
 	%73 = getelementptr [32 x %Word32], [32 x %Word32]* %71, %Int32 0, %Nat32 %72
-	%74 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%74 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%75 = zext %Nat8 %6 to %Nat32
 	%76 = getelementptr [32 x %Word32], [32 x %Word32]* %74, %Int32 0, %Nat32 %75
 	%77 = bitcast %Int32 %4 to %Word32
@@ -772,15 +788,15 @@ else_4:
 	%84 = and %Bool %81, %83
 	br %Bool %84 , label %then_5, label %else_5
 then_5:
-	%85 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%85 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%86 = load %Nat32, %Nat32* %85
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %86, %Str8* bitcast ([19 x i8]* @str9 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%87 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%87 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%88 = zext %Nat8 %5 to %Nat32
 	%89 = getelementptr [32 x %Word32], [32 x %Word32]* %87, %Int32 0, %Nat32 %88
-	%90 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%90 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%91 = zext %Nat8 %6 to %Nat32
 	%92 = getelementptr [32 x %Word32], [32 x %Word32]* %90, %Int32 0, %Nat32 %91
 	%93 = load %Word32, %Word32* %92
@@ -797,15 +813,15 @@ else_5:
 	%100 = and %Bool %98, %99
 	br %Bool %100 , label %then_6, label %else_6
 then_6:
-	%101 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%101 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%102 = load %Nat32, %Nat32* %101
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %102, %Str8* bitcast ([19 x i8]* @str10 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%103 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%103 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%104 = zext %Nat8 %5 to %Nat32
 	%105 = getelementptr [32 x %Word32], [32 x %Word32]* %103, %Int32 0, %Nat32 %104
-	%106 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%106 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%107 = zext %Nat8 %6 to %Nat32
 	%108 = getelementptr [32 x %Word32], [32 x %Word32]* %106, %Int32 0, %Nat32 %107
 	%109 = load %Word32, %Word32* %108
@@ -820,15 +836,15 @@ else_6:
 	%114 = icmp eq %Word8 %1, %113
 	br %Bool %114 , label %then_7, label %else_7
 then_7:
-	%115 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%115 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%116 = load %Nat32, %Nat32* %115
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %116, %Str8* bitcast ([18 x i8]* @str11 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%117 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%117 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%118 = zext %Nat8 %5 to %Nat32
 	%119 = getelementptr [32 x %Word32], [32 x %Word32]* %117, %Int32 0, %Nat32 %118
-	%120 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%120 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%121 = zext %Nat8 %6 to %Nat32
 	%122 = getelementptr [32 x %Word32], [32 x %Word32]* %120, %Int32 0, %Nat32 %121
 	%123 = bitcast %Int32 %4 to %Word32
@@ -842,15 +858,15 @@ else_7:
 	%127 = icmp eq %Word8 %1, %126
 	br %Bool %127 , label %then_8, label %endif_8
 then_8:
-	%128 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%128 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%129 = load %Nat32, %Nat32* %128
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %129, %Str8* bitcast ([19 x i8]* @str12 to [0 x i8]*), %Nat8 %5, %Nat8 %6, %Int32 %4)
 
 	;
-	%130 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%130 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%131 = zext %Nat8 %5 to %Nat32
 	%132 = getelementptr [32 x %Word32], [32 x %Word32]* %130, %Int32 0, %Nat32 %131
-	%133 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%133 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%134 = zext %Nat8 %6 to %Nat32
 	%135 = getelementptr [32 x %Word32], [32 x %Word32]* %133, %Int32 0, %Nat32 %134
 	%136 = bitcast %Int32 %4 to %Word32
@@ -887,11 +903,11 @@ define internal void @execR(%hart_Hart* %hart, %Word32 %instr) {
 	%3 = call %Nat8 @decode_extract_rd(%Word32 %instr)
 	%4 = call %Nat8 @decode_extract_rs1(%Word32 %instr)
 	%5 = call %Nat8 @decode_extract_rs2(%Word32 %instr)
-	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%7 = zext %Nat8 %4 to %Nat32
 	%8 = getelementptr [32 x %Word32], [32 x %Word32]* %6, %Int32 0, %Nat32 %7
 	%9 = load %Word32, %Word32* %8
-	%10 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%10 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%11 = zext %Nat8 %5 to %Nat32
 	%12 = getelementptr [32 x %Word32], [32 x %Word32]* %10, %Int32 0, %Nat32 %11
 	%13 = load %Word32, %Word32* %12
@@ -910,10 +926,10 @@ then_0:
 	br %Bool %17 , label %then_1, label %else_1
 then_1:
 	; MUL rd, rs1, rs2
-	%18 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%18 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%19 = load %Nat32, %Nat32* %18
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %19, %Str8* bitcast ([19 x i8]* @str13 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	%20 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%20 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%21 = zext %Nat8 %3 to %Nat32
 	%22 = getelementptr [32 x %Word32], [32 x %Word32]* %20, %Int32 0, %Nat32 %21
 	%23 = bitcast %Word32 %9 to %Int32
@@ -931,10 +947,10 @@ then_2:
 	; MULH rd, rs1, rs2
 	; Записывает в целевой регистр старшие биты
 	; которые бы не поместились в него при обычном умножении
-	%29 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%29 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%30 = load %Nat32, %Nat32* %29
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %30, %Str8* bitcast ([20 x i8]* @str14 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	%31 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%31 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%32 = zext %Nat8 %3 to %Nat32
 	%33 = getelementptr [32 x %Word32], [32 x %Word32]* %31, %Int32 0, %Nat32 %32
 	%34 = sext %Word32 %9 to %Int64
@@ -954,13 +970,13 @@ else_2:
 then_3:
 	; MULHSU rd, rs1, rs2
 	; mul high signed unsigned
-	%43 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%43 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%44 = load %Nat32, %Nat32* %43
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %44, %Str8* bitcast ([22 x i8]* @str15 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	; NOT IMPLEMENTED!
 	call void (%Str8*, ...) @notImplemented(%Str8* bitcast ([21 x i8]* @str16 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	;hart.reg[rd] = unsafe Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
+	;hart.regs[rd] = unsafe Word32 (Word64 (Int64 v0 * Int64 v1) >> 32)
 	br label %endif_3
 else_3:
 ; if_4
@@ -969,13 +985,13 @@ else_3:
 	br %Bool %46 , label %then_4, label %else_4
 then_4:
 	; MULHU rd, rs1, rs2
-	%47 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%47 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%48 = load %Nat32, %Nat32* %47
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %48, %Str8* bitcast ([21 x i8]* @str17 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	; multiply unsigned high
 	call void (%Str8*, ...) @notImplemented(%Str8* bitcast ([21 x i8]* @str18 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	;hart.reg[rd] = unsafe Word32 (Word64 (Nat64 v0 * Nat64 v1) >> 32)
+	;hart.regs[rd] = unsafe Word32 (Word64 (Nat64 v0 * Nat64 v1) >> 32)
 	br label %endif_4
 else_4:
 ; if_5
@@ -984,10 +1000,10 @@ else_4:
 	br %Bool %50 , label %then_5, label %else_5
 then_5:
 	; DIV rd, rs1, rs2
-	%51 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%51 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%52 = load %Nat32, %Nat32* %51
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %52, %Str8* bitcast ([19 x i8]* @str19 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	%53 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%53 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%54 = zext %Nat8 %3 to %Nat32
 	%55 = getelementptr [32 x %Word32], [32 x %Word32]* %53, %Int32 0, %Nat32 %54
 	%56 = bitcast %Word32 %9 to %Int32
@@ -1003,10 +1019,10 @@ else_5:
 	br %Bool %61 , label %then_6, label %else_6
 then_6:
 	; DIVU rd, rs1, rs2
-	%62 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%62 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%63 = load %Nat32, %Nat32* %62
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %63, %Str8* bitcast ([20 x i8]* @str20 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	%64 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%64 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%65 = zext %Nat8 %3 to %Nat32
 	%66 = getelementptr [32 x %Word32], [32 x %Word32]* %64, %Int32 0, %Nat32 %65
 	%67 = bitcast %Word32 %9 to %Nat32
@@ -1022,10 +1038,10 @@ else_6:
 	br %Bool %72 , label %then_7, label %else_7
 then_7:
 	; REM rd, rs1, rs2
-	%73 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%73 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%74 = load %Nat32, %Nat32* %73
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %74, %Str8* bitcast ([19 x i8]* @str21 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	%75 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%75 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%76 = zext %Nat8 %3 to %Nat32
 	%77 = getelementptr [32 x %Word32], [32 x %Word32]* %75, %Int32 0, %Nat32 %76
 	%78 = bitcast %Word32 %9 to %Int32
@@ -1041,10 +1057,10 @@ else_7:
 	br %Bool %83 , label %then_8, label %endif_8
 then_8:
 	; REMU rd, rs1, rs2
-	%84 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%84 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%85 = load %Nat32, %Nat32* %84
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %85, %Str8* bitcast ([20 x i8]* @str22 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	%86 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%86 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%87 = zext %Nat8 %3 to %Nat32
 	%88 = getelementptr [32 x %Word32], [32 x %Word32]* %86, %Int32 0, %Nat32 %87
 	%89 = bitcast %Word32 %9 to %Nat32
@@ -1078,12 +1094,12 @@ endif_0:
 	%97 = and %Bool %95, %96
 	br %Bool %97 , label %then_9, label %else_9
 then_9:
-	%98 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%98 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%99 = load %Nat32, %Nat32* %98
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %99, %Str8* bitcast ([19 x i8]* @str23 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
-	%100 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%100 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%101 = zext %Nat8 %3 to %Nat32
 	%102 = getelementptr [32 x %Word32], [32 x %Word32]* %100, %Int32 0, %Nat32 %101
 	%103 = bitcast %Word32 %9 to %Int32
@@ -1100,12 +1116,12 @@ else_9:
 	%110 = and %Bool %108, %109
 	br %Bool %110 , label %then_10, label %else_10
 then_10:
-	%111 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%111 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%112 = load %Nat32, %Nat32* %111
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %112, %Str8* bitcast ([19 x i8]* @str24 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
-	%113 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%113 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%114 = zext %Nat8 %3 to %Nat32
 	%115 = getelementptr [32 x %Word32], [32 x %Word32]* %113, %Int32 0, %Nat32 %114
 	%116 = bitcast %Word32 %9 to %Int32
@@ -1121,13 +1137,13 @@ else_10:
 	br %Bool %121 , label %then_11, label %else_11
 then_11:
 	; shift left logical
-	%122 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%122 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%123 = load %Nat32, %Nat32* %122
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %123, %Str8* bitcast ([19 x i8]* @str25 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
 	;printf("?%x\n", v0)
-	%124 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%124 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%125 = zext %Nat8 %3 to %Nat32
 	%126 = getelementptr [32 x %Word32], [32 x %Word32]* %124, %Int32 0, %Nat32 %125
 	%127 = trunc %Word32 %13 to %Nat8
@@ -1142,12 +1158,12 @@ else_11:
 	br %Bool %131 , label %then_12, label %else_12
 then_12:
 	; set less than
-	%132 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%132 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%133 = load %Nat32, %Nat32* %132
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %133, %Str8* bitcast ([19 x i8]* @str26 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
-	%134 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%134 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%135 = zext %Nat8 %3 to %Nat32
 	%136 = getelementptr [32 x %Word32], [32 x %Word32]* %134, %Int32 0, %Nat32 %135
 	%137 = bitcast %Word32 %9 to %Int32
@@ -1163,12 +1179,12 @@ else_12:
 	br %Bool %142 , label %then_13, label %else_13
 then_13:
 	; set less than unsigned
-	%143 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%143 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%144 = load %Nat32, %Nat32* %143
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %144, %Str8* bitcast ([20 x i8]* @str27 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
-	%145 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%145 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%146 = zext %Nat8 %3 to %Nat32
 	%147 = getelementptr [32 x %Word32], [32 x %Word32]* %145, %Int32 0, %Nat32 %146
 	%148 = bitcast %Word32 %9 to %Nat32
@@ -1183,12 +1199,12 @@ else_13:
 	%153 = icmp eq %Word8 %1, %152
 	br %Bool %153 , label %then_14, label %else_14
 then_14:
-	%154 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%154 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%155 = load %Nat32, %Nat32* %154
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %155, %Str8* bitcast ([19 x i8]* @str28 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
-	%156 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%156 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%157 = zext %Nat8 %3 to %Nat32
 	%158 = getelementptr [32 x %Word32], [32 x %Word32]* %156, %Int32 0, %Nat32 %157
 	%159 = xor %Word32 %9, %13
@@ -1204,10 +1220,10 @@ else_14:
 	br %Bool %164 , label %then_15, label %else_15
 then_15:
 	; shift right logical
-	%165 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%165 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%166 = load %Nat32, %Nat32* %165
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %166, %Str8* bitcast ([19 x i8]* @str29 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
-	%167 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%167 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%168 = zext %Nat8 %3 to %Nat32
 	%169 = getelementptr [32 x %Word32], [32 x %Word32]* %167, %Int32 0, %Nat32 %168
 	%170 = trunc %Word32 %13 to %Nat8
@@ -1224,12 +1240,12 @@ else_15:
 	br %Bool %176 , label %then_16, label %else_16
 then_16:
 	; shift right arithmetical
-	%177 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%177 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%178 = load %Nat32, %Nat32* %177
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %178, %Str8* bitcast ([19 x i8]* @str30 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	; ERROR: не реализован арифм сдвиг!
-	;hart.reg[rd] = v0 >> Int32 v1
+	;hart.regs[rd] = v0 >> Int32 v1
 	br label %endif_16
 else_16:
 ; if_17
@@ -1237,17 +1253,17 @@ else_16:
 	%180 = icmp eq %Word8 %1, %179
 	br %Bool %180 , label %then_17, label %else_17
 then_17:
-	%181 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%181 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%182 = load %Nat32, %Nat32* %181
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %182, %Str8* bitcast ([18 x i8]* @str31 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
-	%183 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%183 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%184 = zext %Nat8 %3 to %Nat32
 	%185 = getelementptr [32 x %Word32], [32 x %Word32]* %183, %Int32 0, %Nat32 %184
 	%186 = or %Word32 %9, %13
 	store %Word32 %186, %Word32* %185
-	;printf("=%08x (%08x, %08x)\n", hart.reg[rd], v0, v1)
+	;printf("=%08x (%08x, %08x)\n", hart.regs[rd], v0, v1)
 	br label %endif_17
 else_17:
 ; if_18
@@ -1255,17 +1271,17 @@ else_17:
 	%188 = icmp eq %Word8 %1, %187
 	br %Bool %188 , label %then_18, label %endif_18
 then_18:
-	%189 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%189 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%190 = load %Nat32, %Nat32* %189
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %190, %Str8* bitcast ([19 x i8]* @str32 to [0 x i8]*), %Nat8 %3, %Nat8 %4, %Nat8 %5)
 
 	;
-	%191 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%191 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%192 = zext %Nat8 %3 to %Nat32
 	%193 = getelementptr [32 x %Word32], [32 x %Word32]* %191, %Int32 0, %Nat32 %192
 	%194 = and %Word32 %9, %13
 	store %Word32 %194, %Word32* %193
-	;printf("=%08x (%08x, %08x)\n", hart.reg[rd], v0, v1)
+	;printf("=%08x (%08x, %08x)\n", hart.regs[rd], v0, v1)
 	br label %endif_18
 endif_18:
 	br label %endif_17
@@ -1291,15 +1307,14 @@ endif_9:
 
 
 
-
 ; Load upper immediate
 define internal void @execLUI(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = call %Nat8 @decode_extract_rd(%Word32 %instr)
-	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%4 = load %Nat32, %Nat32* %3
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %4, %Str8* bitcast ([15 x i8]* @str33 to [0 x i8]*), %Nat8 %2, %Word32 %1)
-	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%6 = zext %Nat8 %2 to %Nat32
 	%7 = getelementptr [32 x %Word32], [32 x %Word32]* %5, %Int32 0, %Nat32 %6
 	%8 = zext i8 12 to %Word32
@@ -1314,7 +1329,7 @@ define internal void @execLUI(%hart_Hart* %hart, %Word32 %instr) {
 define internal void @execAUIPC(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Word32 @decode_extract_imm31_12(%Word32 %instr)
 	%2 = call %Int32 @decode_expand12(%Word32 %1)
-	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%3 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%4 = bitcast %Int32 %2 to %Word32
 	%5 = zext i8 12 to %Word32
 	%6 = shl %Word32 %4, %5
@@ -1322,10 +1337,10 @@ define internal void @execAUIPC(%hart_Hart* %hart, %Word32 %instr) {
 	%8 = load %Nat32, %Nat32* %3
 	%9 = add %Nat32 %8, %7
 	%10 = call %Nat8 @decode_extract_rd(%Word32 %instr)
-	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%12 = load %Nat32, %Nat32* %11
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %12, %Str8* bitcast ([17 x i8]* @str34 to [0 x i8]*), %Nat8 %10, %Int32 %2)
-	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%14 = zext %Nat8 %10 to %Nat32
 	%15 = getelementptr [32 x %Word32], [32 x %Word32]* %13, %Int32 0, %Nat32 %14
 	%16 = bitcast %Nat32 %9 to %Word32
@@ -1340,19 +1355,19 @@ define internal void @execJAL(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = call %Nat8 @decode_extract_rd(%Word32 %instr)
 	%2 = call %Word32 @decode_extract_jal_imm(%Word32 %instr)
 	%3 = call %Int32 @decode_expand20(%Word32 %2)
-	%4 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%4 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%5 = load %Nat32, %Nat32* %4
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %5, %Str8* bitcast ([13 x i8]* @str35 to [0 x i8]*), %Nat8 %1, %Int32 %3)
-	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%7 = zext %Nat8 %1 to %Nat32
 	%8 = getelementptr [32 x %Word32], [32 x %Word32]* %6, %Int32 0, %Nat32 %7
-	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%10 = load %Nat32, %Nat32* %9
 	%11 = add %Nat32 %10, 4
 	%12 = bitcast %Nat32 %11 to %Word32
 	store %Word32 %12, %Word32* %8
-	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
-	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%15 = load %Nat32, %Nat32* %14
 	%16 = bitcast %Nat32 %15 to %Int32
 	%17 = add %Int32 %16, %3
@@ -1369,17 +1384,17 @@ define internal void @execJALR(%hart_Hart* %hart, %Word32 %instr) {
 	%2 = call %Nat8 @decode_extract_rd(%Word32 %instr)
 	%3 = call %Word32 @decode_extract_imm12(%Word32 %instr)
 	%4 = call %Int32 @decode_expand12(%Word32 %3)
-	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%6 = load %Nat32, %Nat32* %5
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %6, %Str8* bitcast ([14 x i8]* @str36 to [0 x i8]*), %Int32 %4, %Nat8 %1)
 
 	; rd <- pc + 4
 	; pc <- (rs1 + imm) & ~1
-	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%8 = load %Nat32, %Nat32* %7
 	%9 = add %Nat32 %8, 4
 	%10 = bitcast %Nat32 %9 to %Int32
-	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%12 = zext %Nat8 %1 to %Nat32
 	%13 = getelementptr [32 x %Word32], [32 x %Word32]* %11, %Int32 0, %Nat32 %12
 	%14 = load %Word32, %Word32* %13
@@ -1387,12 +1402,12 @@ define internal void @execJALR(%hart_Hart* %hart, %Word32 %instr) {
 	%16 = add %Int32 %15, %4
 	%17 = bitcast %Int32 %16 to %Word32
 	%18 = and %Word32 %17, 4294967294
-	%19 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%19 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%20 = zext %Nat8 %2 to %Nat32
 	%21 = getelementptr [32 x %Word32], [32 x %Word32]* %19, %Int32 0, %Nat32 %20
 	%22 = bitcast %Int32 %10 to %Word32
 	store %Word32 %22, %Word32* %21
-	%23 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%23 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%24 = bitcast %Word32 %18 to %Nat32
 	store %Nat32 %24, %Nat32* %23
 	ret void
@@ -1407,7 +1422,7 @@ define internal void @execB(%hart_Hart* %hart, %Word32 %instr) {
 	%3 = call %Nat8 @decode_extract_rs2(%Word32 %instr)
 	%4 = call %Int16 @decode_extract_b_imm(%Word32 %instr)
 	%5 = alloca %Nat32, align 4
-	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%7 = load %Nat32, %Nat32* %6
 	%8 = add %Nat32 %7, 4
 	store %Nat32 %8, %Nat32* %5
@@ -1417,16 +1432,16 @@ define internal void @execB(%hart_Hart* %hart, %Word32 %instr) {
 	br %Bool %10 , label %then_0, label %else_0
 then_0:
 	; BEQ - Branch if equal
-	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%11 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%12 = load %Nat32, %Nat32* %11
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %12, %Str8* bitcast ([18 x i8]* @str37 to [0 x i8]*), %Nat8 %2, %Nat8 %3, %Int16 %4)
 
 	; Branch if two registers are equal
 ; if_1
-	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%13 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%14 = zext %Nat8 %2 to %Nat32
 	%15 = getelementptr [32 x %Word32], [32 x %Word32]* %13, %Int32 0, %Nat32 %14
-	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%17 = zext %Nat8 %3 to %Nat32
 	%18 = getelementptr [32 x %Word32], [32 x %Word32]* %16, %Int32 0, %Nat32 %17
 	%19 = load %Word32, %Word32* %15
@@ -1434,7 +1449,7 @@ then_0:
 	%21 = icmp eq %Word32 %19, %20
 	br %Bool %21 , label %then_1, label %endif_1
 then_1:
-	%22 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%22 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%23 = load %Nat32, %Nat32* %22
 	%24 = bitcast %Nat32 %23 to %Int32
 	%25 = sext %Int16 %4 to %Int32
@@ -1451,16 +1466,16 @@ else_0:
 	br %Bool %29 , label %then_2, label %else_2
 then_2:
 	; BNE - Branch if not equal
-	%30 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%30 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%31 = load %Nat32, %Nat32* %30
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %31, %Str8* bitcast ([18 x i8]* @str38 to [0 x i8]*), %Nat8 %2, %Nat8 %3, %Int16 %4)
 
 	;
 ; if_3
-	%32 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%32 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%33 = zext %Nat8 %2 to %Nat32
 	%34 = getelementptr [32 x %Word32], [32 x %Word32]* %32, %Int32 0, %Nat32 %33
-	%35 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%35 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%36 = zext %Nat8 %3 to %Nat32
 	%37 = getelementptr [32 x %Word32], [32 x %Word32]* %35, %Int32 0, %Nat32 %36
 	%38 = load %Word32, %Word32* %34
@@ -1468,7 +1483,7 @@ then_2:
 	%40 = icmp ne %Word32 %38, %39
 	br %Bool %40 , label %then_3, label %endif_3
 then_3:
-	%41 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%41 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%42 = load %Nat32, %Nat32* %41
 	%43 = bitcast %Nat32 %42 to %Int32
 	%44 = sext %Int16 %4 to %Int32
@@ -1485,18 +1500,18 @@ else_2:
 	br %Bool %48 , label %then_4, label %else_4
 then_4:
 	; BLT - Branch if less than (signed)
-	%49 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%49 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%50 = load %Nat32, %Nat32* %49
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %50, %Str8* bitcast ([18 x i8]* @str39 to [0 x i8]*), %Nat8 %2, %Nat8 %3, %Int16 %4)
 
 	;
 ; if_5
-	%51 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%51 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%52 = zext %Nat8 %2 to %Nat32
 	%53 = getelementptr [32 x %Word32], [32 x %Word32]* %51, %Int32 0, %Nat32 %52
 	%54 = load %Word32, %Word32* %53
 	%55 = bitcast %Word32 %54 to %Int32
-	%56 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%56 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%57 = zext %Nat8 %3 to %Nat32
 	%58 = getelementptr [32 x %Word32], [32 x %Word32]* %56, %Int32 0, %Nat32 %57
 	%59 = load %Word32, %Word32* %58
@@ -1504,7 +1519,7 @@ then_4:
 	%61 = icmp slt %Int32 %55, %60
 	br %Bool %61 , label %then_5, label %endif_5
 then_5:
-	%62 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%62 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%63 = load %Nat32, %Nat32* %62
 	%64 = bitcast %Nat32 %63 to %Int32
 	%65 = sext %Int16 %4 to %Int32
@@ -1521,18 +1536,18 @@ else_4:
 	br %Bool %69 , label %then_6, label %else_6
 then_6:
 	; BGE - Branch if greater or equal (signed)
-	%70 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%70 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%71 = load %Nat32, %Nat32* %70
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %71, %Str8* bitcast ([18 x i8]* @str40 to [0 x i8]*), %Nat8 %2, %Nat8 %3, %Int16 %4)
 
 	;
 ; if_7
-	%72 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%72 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%73 = zext %Nat8 %2 to %Nat32
 	%74 = getelementptr [32 x %Word32], [32 x %Word32]* %72, %Int32 0, %Nat32 %73
 	%75 = load %Word32, %Word32* %74
 	%76 = bitcast %Word32 %75 to %Int32
-	%77 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%77 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%78 = zext %Nat8 %3 to %Nat32
 	%79 = getelementptr [32 x %Word32], [32 x %Word32]* %77, %Int32 0, %Nat32 %78
 	%80 = load %Word32, %Word32* %79
@@ -1540,7 +1555,7 @@ then_6:
 	%82 = icmp sge %Int32 %76, %81
 	br %Bool %82 , label %then_7, label %endif_7
 then_7:
-	%83 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%83 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%84 = load %Nat32, %Nat32* %83
 	%85 = bitcast %Nat32 %84 to %Int32
 	%86 = sext %Int16 %4 to %Int32
@@ -1557,18 +1572,18 @@ else_6:
 	br %Bool %90 , label %then_8, label %else_8
 then_8:
 	; BLTU - Branch if less than (unsigned)
-	%91 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%91 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%92 = load %Nat32, %Nat32* %91
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %92, %Str8* bitcast ([19 x i8]* @str41 to [0 x i8]*), %Nat8 %2, %Nat8 %3, %Int16 %4)
 
 	;
 ; if_9
-	%93 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%93 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%94 = zext %Nat8 %2 to %Nat32
 	%95 = getelementptr [32 x %Word32], [32 x %Word32]* %93, %Int32 0, %Nat32 %94
 	%96 = load %Word32, %Word32* %95
 	%97 = bitcast %Word32 %96 to %Nat32
-	%98 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%98 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%99 = zext %Nat8 %3 to %Nat32
 	%100 = getelementptr [32 x %Word32], [32 x %Word32]* %98, %Int32 0, %Nat32 %99
 	%101 = load %Word32, %Word32* %100
@@ -1576,7 +1591,7 @@ then_8:
 	%103 = icmp ult %Nat32 %97, %102
 	br %Bool %103 , label %then_9, label %endif_9
 then_9:
-	%104 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%104 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%105 = load %Nat32, %Nat32* %104
 	%106 = bitcast %Nat32 %105 to %Int32
 	%107 = sext %Int16 %4 to %Int32
@@ -1593,18 +1608,18 @@ else_8:
 	br %Bool %111 , label %then_10, label %endif_10
 then_10:
 	; BGEU - Branch if greater or equal (unsigned)
-	%112 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%112 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%113 = load %Nat32, %Nat32* %112
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %113, %Str8* bitcast ([19 x i8]* @str42 to [0 x i8]*), %Nat8 %2, %Nat8 %3, %Int16 %4)
 
 	;
 ; if_11
-	%114 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%114 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%115 = zext %Nat8 %2 to %Nat32
 	%116 = getelementptr [32 x %Word32], [32 x %Word32]* %114, %Int32 0, %Nat32 %115
 	%117 = load %Word32, %Word32* %116
 	%118 = bitcast %Word32 %117 to %Nat32
-	%119 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%119 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%120 = zext %Nat8 %3 to %Nat32
 	%121 = getelementptr [32 x %Word32], [32 x %Word32]* %119, %Int32 0, %Nat32 %120
 	%122 = load %Word32, %Word32* %121
@@ -1612,7 +1627,7 @@ then_10:
 	%124 = icmp uge %Nat32 %118, %123
 	br %Bool %124 , label %then_11, label %endif_11
 then_11:
-	%125 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%125 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%126 = load %Nat32, %Nat32* %125
 	%127 = bitcast %Nat32 %126 to %Int32
 	%128 = sext %Int16 %4 to %Int32
@@ -1633,7 +1648,7 @@ endif_4:
 endif_2:
 	br label %endif_0
 endif_0:
-	%131 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%131 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%132 = load %Nat32, %Nat32* %5
 	store %Nat32 %132, %Nat32* %131
 	ret void
@@ -1649,7 +1664,7 @@ define internal void @execL(%hart_Hart* %hart, %Word32 %instr) {
 	%4 = call %Nat8 @decode_extract_rd(%Word32 %instr)
 	%5 = call %Nat8 @decode_extract_rs1(%Word32 %instr)
 	%6 = call %Nat8 @decode_extract_rs2(%Word32 %instr)
-	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%8 = zext %Nat8 %5 to %Nat32
 	%9 = getelementptr [32 x %Word32], [32 x %Word32]* %7, %Int32 0, %Nat32 %8
 	%10 = load %Word32, %Word32* %9
@@ -1662,13 +1677,13 @@ define internal void @execL(%hart_Hart* %hart, %Word32 %instr) {
 	br %Bool %15 , label %then_0, label %else_0
 then_0:
 	; LB (Load 8-bit signed integer value)
-	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%17 = load %Nat32, %Nat32* %16
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %17, %Str8* bitcast ([17 x i8]* @str43 to [0 x i8]*), %Nat8 %4, %Int32 %3, %Nat8 %5)
-	%18 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%18 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%19 = zext %Nat8 %4 to %Nat32
 	%20 = getelementptr [32 x %Word32], [32 x %Word32]* %18, %Int32 0, %Nat32 %19
-	%21 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%21 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%22 = load %hart_BusInterface*, %hart_BusInterface** %21
 	%23 = getelementptr %hart_BusInterface, %hart_BusInterface* %22, %Int32 0, %Int32 0
 	%24 = load %Word32 (%Nat32, %Nat8)*, %Word32 (%Nat32, %Nat8)** %23
@@ -1682,13 +1697,13 @@ else_0:
 	br %Bool %27 , label %then_1, label %else_1
 then_1:
 	; LH (Load 16-bit signed integer value)
-	%28 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%28 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%29 = load %Nat32, %Nat32* %28
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %29, %Str8* bitcast ([17 x i8]* @str44 to [0 x i8]*), %Nat8 %4, %Int32 %3, %Nat8 %5)
-	%30 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%30 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%31 = zext %Nat8 %4 to %Nat32
 	%32 = getelementptr [32 x %Word32], [32 x %Word32]* %30, %Int32 0, %Nat32 %31
-	%33 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%33 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%34 = load %hart_BusInterface*, %hart_BusInterface** %33
 	%35 = getelementptr %hart_BusInterface, %hart_BusInterface* %34, %Int32 0, %Int32 0
 	%36 = load %Word32 (%Nat32, %Nat8)*, %Word32 (%Nat32, %Nat8)** %35
@@ -1702,13 +1717,13 @@ else_1:
 	br %Bool %39 , label %then_2, label %else_2
 then_2:
 	; LW (Load 32-bit signed integer value)
-	%40 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%40 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%41 = load %Nat32, %Nat32* %40
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %41, %Str8* bitcast ([17 x i8]* @str45 to [0 x i8]*), %Nat8 %4, %Int32 %3, %Nat8 %5)
-	%42 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%42 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%43 = zext %Nat8 %4 to %Nat32
 	%44 = getelementptr [32 x %Word32], [32 x %Word32]* %42, %Int32 0, %Nat32 %43
-	%45 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%45 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%46 = load %hart_BusInterface*, %hart_BusInterface** %45
 	%47 = getelementptr %hart_BusInterface, %hart_BusInterface* %46, %Int32 0, %Int32 0
 	%48 = load %Word32 (%Nat32, %Nat8)*, %Word32 (%Nat32, %Nat8)** %47
@@ -1722,13 +1737,13 @@ else_2:
 	br %Bool %51 , label %then_3, label %else_3
 then_3:
 	; LBU (Load 8-bit unsigned integer value)
-	%52 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%52 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%53 = load %Nat32, %Nat32* %52
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %53, %Str8* bitcast ([18 x i8]* @str46 to [0 x i8]*), %Nat8 %4, %Int32 %3, %Nat8 %5)
-	%54 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%54 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%55 = zext %Nat8 %4 to %Nat32
 	%56 = getelementptr [32 x %Word32], [32 x %Word32]* %54, %Int32 0, %Nat32 %55
-	%57 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%57 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%58 = load %hart_BusInterface*, %hart_BusInterface** %57
 	%59 = getelementptr %hart_BusInterface, %hart_BusInterface* %58, %Int32 0, %Int32 0
 	%60 = load %Word32 (%Nat32, %Nat8)*, %Word32 (%Nat32, %Nat8)** %59
@@ -1742,13 +1757,13 @@ else_3:
 	br %Bool %63 , label %then_4, label %endif_4
 then_4:
 	; LHU (Load 16-bit unsigned integer value)
-	%64 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%64 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%65 = load %Nat32, %Nat32* %64
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %65, %Str8* bitcast ([18 x i8]* @str47 to [0 x i8]*), %Nat8 %4, %Int32 %3, %Nat8 %5)
-	%66 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%66 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%67 = zext %Nat8 %4 to %Nat32
 	%68 = getelementptr [32 x %Word32], [32 x %Word32]* %66, %Int32 0, %Nat32 %67
-	%69 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%69 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%70 = load %hart_BusInterface*, %hart_BusInterface** %69
 	%71 = getelementptr %hart_BusInterface, %hart_BusInterface* %70, %Int32 0, %Int32 0
 	%72 = load %Word32 (%Nat32, %Nat8)*, %Word32 (%Nat32, %Nat8)** %71
@@ -1784,7 +1799,7 @@ define internal void @execS(%hart_Hart* %hart, %Word32 %instr) {
 	%11 = bitcast %Nat32 %6 to %Word32
 	%12 = or %Word32 %10, %11
 	%13 = call %Int32 @decode_expand12(%Word32 %12)
-	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%15 = zext %Nat8 %4 to %Nat32
 	%16 = getelementptr [32 x %Word32], [32 x %Word32]* %14, %Int32 0, %Nat32 %15
 	%17 = load %Word32, %Word32* %16
@@ -1792,7 +1807,7 @@ define internal void @execS(%hart_Hart* %hart, %Word32 %instr) {
 	%19 = add %Int32 %18, %13
 	%20 = bitcast %Int32 %19 to %Word32
 	%21 = bitcast %Word32 %20 to %Nat32
-	%22 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%22 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%23 = zext %Nat8 %5 to %Nat32
 	%24 = getelementptr [32 x %Word32], [32 x %Word32]* %22, %Int32 0, %Nat32 %23
 	%25 = load %Word32, %Word32* %24
@@ -1803,12 +1818,12 @@ define internal void @execS(%hart_Hart* %hart, %Word32 %instr) {
 then_0:
 	; SB (save 8-bit value)
 	; <source:reg>, <offset:12bit_imm>(<address:reg>)
-	%28 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%28 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%29 = load %Nat32, %Nat32* %28
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %29, %Str8* bitcast ([17 x i8]* @str48 to [0 x i8]*), %Nat8 %5, %Int32 %13, %Nat8 %4)
 
 	;
-	%30 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%30 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%31 = load %hart_BusInterface*, %hart_BusInterface** %30
 	%32 = getelementptr %hart_BusInterface, %hart_BusInterface* %31, %Int32 0, %Int32 1
 	%33 = load void (%Nat32, %Word32, %Nat8)*, void (%Nat32, %Word32, %Nat8)** %32
@@ -1822,12 +1837,12 @@ else_0:
 then_1:
 	; SH (save 16-bit value)
 	; <source:reg>, <offset:12bit_imm>(<address:reg>)
-	%36 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%36 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%37 = load %Nat32, %Nat32* %36
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %37, %Str8* bitcast ([17 x i8]* @str49 to [0 x i8]*), %Nat8 %5, %Int32 %13, %Nat8 %4)
 
 	;
-	%38 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%38 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%39 = load %hart_BusInterface*, %hart_BusInterface** %38
 	%40 = getelementptr %hart_BusInterface, %hart_BusInterface* %39, %Int32 0, %Int32 1
 	%41 = load void (%Nat32, %Word32, %Nat8)*, void (%Nat32, %Word32, %Nat8)** %40
@@ -1841,12 +1856,12 @@ else_1:
 then_2:
 	; SW (save 32-bit value)
 	; <source:reg>, <offset:12bit_imm>(<address:reg>)
-	%44 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%44 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%45 = load %Nat32, %Nat32* %44
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %45, %Str8* bitcast ([17 x i8]* @str50 to [0 x i8]*), %Nat8 %5, %Int32 %13, %Nat8 %4)
 
 	;
-	%46 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%46 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
 	%47 = load %hart_BusInterface*, %hart_BusInterface** %46
 	%48 = getelementptr %hart_BusInterface, %hart_BusInterface* %47, %Int32 0, %Int32 1
 	%49 = load void (%Nat32, %Word32, %Nat8)*, void (%Nat32, %Word32, %Nat8)** %48
@@ -1870,13 +1885,13 @@ define internal void @execSystem(%hart_Hart* %hart, %Word32 %instr) {
 	%6 = icmp eq %Word32 %instr, 115
 	br %Bool %6 , label %then_0, label %else_0
 then_0:
-	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%7 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%8 = load %Nat32, %Nat32* %7
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %8, %Str8* bitcast ([7 x i8]* @str51 to [0 x i8]*))
 
 	;
-	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
-	%10 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
+	%9 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
+	%10 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 3
 	%11 = load %Word32, %Word32* %10
 	%12 = or %Word32 %11, 8
 	store %Word32 %12, %Word32* %9
@@ -1886,10 +1901,10 @@ else_0:
 	%13 = icmp eq %Word32 %instr, 1048691
 	br %Bool %13 , label %then_1, label %else_1
 then_1:
-	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%14 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%15 = load %Nat32, %Nat32* %14
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %15, %Str8* bitcast ([8 x i8]* @str52 to [0 x i8]*))
-	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
+	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
 	store %Bool 1, %Bool* %16
 
 	; CSR instructions
@@ -1952,10 +1967,10 @@ then_7:
 	call void @csr_rci(%hart_Hart* %34, %Nat16 %5, %Nat8 %2, %Nat8 %3)
 	br label %endif_7
 else_7:
-	%35 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%35 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%36 = load %Nat32, %Nat32* %35
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %36, %Str8* bitcast ([34 x i8]* @str53 to [0 x i8]*), %Word32 %instr)
-	%37 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 6
+	%37 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 4
 	store %Bool 1, %Bool* %37
 	br label %endif_7
 endif_7:
@@ -1981,7 +1996,7 @@ define internal void @execFence(%hart_Hart* %hart, %Word32 %instr) {
 	%1 = icmp eq %Word32 %instr, 16777231
 	br %Bool %1 , label %then_0, label %endif_0
 then_0:
-	%2 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 2
+	%2 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
 	%3 = load %Nat32, %Nat32* %2
 	call void (%Nat32, %Str8*, ...) @trace(%Nat32 %3, %Str8* bitcast ([7 x i8]* @str54 to [0 x i8]*))
 	br label %endif_0
@@ -1991,132 +2006,32 @@ endif_0:
 
 
 
-;
-; CSR's
-; see: https://five-embeddev.com/riscv-isa-manual/latest/priv-csrs.html
-;
-
 
 ;
 ;The CSRRW (Atomic Read/Write CSR) instruction atomically swaps values in the CSRs and integer registers. CSRRW reads the old value of the CSR, zero-extends the value to XLEN bits, then writes it to integer register rd. The initial value in rs1 is written to the CSR. If rd=x0, then the instruction shall not read the CSR and shall not cause any of the side effects that might occur on a CSR read.
 ;
 define internal void @csr_rw(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
-	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	;printf("CSR_RW(csr=0x%X, rd=r%d, rs1=r%d)\n", csr, rd, rs1)
+	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%2 = zext %Nat8 %rs1 to %Nat32
 	%3 = getelementptr [32 x %Word32], [32 x %Word32]* %1, %Int32 0, %Nat32 %2
 	%4 = load %Word32, %Word32* %3
-
-	;	if csr == Nat16 0xB00 {
-	;		mcycle
-	;	} else if csr == Nat16 0xB80 {
-	;		mcycleh
-	;	}
-; if_0
-	%5 = icmp eq %Nat16 %csr, 768
-	br %Bool %5 , label %then_0, label %else_0
-then_0:
-	; mstatus (Machine status register)
-	br label %endif_0
-else_0:
-; if_1
-	%6 = icmp eq %Nat16 %csr, 769
-	br %Bool %6 , label %then_1, label %else_1
-then_1:
-	; misa (ISA and extensions)
-	br label %endif_1
-else_1:
-; if_2
-	%7 = icmp eq %Nat16 %csr, 770
-	br %Bool %7 , label %then_2, label %else_2
-then_2:
-	; medeleg (Machine exception delegation register)
-	br label %endif_2
-else_2:
-; if_3
-	%8 = icmp eq %Nat16 %csr, 771
-	br %Bool %8 , label %then_3, label %else_3
-then_3:
-	; mideleg (Machine interrupt delegation register)
-	br label %endif_3
-else_3:
-; if_4
-	%9 = icmp eq %Nat16 %csr, 772
-	br %Bool %9 , label %then_4, label %else_4
-then_4:
-	; mie (Machine interrupt-enable register)
-	br label %endif_4
-else_4:
-; if_5
-	%10 = icmp eq %Nat16 %csr, 773
-	br %Bool %10 , label %then_5, label %else_5
-then_5:
-	; mtvec (Machine trap-handler base address)
-	br label %endif_5
-else_5:
-; if_6
-	%11 = icmp eq %Nat16 %csr, 774
-	br %Bool %11 , label %then_6, label %else_6
-then_6:
-	; mcounteren (Machine counter enable)
-	br label %endif_6
-else_6:
-; if_7
-	%12 = icmp eq %Nat16 %csr, 832
-	br %Bool %12 , label %then_7, label %else_7
-then_7:
-	; mscratch
-	br label %endif_7
-else_7:
-; if_8
-	%13 = icmp eq %Nat16 %csr, 833
-	br %Bool %13 , label %then_8, label %else_8
-then_8:
-	; mepc
-	br label %endif_8
-else_8:
-; if_9
-	%14 = icmp eq %Nat16 %csr, 834
-	br %Bool %14 , label %then_9, label %else_9
-then_9:
-	; mcause
-	br label %endif_9
-else_9:
-; if_10
-	%15 = icmp eq %Nat16 %csr, 835
-	br %Bool %15 , label %then_10, label %else_10
-then_10:
-	; mbadaddr
-	br label %endif_10
-else_10:
-; if_11
-	%16 = icmp eq %Nat16 %csr, 836
-	br %Bool %16 , label %then_11, label %endif_11
-then_11:
-	; mip (machine interrupt pending)
-	br label %endif_11
-endif_11:
-	br label %endif_10
-endif_10:
-	br label %endif_9
-endif_9:
-	br label %endif_8
-endif_8:
-	br label %endif_7
-endif_7:
-	br label %endif_6
-endif_6:
-	br label %endif_5
-endif_5:
-	br label %endif_4
-endif_4:
-	br label %endif_3
-endif_3:
-	br label %endif_2
-endif_2:
-	br label %endif_1
-endif_1:
-	br label %endif_0
-endif_0:
+	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%6 = zext %Nat8 %rd to %Nat32
+	%7 = getelementptr [32 x %Word32], [32 x %Word32]* %5, %Int32 0, %Nat32 %6
+	%8 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%9 = zext %Nat16 %csr to %Nat32
+	%10 = getelementptr [4096 x %Word32], [4096 x %Word32]* %8, %Int32 0, %Nat32 %9
+	%11 = load %Word32, %Word32* %10
+	store %Word32 %11, %Word32* %7
+	%12 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%13 = zext %Nat16 %csr to %Nat32
+	%14 = getelementptr [4096 x %Word32], [4096 x %Word32]* %12, %Int32 0, %Nat32 %13
+	%15 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%16 = zext %Nat8 %rs1 to %Nat32
+	%17 = getelementptr [4096 x %Word32], [4096 x %Word32]* %15, %Int32 0, %Nat32 %16
+	%18 = load %Word32, %Word32* %17
+	store %Word32 %18, %Word32* %14
 	ret void
 }
 
@@ -2126,24 +2041,80 @@ endif_0:
 ;The CSRRS (Atomic Read and Set Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be set in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be set in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
 ;
 define internal void @csr_rs(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
-	;TODO
+	; csrrs rd, csr, rs
+	;printf("CSR_RS(csr=0x%X, rd=r%d, rs1=r%d)\n", csr, rd, rs1)
+	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%2 = zext %Nat8 %rs1 to %Nat32
+	%3 = getelementptr [32 x %Word32], [32 x %Word32]* %1, %Int32 0, %Nat32 %2
+	%4 = load %Word32, %Word32* %3
+	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%6 = zext %Nat8 %rd to %Nat32
+	%7 = getelementptr [32 x %Word32], [32 x %Word32]* %5, %Int32 0, %Nat32 %6
+	%8 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%9 = zext %Nat16 %csr to %Nat32
+	%10 = getelementptr [4096 x %Word32], [4096 x %Word32]* %8, %Int32 0, %Nat32 %9
+	%11 = load %Word32, %Word32* %10
+	store %Word32 %11, %Word32* %7
+	%12 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%13 = zext %Nat16 %csr to %Nat32
+	%14 = getelementptr [4096 x %Word32], [4096 x %Word32]* %12, %Int32 0, %Nat32 %13
+	%15 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%16 = zext %Nat16 %csr to %Nat32
+	%17 = getelementptr [4096 x %Word32], [4096 x %Word32]* %15, %Int32 0, %Nat32 %16
+	%18 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%19 = zext %Nat8 %rs1 to %Nat32
+	%20 = getelementptr [32 x %Word32], [32 x %Word32]* %18, %Int32 0, %Nat32 %19
+	%21 = load %Word32, %Word32* %17
+	%22 = load %Word32, %Word32* %20
+	%23 = or %Word32 %21, %22
+	store %Word32 %23, %Word32* %14
 	ret void
 }
+
 
 
 ;
 ;The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads the value of the CSR, zero-extends the value to XLEN bits, and writes it to integer register rd. The initial value in integer register rs1 is treated as a bit mask that specifies bit positions to be cleared in the CSR. Any bit that is high in rs1 will cause the corresponding bit to be cleared in the CSR, if that CSR bit is writable. Other bits in the CSR are not explicitly written.
 ;
 define internal void @csr_rc(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %rs1) {
-	;TODO
+	; csrrc rd, csr, rs
+	;printf("CSR_RC(csr=0x%X, rd=r%d, rs1=r%d)\n", csr, rd, rs1)
+	%1 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%2 = zext %Nat8 %rs1 to %Nat32
+	%3 = getelementptr [32 x %Word32], [32 x %Word32]* %1, %Int32 0, %Nat32 %2
+	%4 = load %Word32, %Word32* %3
+	%5 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%6 = zext %Nat8 %rd to %Nat32
+	%7 = getelementptr [32 x %Word32], [32 x %Word32]* %5, %Int32 0, %Nat32 %6
+	%8 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%9 = zext %Nat16 %csr to %Nat32
+	%10 = getelementptr [4096 x %Word32], [4096 x %Word32]* %8, %Int32 0, %Nat32 %9
+	%11 = load %Word32, %Word32* %10
+	store %Word32 %11, %Word32* %7
+	%12 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%13 = zext %Nat16 %csr to %Nat32
+	%14 = getelementptr [4096 x %Word32], [4096 x %Word32]* %12, %Int32 0, %Nat32 %13
+	%15 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 5
+	%16 = zext %Nat16 %csr to %Nat32
+	%17 = getelementptr [4096 x %Word32], [4096 x %Word32]* %15, %Int32 0, %Nat32 %16
+	%18 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
+	%19 = zext %Nat8 %rs1 to %Nat32
+	%20 = getelementptr [32 x %Word32], [32 x %Word32]* %18, %Int32 0, %Nat32 %19
+	%21 = load %Word32, %Word32* %20
+	%22 = xor %Word32 %21, -1
+	%23 = load %Word32, %Word32* %17
+	%24 = and %Word32 %23, %22
+	store %Word32 %24, %Word32* %14
 	ret void
 }
 
 
 
-; -
+; read+write immediate(5-bit)
 define internal void @csr_rwi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
+	;printf("RWI\n")
+	call void (%Str8*, ...) @fatal(%Str8* bitcast ([21 x i8]* @str55 to [0 x i8]*))
 	ret void
 }
 
@@ -2152,6 +2123,8 @@ define internal void @csr_rwi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %
 ; read+clear immediate(5-bit)
 define internal void @csr_rsi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
+	;printf("RSI\n")
+	call void (%Str8*, ...) @fatal(%Str8* bitcast ([21 x i8]* @str56 to [0 x i8]*))
 	ret void
 }
 
@@ -2160,6 +2133,8 @@ define internal void @csr_rsi(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %
 ; read+clear immediate(5-bit)
 define internal void @csr_rci(%hart_Hart* %hart, %Nat16 %csr, %Nat8 %rd, %Nat8 %imm) {
 	;TODO
+	;printf("RCI\n")
+	call void (%Str8*, ...) @fatal(%Str8* bitcast ([21 x i8]* @str57 to [0 x i8]*))
 	ret void
 }
 
@@ -2174,7 +2149,7 @@ endif_0:
 	%3 = alloca %__VA_List, align 1
 	%4 = bitcast %__VA_List* %3 to i8*
 	call void @llvm.va_start(i8* %4)
-	%5 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str55 to [0 x i8]*), %Nat32 %pc)
+	%5 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str58 to [0 x i8]*), %Nat32 %pc)
 	%6 = load %__VA_List, %__VA_List* %3
 	%7 = call %Int @vprintf(%Str8* %form, %__VA_List %6)
 	%8 = bitcast %__VA_List* %3 to i8*
@@ -2186,7 +2161,7 @@ define internal void @trace2(%Nat32 %pc, %Str8* %form, ...) {
 	%1 = alloca %__VA_List, align 1
 	%2 = bitcast %__VA_List* %1 to i8*
 	call void @llvm.va_start(i8* %2)
-	%3 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str56 to [0 x i8]*), %Nat32 %pc)
+	%3 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([8 x i8]* @str59 to [0 x i8]*), %Nat32 %pc)
 	%4 = load %__VA_List, %__VA_List* %1
 	%5 = call %Int @vprintf(%Str8* %form, %__VA_List %4)
 	%6 = bitcast %__VA_List* %1 to i8*
@@ -2194,16 +2169,28 @@ define internal void @trace2(%Nat32 %pc, %Str8* %form, ...) {
 	ret void
 }
 
+define internal void @fatal(%Str8* %form, ...) {
+	%1 = alloca %__VA_List, align 1
+	%2 = bitcast %__VA_List* %1 to i8*
+	call void @llvm.va_start(i8* %2)
+	%3 = load %__VA_List, %__VA_List* %1
+	%4 = call %Int @vprintf(%Str8* %form, %__VA_List %3)
+	%5 = bitcast %__VA_List* %1 to i8*
+	call void @llvm.va_end(i8* %5)
+	call void @exit(%Int -1)
+	ret void
+}
+
 define internal void @notImplemented(%Str8* %form, ...) {
 	%1 = alloca %__VA_List, align 1
 	%2 = bitcast %__VA_List* %1 to i8*
 	call void @llvm.va_start(i8* %2)
-	%3 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([33 x i8]* @str57 to [0 x i8]*))
+	%3 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([33 x i8]* @str60 to [0 x i8]*))
 	%4 = load %__VA_List, %__VA_List* %1
 	%5 = call %Int @vprintf(%Str8* %form, %__VA_List %4)
 	%6 = bitcast %__VA_List* %1 to i8*
 	call void @llvm.va_end(i8* %6)
-	%7 = call %Int @puts(%ConstCharStr* bitcast ([3 x i8]* @str58 to [0 x i8]*))
+	%7 = call %Int @puts(%ConstCharStr* bitcast ([3 x i8]* @str61 to [0 x i8]*))
 	call void @exit(%Int -1)
 	ret void
 }
@@ -2220,21 +2207,21 @@ again_1:
 body_1:
 	%4 = load %Nat16, %Nat16* %1
 	%5 = load %Nat16, %Nat16* %1
-	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%6 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%7 = zext %Nat16 %5 to %Nat32
 	%8 = getelementptr [32 x %Word32], [32 x %Word32]* %6, %Int32 0, %Nat32 %7
 	%9 = load %Word32, %Word32* %8
-	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str59 to [0 x i8]*), %Nat16 %4, %Word32 %9)
-	%11 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str60 to [0 x i8]*))
+	%10 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([15 x i8]* @str62 to [0 x i8]*), %Nat16 %4, %Word32 %9)
+	%11 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([5 x i8]* @str63 to [0 x i8]*))
 	%12 = load %Nat16, %Nat16* %1
 	%13 = add %Nat16 %12, 16
 	%14 = load %Nat16, %Nat16* %1
 	%15 = add %Nat16 %14, 16
-	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 1
+	%16 = getelementptr %hart_Hart, %hart_Hart* %hart, %Int32 0, %Int32 0
 	%17 = zext %Nat16 %15 to %Nat32
 	%18 = getelementptr [32 x %Word32], [32 x %Word32]* %16, %Int32 0, %Nat32 %17
 	%19 = load %Word32, %Word32* %18
-	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([16 x i8]* @str61 to [0 x i8]*), %Nat16 %13, %Word32 %19)
+	%20 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([16 x i8]* @str64 to [0 x i8]*), %Nat16 %13, %Word32 %19)
 	%21 = load %Nat16, %Nat16* %1
 	%22 = add %Nat16 %21, 1
 	store %Nat16 %22, %Nat16* %1

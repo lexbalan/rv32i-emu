@@ -28,14 +28,14 @@ int main() {
 
 	hart_init(&hart, 0, &busctl);
 
-	printf("*** START ***\n");
+	printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
 	while (!hart.end) {
 		hart_tick(&hart);
 	}
 
-	printf("*** END ***\n");
-	printf("hart.cnt = %u\n", hart.cnt);
+	printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
+	printf("mcycle = %u\n", hart.csrs[csr_csr_mcycle_adr]);
 
 	printf("\nCore dump:\n");
 	hart_show_regs(&hart);

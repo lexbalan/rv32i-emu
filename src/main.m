@@ -2,6 +2,8 @@
 include "libc/stdlib"
 include "libc/stdio"
 
+include "hart/csr"
+
 import "bus"
 import "hart/hart" as rvHart
 
@@ -27,14 +29,14 @@ public func main () -> Int {
 
 	rvHart.init(&hart, 0, &busctl)
 
-	printf("*** START ***\n")
+	printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
 
 	while not hart.end {
 		rvHart.tick(&hart)
 	}
 
-	printf("*** END ***\n")
-	printf("hart.cnt = %u\n", hart.cnt)
+	printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")
+	printf("mcycle = %u\n", hart.csrs[Nat32 csr_mcycle_adr])
 
 	printf("\nCore dump:\n")
 	rvHart.show_regs(&hart)
