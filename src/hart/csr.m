@@ -33,3 +33,18 @@ public const csr_sip_adr = 0x144
 public const csr_satp_adr = 0x180
 
 
+
+// MISA fields
+public const csr_misa_a = Word32 1 << 0
+public const csr_misa_b = Word32 1 << 1
+public const csr_misa_c = Word32 1 << 2
+public const csr_misa_f = Word32 1 << 5
+public const csr_misa_i = Word32 1 << 8
+public const csr_misa_m = Word32 1 << 12
+public const csr_misa_s = Word32 1 << 18
+public const csr_misa_u = Word32 1 << 20
+public const csr_misa_x = Word32 1 << 23
+public const csr_misa_xlen_32 = Word32 1 << 30
+public const csr_misa_xlen_64 = Word32 2 << 30
+
+

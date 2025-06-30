@@ -28,7 +28,6 @@ struct hart_Hart {
 	uint32_t irq;
 
 	bool end;
-
 	uint32_t csrs[4096];
 };
 typedef struct hart_Hart hart_Hart;

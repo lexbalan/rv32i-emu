@@ -34,5 +34,16 @@
 #define csr_csr_stval_adr  0x143
 #define csr_csr_sip_adr  0x144
 #define csr_csr_satp_adr  0x180
+#define csr_csr_misa_a  (0x1 << 0)
+#define csr_csr_misa_b  (0x1 << 1)
+#define csr_csr_misa_c  (0x1 << 2)
+#define csr_csr_misa_f  (0x1 << 5)
+#define csr_csr_misa_i  (0x1 << 8)
+#define csr_csr_misa_m  (0x1 << 12)
+#define csr_csr_misa_s  (0x1 << 18)
+#define csr_csr_misa_u  (0x1 << 20)
+#define csr_csr_misa_x  (0x1 << 23)
+#define csr_csr_misa_xlen_32  (0x1 << 30)
+#define csr_csr_misa_xlen_64  (0x2 << 30)
 
 #endif /* CSR_H */

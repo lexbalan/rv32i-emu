@@ -44,16 +44,10 @@
 #define funct3_CSRRSI  5
 #define funct3_CSRRCI  6
 
-#define misa_xlen_32  (0x1 << 30)
-#define misa_xlen_64  (0x1 << 31)
-#define misa_i  (0x1 << 8)
-#define misa_m  (0x1 << 12)
-#define misa_val  (misa_xlen_32 | misa_i | misa_m)
-
 void hart_init(hart_Hart *hart, uint32_t id, hart_BusInterface *bus) {
 	printf("hart #%d init\n", id);
 	hart->csrs[csr_csr_mhartid_adr] = id;
-	hart->csrs[csr_csr_misa_adr] = misa_val;
+	hart->csrs[csr_csr_misa_adr] = csr_csr_misa_xlen_32 | csr_csr_misa_i | csr_csr_misa_m;
 	memset(&hart->regs, 0, sizeof(uint32_t[32]));
 	hart->pc = 0;
 	hart->bus = bus;

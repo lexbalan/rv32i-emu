@@ -23,7 +23,6 @@ public type Hart = record {
 	irq: Word32
 
 	public end: Bool
-
 	public csrs: [4096]Word32
 }
 
@@ -67,18 +66,10 @@ public const intSysCall = 0x08
 public const intMemViolation = 0x0B
 
 
-
-const misa_xlen_32 = Word32 1 << 30
-const misa_xlen_64 = Word32 1 << 31
-const misa_i = Word32 1 << 8
-const misa_m = Word32 1 << 12
-const misa_val = misa_xlen_32 or misa_i or misa_m
-
-
 public func init (hart: *Hart, id: Nat32, bus: *BusInterface) -> Unit {
 	printf("hart #%d init\n", id)
 	hart.csrs[Nat32 csr_mhartid_adr] = Word32 id
-	hart.csrs[Nat32 csr_misa_adr] = misa_val
+	hart.csrs[Nat32 csr_misa_adr] = csr_misa_xlen_32 or csr_misa_i or csr_misa_m
 	hart.regs = []
 	hart.pc = 0
 	hart.bus = bus
