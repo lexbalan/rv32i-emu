@@ -291,7 +291,6 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 		return
 	}
 
-
 	if funct3 == 0 and funct7 == 0x00 {
 		trace(hart.pc, "add x%d, x%d, x%d\n", rd, rs1, rs2)
 
@@ -366,7 +365,6 @@ func execR (hart: *Hart, instr: Word32) -> Unit {
 		//printf("=%08x (%08x, %08x)\n", hart.reg[rd], v0, v1)
 	}
 }
-
 
 
 // Load upper immediate
