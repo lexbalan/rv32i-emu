@@ -9,8 +9,7 @@
 #include "../sys/vm_sys.h"
 
 
-int main()
-{
+int main() {
 	printf("Hello World!\n");
 
 	asm("ecall");

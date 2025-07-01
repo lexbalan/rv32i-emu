@@ -28,11 +28,10 @@ char buf2[1024];
 uint32_t c0 = 8;
 uint32_t d0 = 2;
 
-void yyy();
+void doTests();
 
 
-int main()
-{
+int main() {
 	volatile int jj = 3;
 	int a = 3 * jj;
 	int b = 5;
@@ -61,7 +60,7 @@ int main()
 
 	test_crc32();
 
-	yyy();
+	doTests();
 
 	//mcpy(buf2, buf1, 1024);
 
@@ -196,7 +195,7 @@ static bool doTest(SHA256_TestCase *test) {
 	//return memcmp(&test_hash, &test->expected_result, sizeof(sha256_Hash)) == 0;
 }
 
-void yyy() {
+void doTests() {
 	doTest(&test0);
 	doTest(&test1);
 }

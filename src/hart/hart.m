@@ -69,7 +69,10 @@ public const intMemViolation = 0x0B
 public func init (hart: *Hart, id: Nat32, bus: *BusInterface) -> Unit {
 	printf("hart #%d init\n", id)
 	hart.csrs[Nat32 csr_mhartid_adr] = Word32 id
-	hart.csrs[Nat32 csr_misa_adr] = csr_misa_xlen_32 or csr_misa_i or csr_misa_m
+	hart.csrs[Nat32 csr_misa_adr] =
+		csr_misa_xlen_32 or
+		csr_misa_i or
+		csr_misa_m
 	hart.regs = []
 	hart.pc = 0
 	hart.bus = bus
