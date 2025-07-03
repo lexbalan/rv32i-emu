@@ -1,4 +1,3 @@
-
 include "libc/stdlib"
 include "libc/stdio"
 
@@ -32,7 +31,7 @@ public func main () -> Int {
 	printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n")
 
 	while not hart.end {
-		rvHart.tick(&hart)
+		rvHart.cycle(&hart)
 	}
 
 	printf("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n")

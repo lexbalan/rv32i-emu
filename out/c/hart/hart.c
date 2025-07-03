@@ -63,7 +63,7 @@ static inline uint32_t fetch(hart_Hart *hart) {
 static void trace(uint32_t pc, char *form, ...);
 static void exec(hart_Hart *hart, uint32_t instr);
 
-void hart_tick(hart_Hart *hart) {
+void hart_cycle(hart_Hart *hart) {
 	if (hart->irq != 0x0) {
 		trace(hart->pc, "\nINT #%02X\n", hart->irq);
 		const uint32_t vect_offset = hart->irq * 4;
@@ -628,27 +628,27 @@ static void csr_rc(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t rs1) {
 }
 
 // read+write immediate(5-bit)
-
-static void fatal(char *form, ...);
-
 static void csr_rwi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm) {
-	//TODO
-	//printf("RWI\n")
-	fatal("RWI not implemented\n");
+	const uint32_t imm32 = (uint32_t)imm;
+	//printf("CSR_RWI(csr=0x%X, rd=r%d, imm=%0x%X)\n", csr, rd, imm32)
+	hart->regs[rd] = hart->csrs[csr];
+	hart->csrs[csr] = imm32;
 }
 
 // read+clear immediate(5-bit)
 static void csr_rsi(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm) {
-	//TODO
-	//printf("RSI\n")
-	fatal("RSI not implemented\n");
+	const uint32_t imm32 = (uint32_t)imm;
+	//printf("CSR_RSI(csr=0x%X, rd=r%d, imm=%0x%X)\n", csr, rd, imm32)
+	hart->regs[rd] = hart->csrs[csr];
+	hart->csrs[csr] = hart->csrs[csr] | imm32;
 }
 
 // read+clear immediate(5-bit)
 static void csr_rci(hart_Hart *hart, uint16_t csr, uint8_t rd, uint8_t imm) {
-	//TODO
-	//printf("RCI\n")
-	fatal("RCI not implemented\n");
+	const uint32_t imm32 = (uint32_t)imm;
+	//printf("CSR_RCI(csr=0x%X, rd=r%d, imm=%0x%X)\n", csr, rd, imm32)
+	hart->regs[rd] = hart->csrs[csr];
+	hart->csrs[csr] = hart->csrs[csr] & ~imm32;
 }
 
 static void trace(uint32_t pc, char *form, ...) {

@@ -2,18 +2,21 @@
 INDIR=./src
 OUTDIR=./out
 
-.PHONY: C LLVM CM clean
+.PHONY: all C LLVM CM clean
 
 # output dir prefix
 CMPREFIX=$(OUTDIR)/cm/
 CPREFIX=$(OUTDIR)/c/
 LLVMPREFIX = $(OUTDIR)/llvm/
 
-COPTIONS = --include=$(CPREFIX)/include
+CM_OPTS = -funsafe
+
+C_OPTIONS = -I$(CPREFIX)/include -I$(CPREFIX)/hart
+
+
 
 all: LLVM
 
-CM_OPTS = -funsafe  # -fparanoid
 
 LLVM:
 	mcc -o $(LLVMPREFIX)/main $(CM_OPTS) -mbackend=llvm $(INDIR)/main.m
@@ -21,7 +24,12 @@ LLVM:
 	mcc -o $(LLVMPREFIX)/hart/decode $(CM_OPTS) -mbackend=llvm $(INDIR)/hart/decode.m
 	mcc -o $(LLVMPREFIX)/bus $(CM_OPTS) -mbackend=llvm $(INDIR)/bus.m
 	mcc -o $(LLVMPREFIX)/mmio $(CM_OPTS) -mbackend=llvm $(INDIR)/mmio.m
-	clang $(LLVMPREFIX)/main.ll $(LLVMPREFIX)/hart/hart.ll $(LLVMPREFIX)/hart/decode.ll $(LLVMPREFIX)/bus.ll $(LLVMPREFIX)/mmio.ll
+	clang \
+		$(LLVMPREFIX)/main.ll \
+		$(LLVMPREFIX)/hart/hart.ll \
+		$(LLVMPREFIX)/hart/decode.ll \
+		$(LLVMPREFIX)/bus.ll \
+		$(LLVMPREFIX)/mmio.ll
 
 
 CM:
@@ -40,7 +48,12 @@ C:
 	mcc -o $(CPREFIX)/hart/decode $(CM_OPTS) -mbackend=c $(CM_OPTS) $(INDIR)/hart/decode.m
 	mcc -o $(CPREFIX)/bus $(CM_OPTS) $(CM_OPTS) -mbackend=c $(INDIR)/bus.m
 	mcc -o $(CPREFIX)/mmio $(CM_OPTS) $(CM_OPTS) -mbackend=c $(INDIR)/mmio.m
-	CC -I$(CPREFIX)/include $(CPREFIX)/main.c $(CPREFIX)/hart/hart.c $(CPREFIX)/hart/decode.c $(CPREFIX)/bus.c $(CPREFIX)/mmio.c
+	CC $(C_OPTIONS) \
+		$(CPREFIX)/main.c \
+		$(CPREFIX)/hart/hart.c \
+		$(CPREFIX)/hart/decode.c \
+		$(CPREFIX)/bus.c \
+		$(CPREFIX)/mmio.c
 
 
 clean:

@@ -82,7 +82,7 @@ func fetch (hart: *Hart) -> Word32 {
 }
 
 
-public func tick (hart: *Hart) -> Unit {
+public func cycle (hart: *Hart) -> Unit {
 	if hart.irq != 0 {
 		trace(hart.pc, "\nINT #%02X\n", hart.irq)
 		let vect_offset: Nat32 = Nat32 hart.irq * 4
@@ -641,25 +641,28 @@ func csr_rc (hart: *Hart, csr: Nat16, rd: Nat8, rs1: Nat8) -> Unit {
 
 // read+write immediate(5-bit)
 func csr_rwi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
-	//TODO
-	//printf("RWI\n")
-	fatal("RWI not implemented\n")
+	let imm32 = Word32 imm
+	//printf("CSR_RWI(csr=0x%X, rd=r%d, imm=%0x%X)\n", csr, rd, imm32)
+	hart.regs[rd] = hart.csrs[csr]
+	hart.csrs[csr] = imm32
 }
 
 
 // read+clear immediate(5-bit)
 func csr_rsi (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
-	//TODO
-	//printf("RSI\n")
-	fatal("RSI not implemented\n")
+	let imm32 = Word32 imm
+	//printf("CSR_RSI(csr=0x%X, rd=r%d, imm=%0x%X)\n", csr, rd, imm32)
+	hart.regs[rd] = hart.csrs[csr]
+	hart.csrs[csr] = hart.csrs[csr] or imm32
 }
 
 
 // read+clear immediate(5-bit)
 func csr_rci (hart: *Hart, csr: Nat16, rd: Nat8, imm: Nat8) -> Unit {
-	//TODO
-	//printf("RCI\n")
-	fatal("RCI not implemented\n")
+	let imm32 = Word32 imm
+	//printf("CSR_RCI(csr=0x%X, rd=r%d, imm=%0x%X)\n", csr, rd, imm32)
+	hart.regs[rd] = hart.csrs[csr]
+	hart.csrs[csr] = hart.csrs[csr] and not imm32
 }
 
 

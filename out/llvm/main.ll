@@ -344,7 +344,7 @@ declare %Int32 @decode_expand20(%Word32 %val_20bit)
 };
 
 declare void @hart_init(%hart_Hart* %hart, %Nat32 %id, %hart_BusInterface* %bus)
-declare void @hart_tick(%hart_Hart* %hart)
+declare void @hart_cycle(%hart_Hart* %hart)
 declare void @hart_show_regs(%hart_Hart* %hart)
 
 ; end from import "rvHart"
@@ -384,7 +384,7 @@ again_1:
 	%11 = xor %Bool %10, 1
 	br %Bool %11 , label %body_1, label %break_1
 body_1:
-	call void @hart_tick(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
+	call void @hart_cycle(%hart_Hart* bitcast (%hart_Hart* @hart to %hart_Hart*))
 	br label %again_1
 break_1:
 	%12 = call %Int (%ConstCharStr*, ...) @printf(%ConstCharStr* bitcast ([82 x i8]* @str4 to [0 x i8]*))
